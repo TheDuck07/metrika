@@ -1,0 +1,9 @@
+{
+  "appId": "bo.metrika.app",
+  "appName": "Metrika",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}
+

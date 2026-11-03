@@ -1,0 +1,6 @@
+{
+  "name": "Metrika",
+  "description": "Sistema de gestión y control diario de ventas, compras, inventario y balance en tiempo real para tienditas y almacenes de Bolivia.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

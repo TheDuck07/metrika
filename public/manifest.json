@@ -1,0 +1,26 @@
+{
+  "name": "Metrika - Control Total de tu Tienda",
+  "short_name": "Metrika",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#241a16",
+  "theme_color": "#bd532b",
+  "description": "Sistema de gestión y control diario de ventas, compras, inventario y balance en tiempo real para negocios y tienditas de Bolivia.",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
+

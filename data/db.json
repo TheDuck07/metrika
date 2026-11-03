@@ -1,0 +1,196 @@
+{
+  "users": [
+    {
+      "id": "user-demo",
+      "name": "Doña María Mendoza R.",
+      "storeName": "Tienda Don Lucho",
+      "phone": "77234567",
+      "email": "donlucho@metrika.bo",
+      "pin": "1234",
+      "authProvider": "local",
+      "avatarUrl": "",
+      "createdAt": "2026-11-03T15:53:58.807Z"
+    },
+    {
+      "id": "usr_5c97722a-7fe1-42cd-b46b-cca391b29521",
+      "name": "Mantecado",
+      "storeName": "Restaurante Mantecado",
+      "phone": "70355237",
+      "pin": "1234",
+      "authProvider": "local",
+      "createdAt": "2026-11-03T18:14:56.665Z"
+    }
+  ],
+  "sessions": [
+    {
+      "token": "tok_c2644dbc-b99b-4697-8f34-963953263454",
+      "userId": "usr_5c97722a-7fe1-42cd-b46b-cca391b29521",
+      "createdAt": "2026-11-03T18:14:56.665Z"
+    },
+    {
+      "token": "tok_9e6cb5ec-6e66-4a63-a3d3-b76e9c5da9e2",
+      "userId": "user-demo",
+      "createdAt": "2026-11-03T18:56:16.244Z"
+    }
+  ],
+  "storesData": {
+    "usr_5c97722a-7fe1-42cd-b46b-cca391b29521": {
+      "storeInfo": {
+        "name": "Restaurante Mantecado",
+        "owner": "Mantecado",
+        "phone": "70355237",
+        "city": "La Paz - San Pedro",
+        "type": "Restaurante"
+      },
+      "products": [],
+      "transactions": [],
+      "updatedAt": "2026-11-03T18:14:57.181Z"
+    },
+    "user-demo": {
+      "storeInfo": {
+        "name": "Tienda Don Lucho",
+        "owner": "Doña María Mendoza R.",
+        "phone": "77234567",
+        "city": "La Paz - San Pedro",
+        "type": "Barrio"
+      },
+      "products": [
+        {
+          "id": "prod-1",
+          "name": "Tomate perita de feria",
+          "category": "Verduras / Frutas",
+          "price": 8,
+          "cost": 5.5,
+          "stock": 12.5,
+          "unit": "kg",
+          "minStock": 5,
+          "icon": "nutrition",
+          "badgeColor": "#e11d48"
+        },
+        {
+          "id": "prod-2",
+          "name": "Carne de res molida especial",
+          "category": "Carnes",
+          "price": 38,
+          "cost": 29,
+          "stock": 6,
+          "unit": "kg",
+          "minStock": 8,
+          "icon": "restaurant",
+          "badgeColor": "#dc2626"
+        },
+        {
+          "id": "prod-3",
+          "name": "Leche Pil Entera (1L)",
+          "category": "Lácteos",
+          "price": 6.5,
+          "cost": 4.8,
+          "stock": 25,
+          "unit": "L",
+          "minStock": 10,
+          "icon": "water_drop",
+          "badgeColor": "#2563eb"
+        },
+        {
+          "id": "prod-4",
+          "name": "Coca-Cola 2L Retornable",
+          "category": "Refrescos",
+          "price": 14,
+          "cost": 11,
+          "stock": 18,
+          "unit": "ud",
+          "minStock": 10,
+          "icon": "local_drink",
+          "badgeColor": "#b91c1c"
+        },
+        {
+          "id": "prod-5",
+          "name": "Arroz Grano de Oro 1kg",
+          "category": "Abarrotes",
+          "price": 9.5,
+          "cost": 7.2,
+          "stock": 42,
+          "unit": "kg",
+          "minStock": 15,
+          "icon": "grain",
+          "badgeColor": "#d97706"
+        },
+        {
+          "id": "prod-6",
+          "name": "Aceite Fino 900ml",
+          "category": "Abarrotes",
+          "price": 13,
+          "cost": 10.2,
+          "stock": 15,
+          "unit": "ud",
+          "minStock": 8,
+          "icon": "oil_barrel",
+          "badgeColor": "#eab308"
+        }
+      ],
+      "transactions": [
+        {
+          "id": "tx-1",
+          "type": "venta",
+          "category": "Bebidas",
+          "title": "3 uds. Coca-Cola 500 ml",
+          "detail": "Bebidas",
+          "amount": 18,
+          "date": "2026-11-03",
+          "time": "11:42 AM"
+        },
+        {
+          "id": "tx-2",
+          "type": "venta",
+          "category": "Lácteos",
+          "title": "5 uds. Pilfrut",
+          "detail": "Lácteos",
+          "amount": 10,
+          "date": "2026-11-03",
+          "time": "10:15 AM"
+        },
+        {
+          "id": "tx-3",
+          "type": "compra",
+          "category": "Abarrotes",
+          "title": "20 uds. Lata de atún",
+          "detail": "Abarrotes",
+          "amount": 250,
+          "date": "2026-11-03",
+          "time": "08:30 AM"
+        },
+        {
+          "id": "tx-4",
+          "type": "gasto",
+          "category": "Servicio eléctrico local",
+          "title": "Gasto Luz mensual",
+          "detail": "Servicio eléctrico local",
+          "amount": 40,
+          "date": "2026-11-02",
+          "time": "06:10 PM"
+        },
+        {
+          "id": "tx-5",
+          "type": "venta",
+          "category": "Lácteos",
+          "title": "3 uds. Leche PIL natural",
+          "detail": "Lácteos",
+          "amount": 21,
+          "date": "2026-11-02",
+          "time": "03:22 PM"
+        },
+        {
+          "id": "tx-6",
+          "type": "venta",
+          "category": "Panadería fresca",
+          "title": "8 uds. Pan de batalla",
+          "detail": "Panadería fresca",
+          "amount": 8,
+          "date": "2026-11-02",
+          "time": "07:15 AM"
+        }
+      ],
+      "updatedAt": "2026-11-03T18:56:16.950Z"
+    }
+  }
+}

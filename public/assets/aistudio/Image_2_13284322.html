@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Metrika - Hola al control total</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              terracotta: '#bd532b',
+              'terracotta-dark': '#a3421e',
+              'terracotta-light': '#cf643c',
+              cream: '#fceede',
+              'cream-card': '#fbf0e4',
+              sand: '#f5dec7',
+              dark: '#2c1e19',
+              muted: '#7a5a4e'
+            }
+          },
+          fontFamily: {
+            display: ['Outfit', 'sans-serif'],
+            body: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          borderRadius: {
+            '4xl': '2.5rem',
+            '5xl': '3rem',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="base-styling">
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .font-brand-display {
+      font-family: 'Outfit', sans-serif;
+    }
+    .pill-input {
+      transition: all 0.2s ease;
+    }
+    .pill-input:focus-within {
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45);
+      border-color: #ffffff;
+    }
+    /* Estilos de animación para modal y toast */
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .modal-sheet-enter {
+      animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .fade-enter {
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="bg-[#241a16] flex justify-center items-center min-h-screen p-0 sm:p-4 select-none">
+<!-- BEGIN: MobileContainer -->
+<div class="relative w-full max-w-[414px] min-h-[896px] bg-[#bd532b] flex flex-col justify-between overflow-hidden shadow-2xl sm:rounded-[46px] border-0 sm:border-[8px] sm:border-stone-800" data-purpose="mobile-viewport">
+<!-- Toast de Notificación Flotante -->
+<div class="fixed sm:absolute top-5 left-1/2 -translate-x-1/2 w-[90%] max-w-[370px] z-50 transform -translate-y-20 opacity-0 pointer-events-none transition-all duration-300 ease-out bg-[#2c1e19]/95 text-white backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/15 flex items-center gap-3" id="toast-notification">
+<div class="w-10 h-10 rounded-full bg-[#fceede] text-[#bd532b] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-2xl font-bold" id="toast-icon">check_circle</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-sm leading-tight text-[#fceede]" id="toast-title">¡Ingreso Exitoso!</h4>
+<p class="text-xs text-white/85 mt-0.5" id="toast-msg">Abriendo tu tienda...</p>
+</div>
+</div>
+<!-- BEGIN: TopBarSection -->
+<header aria-label="Barra de estado" class="w-full pt-3 px-7 flex justify-between items-center text-white/90 z-20">
+<div aria-hidden="true" class="flex items-center space-x-1.5">
+<span class="w-2.5 h-2.5 bg-white rounded-full"></span>
+<span class="w-2.5 h-2.5 bg-white rounded-full"></span>
+<span class="w-2.5 h-2.5 bg-white rounded-full"></span>
+</div>
+<div class="flex items-center space-x-2 text-xs font-semibold tracking-wider opacity-90">
+<span>4G</span>
+<svg class="w-4 h-4 fill-current inline-block" viewbox="0 0 24 24">
+<path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 18.25c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l.73-.73C8.03 19.9 9.93 21 12 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 2c3.87 0 7 3.13 7 7 0 1.63-.56 3.13-1.5 4.34l-9.84-9.84C8.87 5.56 10.37 5 12 5zm-7 7c0-1.63.56-3.13 1.5-4.34l9.84 9.84c-1.21.94-2.71 1.5-4.34 1.5-3.87 0-7-3.13-7-7z"></path>
+</svg>
+<span class="text-sm font-medium">9:41</span>
+</div>
+</header>
+<!-- END: TopBarSection -->
+<!-- BEGIN: BrandHeroSection -->
+<section aria-label="Identidad de marca" class="flex flex-col items-center justify-center pt-1 pb-3 px-6 text-center z-10">
+<!-- Círculo crema con icono representativo de Tiendita -->
+<div class="relative w-40 h-40 sm:w-44 sm:h-44 rounded-full bg-[#fceede] flex items-center justify-center shadow-lg mb-3 transition-transform hover:scale-105 duration-300">
+<svg aria-label="Icono de tiendita de barrio Metrika" class="w-28 h-28 sm:w-30 sm:h-30 fill-[#bd532b]" role="img" viewbox="0 0 100 100">
+<path d="M 28 20 C 24 20 22 25 21 29 L 16 38 C 14 43 17 48 22 48 C 26 48 28 44 31 40 C 34 44 38 48 43 48 C 47 48 50 44 53 40 C 56 44 60 48 65 48 C 69 48 72 44 75 40 C 78 44 82 48 87 48 C 91 48 94 43 92 38 L 87 29 C 86 25 84 20 80 20 Z"></path>
+<path d="M 24 45 L 24 74 L 84 74 L 84 45 C 81 47 77 48 74 48 C 69 48 65 45 63 43 C 60 45 56 48 51 48 C 46 48 43 45 40 43 C 37 45 33 48 29 48 C 27 48 25 47 24 45 Z M 31 54 L 77 54 L 77 68 L 31 68 Z"></path>
+<rect height="6.5" rx="3.25" width="78" x="15" y="74"></rect>
+</svg>
+</div>
+<h1 class="text-4xl sm:text-5xl font-black tracking-tight text-white font-brand-display mb-1 drop-shadow-sm">
+  Metrika
+</h1>
+<p class="text-white/95 text-xs sm:text-sm font-bold tracking-[0.22em] uppercase mb-2">
+  HOLA AL CONTROL TOTAL
+</p>
+<div class="inline-flex items-center gap-1.5 px-3 py-1 bg-black/15 backdrop-blur-sm rounded-full text-white/90 text-[11px] font-medium border border-white/10 mb-1">
+<span>🇧🇴 Hecho para tienditas y almacenes de Bolivia</span>
+</div>
+</section>
+<!-- END: BrandHeroSection -->
+<!-- BEGIN: FormAndActionSection -->
+<main class="w-full flex flex-col justify-end">
+<!-- Botón Destacado de Entrada Rápida / Sin Contraseña -->
+<div class="px-7 mb-3">
+<button class="group relative w-full bg-gradient-to-r from-[#ffe4cb] to-[#fceede] hover:from-[#ffeedf] hover:to-[#fff5ea] active:scale-[0.98] transition-all text-[#2c1e19] rounded-2xl p-3 shadow-lg border border-white/40 flex items-center justify-between text-left" id="btn-quick-login" type="button">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-[#bd532b] text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-2xl font-bold">bolt</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="text-sm font-black text-[#bd532b] uppercase tracking-wider">Entrada Rápida</span>
+<span class="bg-[#bd532b]/15 text-[#bd532b] text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">Sin clave</span>
+</div>
+<p class="text-xs font-bold text-[#3d271e]">Entrar como Don Lucho (Demo)</p>
+</div>
+</div>
+<div class="w-8 h-8 rounded-full bg-white/70 flex items-center justify-center text-[#bd532b] group-hover:translate-x-0.5 transition-transform">
+<span class="material-symbols-outlined text-xl">arrow_forward</span>
+</div>
+</button>
+</div>
+<!-- Campos de acceso rápido situados sobre el fondo terracota -->
+<div class="px-7 space-y-2.5 mb-4" data-purpose="credentials-form">
+<!-- Campo: Celular o Correo -->
+<div class="pill-input relative flex items-center bg-transparent border-2 border-white/90 rounded-full h-13 py-2 px-4 shadow-sm">
+<div class="flex items-center pl-1 pr-2 text-white/90">
+<svg class="w-5 h-5 fill-current" viewbox="0 0 20 20">
+<path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<input autocomplete="username" class="w-full bg-transparent border-none text-white placeholder-white/75 text-sm sm:text-base font-normal focus:ring-0 focus:outline-none px-2" id="user-identity" name="identity" placeholder="Email o teléfono (ej. 77012345)" type="text"/>
+</div>
+<!-- Campo: Contraseña o PIN -->
+<div class="pill-input relative flex items-center bg-transparent border-2 border-white/90 rounded-full h-13 py-2 px-4 shadow-sm">
+<div class="flex items-center pl-1 pr-2 text-white/90">
+<svg class="w-5 h-5 fill-current" viewbox="0 0 20 20">
+<path clip-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<input class="w-full bg-transparent border-none text-white placeholder-white/75 text-sm sm:text-base font-normal focus:ring-0 focus:outline-none px-2" id="password-input" name="password" placeholder="Contraseña o PIN de 4 dígitos" type="password"/>
+<button aria-label="Ver u ocultar contraseña" class="text-white/80 hover:text-white p-1.5 focus:outline-none" data-purpose="password-visibility-toggle" id="toggle-password" type="button">
+<svg class="w-5 h-5 fill-current" id="eye-icon" viewbox="0 0 20 20">
+<path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+<path clip-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" fill-rule="evenodd"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- BEGIN: BottomSheetCard -->
+<section aria-label="Acciones de cuenta" class="bg-[#fceede] rounded-t-[2.5rem] pt-5 pb-5 px-7 flex flex-col items-center shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.15)] text-center">
+<!-- Enlace de recuperación -->
+<a class="text-[#7d503f] hover:text-[#bd532b] text-[13px] font-medium tracking-tight mb-3 transition-colors" href="#recuperar">
+  ¿Te olvidaste tu contraseña o PIN?
+</a>
+<!-- Botón Primario: Iniciar Sesión -->
+<button class="w-full h-13 py-3.5 bg-[#bd532b] hover:bg-[#a94822] active:scale-[0.98] text-white text-base sm:text-lg font-bold rounded-full flex items-center justify-center shadow-md shadow-[#bd532b]/30 transition-all mb-2.5 tracking-wide" id="btn-login" type="button">
+  Iniciar
+</button>
+<!-- Separador 'o' minimalista -->
+<div aria-hidden="true" class="relative w-full flex items-center justify-center my-0.5">
+<span class="text-[#8e6858] text-xs font-semibold px-2">o</span>
+</div>
+<!-- Botón Secundario: Abrir Modal Crear Cuenta -->
+<button class="w-full h-13 py-3.5 bg-transparent border-2 border-[#df9d83] hover:border-[#bd532b] hover:bg-[#fae7d4] active:scale-[0.98] text-[#2c1d17] text-base font-bold rounded-full flex items-center justify-center transition-all mt-1.5" id="btn-open-register" type="button">
+  Crear cuenta
+</button>
+<!-- Acceso alternativo WhatsApp -->
+<div class="mt-3.5 pt-0.5 flex items-center justify-center gap-1.5 text-[12px] text-[#714d3e]">
+<svg class="w-4 h-4 text-emerald-600 fill-current" viewbox="0 0 24 24">
+<path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.699c.969.54 1.83.824 2.796.824 3.182 0 5.768-2.587 5.768-5.766.001-3.182-2.585-5.77-5.768-5.77zm0 10.378c-.859 0-1.703-.231-2.439-.668l-.175-.104-1.81.475.483-1.765-.114-.182a4.675 4.675 0 0 1-.718-2.568c.001-2.597 2.115-4.71 4.773-4.71 2.599 0 4.713 2.113 4.713 4.712s-2.114 4.81-4.713 4.81z"></path>
+</svg>
+<a class="font-semibold text-[#bd532b] underline underline-offset-2 hover:text-[#9f3c16]" href="#whatsapp-login">
+  Ingreso rápido con WhatsApp
+</a>
+</div>
+<!-- Garantía de seguridad y modo offline -->
+<div class="mt-3 flex items-center text-[10.5px] text-[#8e6858] tracking-tight gap-1.5">
+<svg class="w-3.5 h-3.5 text-emerald-700" fill="currentColor" viewbox="0 0 20 20">
+<path clip-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path>
+</svg>
+<span>Funciona sin internet permanente • Datos seguros</span>
+</div>
+<!-- Indicador de barra inferior (Home Indicator de iOS) -->
+<div aria-hidden="true" class="w-32 h-1 bg-[#d6b79f] rounded-full mt-3.5"></div>
+</section>
+<!-- END: BottomSheetCard -->
+</main>
+<!-- END: FormAndActionSection -->
+<!-- BEGIN: Modal Registro de Tienda -->
+<div class="hidden fixed sm:absolute inset-0 z-50 flex items-end sm:items-center justify-center" id="modal-register">
+<!-- Backdrop desenfocado -->
+<div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" id="modal-backdrop"></div>
+<!-- Contenedor del Modal Bottom Sheet -->
+<div class="relative w-full max-w-[414px] bg-[#fff8f5] rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl z-10 modal-sheet-enter border-t border-amber-100 max-h-[92vh] overflow-y-auto">
+<!-- Manija superior móvil -->
+<div class="w-12 h-1.5 bg-[#dec0b7] rounded-full mx-auto mb-4 sm:hidden"></div>
+<!-- Encabezado del modal con botón cerrar 'X' -->
+<div class="flex items-center justify-between pb-3 border-b border-[#dec0b7]/40 mb-4">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-full bg-[#fceede] flex items-center justify-center text-[#bd532b]">
+<span class="material-symbols-outlined text-xl">storefront</span>
+</div>
+<div>
+<h3 class="font-extrabold text-lg text-[#2c1e19] leading-tight">Crear cuenta en Metrika</h3>
+<p class="text-xs text-[#8e6858]">Registra tu tiendita en 1 minuto</p>
+</div>
+</div>
+<button class="w-8 h-8 rounded-full bg-[#eae1dd]/60 hover:bg-[#eae1dd] text-[#57423b] flex items-center justify-center transition-colors" id="btn-close-modal" type="button">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+<!-- Formulario simplificado para tiendas bolivianas -->
+<form class="space-y-3.5" id="form-register" onsubmit="event.preventDefault();">
+<!-- Nombre de la tienda -->
+<div>
+<label class="block text-xs font-bold text-[#57423b] mb-1" for="reg-shop-name">Nombre de la tienda</label>
+<div class="flex items-center bg-[#f5ece8] rounded-2xl px-3.5 py-2.5 border border-[#dec0b7] focus-within:border-[#bd532b] focus-within:ring-2 focus-within:ring-[#bd532b]/20">
+<span class="material-symbols-outlined text-[#8a726a] text-lg mr-2">store</span>
+<input class="w-full bg-transparent text-sm text-[#1f1b19] placeholder-[#8a726a]/70 border-none p-0 focus:ring-0 focus:outline-none font-medium" id="reg-shop-name" placeholder="Ej: Tienda Don Lucho / Abarrotes Mary" type="text"/>
+</div>
+</div>
+<!-- Nombre del dueño -->
+<div>
+<label class="block text-xs font-bold text-[#57423b] mb-1" for="reg-owner-name">Nombre del dueño / comerciante</label>
+<div class="flex items-center bg-[#f5ece8] rounded-2xl px-3.5 py-2.5 border border-[#dec0b7] focus-within:border-[#bd532b] focus-within:ring-2 focus-within:ring-[#bd532b]/20">
+<span class="material-symbols-outlined text-[#8a726a] text-lg mr-2">person</span>
+<input class="w-full bg-transparent text-sm text-[#1f1b19] placeholder-[#8a726a]/70 border-none p-0 focus:ring-0 focus:outline-none font-medium" id="reg-owner-name" placeholder="Ej: Doña María Mendoza" type="text"/>
+</div>
+</div>
+<!-- Celular / WhatsApp -->
+<div>
+<label class="block text-xs font-bold text-[#57423b] mb-1" for="reg-phone">Celular / WhatsApp (Bolivia)</label>
+<div class="flex items-center bg-[#f5ece8] rounded-2xl px-3.5 py-2.5 border border-[#dec0b7] focus-within:border-[#bd532b] focus-within:ring-2 focus-within:ring-[#bd532b]/20">
+<span class="text-xs font-bold text-[#bd532b] mr-2">🇧🇴 +591</span>
+<input class="w-full bg-transparent text-sm text-[#1f1b19] placeholder-[#8a726a]/70 border-none p-0 focus:ring-0 focus:outline-none font-medium" id="reg-phone" placeholder="77012345" type="tel"/>
+</div>
+</div>
+<!-- PIN de 4 dígitos -->
+<div>
+<label class="block text-xs font-bold text-[#57423b] mb-1" for="reg-pin">Crear PIN fácil de 4 números</label>
+<div class="flex items-center bg-[#f5ece8] rounded-2xl px-3.5 py-2.5 border border-[#dec0b7] focus-within:border-[#bd532b] focus-within:ring-2 focus-within:ring-[#bd532b]/20">
+<span class="material-symbols-outlined text-[#8a726a] text-lg mr-2">pin</span>
+<input class="w-full bg-transparent text-sm text-[#1f1b19] placeholder-[#8a726a]/70 border-none p-0 focus:ring-0 focus:outline-none font-medium tracking-widest" id="reg-pin" maxlength="4" placeholder="Ej: 1234" type="password"/>
+</div>
+<p class="text-[10.5px] text-[#8e6858] mt-1">Con este PIN podrás ingresar rápido sin recordar contraseñas largas.</p>
+</div>
+<!-- Botones de Acción dentro del modal -->
+<div class="pt-2 space-y-2">
+<button class="w-full h-12 bg-[#bd532b] hover:bg-[#a3421e] active:scale-[0.98] text-white font-bold text-sm rounded-full flex items-center justify-center gap-2 shadow-md shadow-[#bd532b]/25 transition-all" id="btn-submit-register" type="button">
+<span class="material-symbols-outlined text-lg">check_circle</span>
+          Registrar mi tienda gratis
+        </button>
+<button class="w-full h-10 bg-transparent text-[#8e6858] hover:text-[#2c1e19] text-xs font-bold rounded-full flex items-center justify-center transition-colors" id="btn-cancel-modal" type="button">
+          Ya tengo cuenta / Cancelar
+        </button>
+</div>
+</form>
+</div>
+</div>
+<!-- END: Modal Registro de Tienda -->
+</div>
+<!-- END: MobileContainer -->
+<!-- BEGIN: InteractiveScripts -->
+<script data-purpose="metrika-interactions">
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Alternador de visibilidad de contraseña
+    const toggleBtn = document.getElementById('toggle-password');
+    const passwordField = document.getElementById('password-input');
+    const eyeIcon = document.getElementById('eye-icon');
+
+    if (toggleBtn && passwordField) {
+      toggleBtn.addEventListener('click', () => {
+        const isPassword = passwordField.type === 'password';
+        passwordField.type = isPassword ? 'text' : 'password';
+        if (isPassword) {
+          eyeIcon.innerHTML = `
+            <path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd" />
+            <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
+          `;
+        } else {
+          eyeIcon.innerHTML = `
+            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" fill-rule="evenodd" />
+          `;
+        }
+      });
+    }
+
+    // 2. Sistema de Toast para feedback visual
+    const toast = document.getElementById('toast-notification');
+    const toastTitle = document.getElementById('toast-title');
+    const toastMsg = document.getElementById('toast-msg');
+    const toastIcon = document.getElementById('toast-icon');
+
+    function showToast(title, message, icon = 'check_circle') {
+      if (!toast) return;
+      toastTitle.textContent = title;
+      toastMsg.textContent = message;
+      toastIcon.textContent = icon;
+      
+      toast.classList.remove('opacity-0', '-translate-y-20', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-20', 'pointer-events-none');
+      }, 3500);
+    }
+
+    // 3. Botón de Entrada Rápida (Sin contraseña / Demo Don Lucho)
+    const quickLoginBtn = document.getElementById('btn-quick-login');
+    if (quickLoginBtn) {
+      quickLoginBtn.addEventListener('click', () => {
+        quickLoginBtn.classList.add('ring-2', 'ring-white', 'scale-[0.98]');
+        showToast('¡Bienvenido de nuevo, Don Lucho!', 'Abriendo tu tienda "Abarrotes Don Lucho"...', 'bolt');
+        setTimeout(() => {
+          quickLoginBtn.classList.remove('ring-2', 'ring-white', 'scale-[0.98]');
+        }, 1500);
+      });
+    }
+
+    // 4. Botón Iniciar Sesión Tradicional
+    const loginBtn = document.getElementById('btn-login');
+    const userInput = document.getElementById('user-identity');
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => {
+        if (userInput && !userInput.value.trim()) {
+          // Si está vacío, llena amigablemente o invita a entrar
+          userInput.value = "77012345";
+          userInput.parentElement.classList.add('animate-pulse');
+          setTimeout(() => userInput.parentElement.classList.remove('animate-pulse'), 800);
+          showToast('¡Bienvenido a Metrika!', 'Ingresando como Tienda 77012345...', 'storefront');
+        } else {
+          loginBtn.textContent = 'Ingresando...';
+          showToast('¡Bienvenido a Metrika!', 'Abriendo el panel de control...', 'check_circle');
+          setTimeout(() => {
+            loginBtn.textContent = 'Iniciar';
+          }, 1500);
+        }
+      });
+    }
+
+    // 5. Manejo del Modal de "Crear Cuenta"
+    const modal = document.getElementById('modal-register');
+    const btnOpenRegister = document.getElementById('btn-open-register');
+    const btnCloseModal = document.getElementById('btn-close-modal');
+    const btnCancelModal = document.getElementById('btn-cancel-modal');
+    const backdrop = document.getElementById('modal-backdrop');
+    const btnSubmitRegister = document.getElementById('btn-submit-register');
+    const shopNameInput = document.getElementById('reg-shop-name');
+
+    function openModal() {
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeModal() {
+      if (!modal) return;
+      modal.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    if (btnOpenRegister) btnOpenRegister.addEventListener('click', openModal);
+    if (btnCloseModal) btnCloseModal.addEventListener('click', closeModal);
+    if (btnCancelModal) btnCancelModal.addEventListener('click', closeModal);
+    if (backdrop) backdrop.addEventListener('click', closeModal);
+
+    // Registro exitoso dentro del Modal
+    if (btnSubmitRegister) {
+      btnSubmitRegister.addEventListener('click', () => {
+        const name = shopNameInput && shopNameInput.value.trim() ? shopNameInput.value.trim() : 'Tu Tienda';
+        closeModal();
+        showToast('¡Cuenta creada con éxito!', `¡Bienvenido a Metrika, ${name}!`, 'celebration');
+        if (shopNameInput) shopNameInput.value = '';
+      });
+    }
+  });
+</script>
+<!-- END: InteractiveScripts -->
+</body></html>
