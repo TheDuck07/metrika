@@ -127,7 +127,9 @@ export const VoiceRecorderModal: React.FC<VoiceRecorderModalProps> = ({ isOpen, 
         console.warn('Speech recognition error:', event.error);
         setIsListening(false);
         if (event.error === 'not-allowed') {
-          showToast('Permiso de micrófono denegado. Puedes escribir la frase abajo.', 'info');
+          showToast('Permiso de micrófono denegado. Puedes escribir o tocar los ejemplos abajo.', 'info');
+        } else if (event.error === 'network') {
+          showToast('Reconocimiento por voz offline: Escribe o toca los ejemplos rápidos abajo.', 'info');
         }
       };
 
@@ -169,55 +171,63 @@ export const VoiceRecorderModal: React.FC<VoiceRecorderModalProps> = ({ isOpen, 
     }
   };
 
-  // Process text using Gemini endpoint first, fallback to local NLP
+  // Process text using Gemini endpoint first (if online), fallback to local NLP
   const processVoiceText = async (textToProcess: string) => {
     if (!textToProcess.trim()) return;
     setIsProcessing(true);
 
-    try {
-      // 1. Try server Gemini endpoint
-      const response = await fetch('/api/parse-voice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: textToProcess,
-          inventory: products.map((p) => ({
-            id: p.id,
-            name: p.name,
-            price: p.price,
-            unit: p.unit,
-            category: p.category,
-          })),
-        }),
-      });
+    // 1. Try Gemini endpoint ONLY if device is online
+    if (typeof navigator !== 'undefined' && navigator.onLine) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2500); // 2.5s timeout max
 
-      if (response.ok) {
-        const json = await response.json();
-        if (json.success && json.data) {
-          const d = json.data;
-          setEngineUsed('gemini');
-          setParsedTx({
-            tipo: d.tipo || 'venta',
-            concepto: d.concepto || textToProcess,
-            categoria: d.categoria || 'Venta Rápida',
-            monto: Number(d.monto) || 0,
-            cantidad: Number(d.cantidad) || 1,
-            unidad: d.unidad || 'ud',
-            matchedProductId: d.matchedProductId || null,
-            metodoPago: d.metodoPago === 'qr' ? 'qr' : 'efectivo',
-            esFiado: Boolean(d.esFiado),
-            clienteFiado: d.clienteFiado || null,
-            confidence: d.confidence || 0.9,
-          });
-          setIsProcessing(false);
-          return;
+        const response = await fetch('/api/parse-voice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            text: textToProcess,
+            inventory: products.map((p) => ({
+              id: p.id,
+              name: p.name,
+              price: p.price,
+              unit: p.unit,
+              category: p.category,
+            })),
+          }),
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const json = await response.json();
+          if (json.success && json.data) {
+            const d = json.data;
+            setEngineUsed('gemini');
+            setParsedTx({
+              tipo: d.tipo || 'venta',
+              concepto: d.concepto || textToProcess,
+              categoria: d.categoria || 'Venta Rápida',
+              monto: Number(d.monto) || 0,
+              cantidad: Number(d.cantidad) || 1,
+              unidad: d.unidad || 'ud',
+              matchedProductId: d.matchedProductId || null,
+              metodoPago: d.metodoPago === 'qr' ? 'qr' : 'efectivo',
+              esFiado: Boolean(d.esFiado),
+              clienteFiado: d.clienteFiado || null,
+              confidence: d.confidence || 0.9,
+            });
+            setIsProcessing(false);
+            return;
+          }
         }
+      } catch {
+        // Network timeout / offline: proceed seamlessly to 100% offline local parser
       }
-    } catch {
-      // Network failure, silently proceed to local fallback
     }
 
-    // 2. Local Fallback NLP Parser
+    // 2. 100% Offline Local Fallback NLP Parser (Zero tokens, Zero billing, Instant)
     setEngineUsed('local');
     const localResult = parseVoiceCommandLocally(textToProcess, products);
     const isFiadoLocal = textToProcess.toLowerCase().includes('fiado') || textToProcess.toLowerCase().includes('fía');
@@ -242,7 +252,7 @@ export const VoiceRecorderModal: React.FC<VoiceRecorderModalProps> = ({ isOpen, 
       metodoPago: isQr ? 'qr' : 'efectivo',
       esFiado: isFiadoLocal,
       clienteFiado: clienteFiadoName,
-      confidence: localResult.confidence === 'high' ? 0.9 : 0.6,
+      confidence: localResult.confidence === 'high' ? 0.9 : 0.7,
     });
     setIsProcessing(false);
   };

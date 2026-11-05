@@ -76,40 +76,33 @@ export const ProductScanModal: React.FC<ProductScanModalProps> = ({
     setRecognizedItems([]);
 
     let success = false;
-    let isBilling = false;
 
-    // 1. Try Gemini Cloud AI
-    try {
-      const result = await recognizeProductsWithGemini(dataUrl, products);
-      if (result.billingRequired) {
-        isBilling = true;
-        setBillingRequired(true);
-      } else if (result.identified && result.products.length > 0) {
-        setRecognizedItems(result.products);
-        success = true;
+    // 1. Try Gemini Cloud AI ONLY if device is online
+    if (typeof navigator !== 'undefined' && navigator.onLine) {
+      try {
+        const result = await recognizeProductsWithGemini(dataUrl, products);
+        if (result.identified && result.products.length > 0) {
+          setRecognizedItems(result.products);
+          success = true;
 
-        const first = result.products[0];
-        if (first) {
-          setInvName(first.name);
-          setInvCategory(first.category);
-          setInvUnit(first.unit);
-          setInvStock(String(first.quantity || 1));
-          setInvPrice(first.unitPrice ? first.unitPrice.toFixed(2) : '');
-          setInvCost('');
+          const first = result.products[0];
+          if (first) {
+            setInvName(first.name);
+            setInvCategory(first.category);
+            setInvUnit(first.unit);
+            setInvStock(String(first.quantity || 1));
+            setInvPrice(first.unitPrice ? first.unitPrice.toFixed(2) : '');
+            setInvCost('');
+          }
+
+          showToast(
+            `¡Gemini IA reconoció ${result.products.length} producto(s)! Revisa los datos antes de confirmar.`,
+            'success'
+          );
         }
-
-        showToast(
-          `¡Gemini IA reconoció ${result.products.length} producto(s)! Revisa los datos antes de confirmar.`,
-          'success'
-        );
-      } else {
-        setErrorMessage(
-          result.message ||
-            'La IA no distinguió productos claramente en la fotografía.'
-        );
+      } catch (err: any) {
+        console.warn('Gemini cloud no disponible, pasando a visión local offline:', err?.message || err);
       }
-    } catch (err: any) {
-      console.warn('Gemini vision no disponible:', err?.message || err);
     }
 
     // 2. Fallback to free local on-device neural network (COCO-SSD / MobileNet)
@@ -171,18 +164,13 @@ export const ProductScanModal: React.FC<ProductScanModalProps> = ({
       }
     }
 
-    // 3. Neither worked (e.g. unrecognizable image or both failed)
+    // 3. Fallback when offline or unrecognized
     if (!success) {
-      setUnidentifiedAlert(true);
-      if (isBilling) {
-        setErrorMessage(
-          'El nivel gratuito de Gemini no está disponible para este proyecto en AI Studio. Para usar la IA de Gemini se requiere activar facturación en Google Cloud, o puedes registrar el producto manualmente de forma gratuita.'
-        );
-      } else {
-        setErrorMessage(
-          'No se pudo distinguir con nitidez el producto. Puedes tomar otra foto o registrarlo manualmente.'
-        );
-      }
+      setUsedLocalVision(true);
+      setIsManualEntryActive(true);
+      setErrorMessage(
+        'Modo Offline activo: Foto capturada con éxito en tu celular. Confirma los datos o selecciona el producto abajo.'
+      );
     }
 
     setIsAnalyzing(false);

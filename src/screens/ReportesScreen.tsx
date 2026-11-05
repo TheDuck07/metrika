@@ -350,24 +350,24 @@ export const ReportesScreen: React.FC = () => {
         {activeTab === 'mes' && (
           <div className="space-y-3.5" id="view-mes">
             {/* Month Navigator */}
-            <div className="bg-white rounded-xl p-2.5 shadow-xs border border-[#dec0b7]/40 flex items-center justify-between">
+            <div className="bg-white dark:bg-[#201815] rounded-xl p-2.5 shadow-xs border border-[#dec0b7]/40 dark:border-stone-800 flex items-center justify-between transition-colors">
               <button
                 id="btn-prev-mes"
                 type="button"
                 aria-label="Mes anterior"
                 onClick={() => setSelectedMonthOffset((prev) => prev - 1)}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-[#f5ece8] hover:bg-[#eae1dd] text-[#57423b] cursor-pointer active:scale-95 transition-all"
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-[#f5ece8] dark:bg-stone-800 hover:bg-[#eae1dd] dark:hover:bg-stone-700 text-[#57423b] dark:text-stone-300 cursor-pointer active:scale-95 transition-all"
               >
                 <span className="material-symbols-outlined text-[20px]">chevron_left</span>
               </button>
 
               <div className="flex items-center gap-1.5 select-none">
-                <span className="material-symbols-outlined text-[#9f3c16] text-[18px]">calendar_month</span>
-                <span id="mes-display-title" className="text-sm font-extrabold text-[#1f1b19]">
+                <span className="material-symbols-outlined text-[#9f3c16] dark:text-[#ff9973] text-[18px]">calendar_month</span>
+                <span id="mes-display-title" className="text-sm font-extrabold text-[#1f1b19] dark:text-stone-100">
                   {monthDisplayName}
                 </span>
                 {selectedMonthOffset === 0 && (
-                  <span className="bg-[#b1f0d4] text-[#0f513c] text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                  <span className="bg-[#b1f0d4] dark:bg-emerald-950/70 text-[#0f513c] dark:text-emerald-300 text-[10px] font-bold px-1.5 py-0.2 rounded-full border border-emerald-500/20">
                     Actual
                   </span>
                 )}
@@ -379,47 +379,47 @@ export const ReportesScreen: React.FC = () => {
                 aria-label="Mes siguiente"
                 disabled={selectedMonthOffset >= 0}
                 onClick={() => setSelectedMonthOffset((prev) => prev + 1)}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-[#f5ece8] hover:bg-[#eae1dd] text-[#57423b] disabled:opacity-30 cursor-pointer active:scale-95 transition-all"
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-[#f5ece8] dark:bg-stone-800 hover:bg-[#eae1dd] dark:hover:bg-stone-700 text-[#57423b] dark:text-stone-300 disabled:opacity-30 cursor-pointer active:scale-95 transition-all"
               >
                 <span className="material-symbols-outlined text-[20px]">chevron_right</span>
               </button>
             </div>
 
             {/* KPI Cards: Ganancia Neta y Semana Estrella */}
-            <section className="bg-gradient-to-br from-[#ffddb8]/40 via-[#fbf2ee] to-[#f5ece8] rounded-2xl p-3.5 shadow-xs border border-[#dec0b7]/40">
-              <div className="grid grid-cols-2 gap-2 bg-white/80 backdrop-blur-xs rounded-xl p-3 border border-[#dec0b7]/30">
+            <section className="bg-gradient-to-br from-[#ffddb8]/40 dark:from-[#352119] via-[#fbf2ee] dark:via-[#221815] to-[#f5ece8] dark:to-[#1c1411] rounded-2xl p-3.5 shadow-xs border border-[#dec0b7]/40 dark:border-stone-800">
+              <div className="grid grid-cols-2 gap-2 bg-white/90 dark:bg-[#1a1311]/90 backdrop-blur-xs rounded-xl p-3 border border-[#dec0b7]/30 dark:border-stone-800">
                 {/* Ganancia Neta */}
-                <div className="flex flex-col min-w-0 border-r border-[#eae1dd] px-1">
-                  <span className="text-[11px] text-[#57423b] flex items-center gap-1 truncate font-medium">
-                    <span className="material-symbols-outlined text-[15px] text-[#9f3c16]">
+                <div className="flex flex-col min-w-0 border-r border-[#eae1dd] dark:border-stone-800 px-1">
+                  <span className="text-[11px] text-[#57423b] dark:text-stone-400 flex items-center gap-1 truncate font-medium">
+                    <span className="material-symbols-outlined text-[15px] text-[#9f3c16] dark:text-[#ff9973]">
                       account_balance_wallet
                     </span>
                     Ganancia Neta
                   </span>
                   <div className="flex items-baseline gap-1 mt-1">
-                    <span id="kpi-ganancia-mes" className="text-2xl font-extrabold text-[#9f3c16] truncate">
+                    <span id="kpi-ganancia-mes" className="text-2xl font-extrabold text-[#9f3c16] dark:text-[#ff9973] truncate">
                       {monthlyStats.gananciaNeta.toLocaleString('es-BO', { maximumFractionDigits: 0 })}
                     </span>
                   </div>
-                  <span id="kpi-ganancia-sub" className="text-[10px] text-[#2a6651] font-bold leading-none mt-0.5">
+                  <span id="kpi-ganancia-sub" className="text-[10px] text-[#2a6651] dark:text-emerald-400 font-bold leading-none mt-0.5">
                     Bs. (Ventas - Salidas)
                   </span>
                 </div>
 
                 {/* Semana Estrella */}
                 <div className="flex flex-col min-w-0 px-2">
-                  <span className="text-[11px] text-[#57423b] flex items-center gap-1 truncate font-medium">
-                    <span className="material-symbols-outlined text-[15px] text-[#855300]">
+                  <span className="text-[11px] text-[#57423b] dark:text-stone-400 flex items-center gap-1 truncate font-medium">
+                    <span className="material-symbols-outlined text-[15px] text-[#855300] dark:text-amber-400">
                       workspace_premium
                     </span>
                     Mejor Semana
                   </span>
                   <div className="flex items-baseline gap-1 mt-1 truncate">
-                    <span id="kpi-mejor-semana" className="text-2xl font-extrabold text-[#855300] truncate">
+                    <span id="kpi-mejor-semana" className="text-2xl font-extrabold text-[#855300] dark:text-amber-400 truncate">
                       {monthlyStats.mejorSemanaLabel}
                     </span>
                   </div>
-                  <span id="kpi-mejor-semana-bs" className="text-[10px] text-[#57423b] font-medium leading-none mt-0.5 truncate">
+                  <span id="kpi-mejor-semana-bs" className="text-[10px] text-[#57423b] dark:text-stone-400 font-medium leading-none mt-0.5 truncate">
                     {monthlyStats.mejorSemanaBs}
                   </span>
                 </div>
@@ -427,15 +427,15 @@ export const ReportesScreen: React.FC = () => {
             </section>
 
             {/* Ventas del Mes: Gráfico Semanal Dinámico */}
-            <section className="bg-white rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 space-y-2">
+            <section className="bg-white dark:bg-[#201815] rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 dark:border-stone-800 space-y-2 transition-colors">
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#9f3c16]"></span>
-                  <h3 className="text-sm font-bold text-[#1f1b19]">Ventas del Mes</h3>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#9f3c16] dark:bg-[#ff9973]"></span>
+                  <h3 className="text-sm font-bold text-[#1f1b19] dark:text-stone-100">Ventas del Mes</h3>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] text-[#57423b] block uppercase font-medium">Total Ventas</span>
-                  <span className="text-sm font-extrabold text-[#9f3c16]">
+                  <span className="text-[10px] text-[#57423b] dark:text-stone-400 block uppercase font-medium">Total Ventas</span>
+                  <span className="text-sm font-extrabold text-[#9f3c16] dark:text-[#ff9973]">
                     Bs. {monthlyStats.totalVentas.toLocaleString('es-BO', { maximumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -445,16 +445,16 @@ export const ReportesScreen: React.FC = () => {
                 <div className="h-36 w-full flex items-end justify-between px-2 gap-2">
                   {monthlyStats.semanas.map((s) => (
                     <div key={s.label} className="flex-1 flex flex-col items-center h-full justify-end">
-                      <span className={`text-[10px] font-bold mb-1 ${s.isPeak ? 'text-[#9f3c16]' : 'text-[#57423b]'}`}>
+                      <span className={`text-[10px] font-bold mb-1 ${s.isPeak ? 'text-[#9f3c16] dark:text-[#ff9973]' : 'text-[#57423b] dark:text-stone-400'}`}>
                         {s.val > 0 ? `Bs. ${s.val.toFixed(0)}` : '0'}
                       </span>
                       <div
                         className={`w-full max-w-[42px] rounded-t-lg transition-all duration-500 ${
-                          s.isPeak ? 'bg-[#9f3c16]' : 'bg-[#ffddb8]'
+                          s.isPeak ? 'bg-[#9f3c16] dark:bg-[#ff8659]' : 'bg-[#ffddb8] dark:bg-[#733e2b]'
                         }`}
                         style={{ height: s.height }}
                       />
-                      <span className="text-[10px] text-[#57423b] font-semibold mt-1">
+                      <span className="text-[10px] text-[#57423b] dark:text-stone-400 font-semibold mt-1">
                         Días {s.label}
                       </span>
                     </div>
@@ -464,13 +464,13 @@ export const ReportesScreen: React.FC = () => {
             </section>
 
             {/* Top Productos del Mes */}
-            <section className="bg-white rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 space-y-3">
+            <section className="bg-white dark:bg-[#201815] rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 dark:border-stone-800 space-y-3 transition-colors">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#9f3c16]"></span>
-                  <h3 className="text-sm font-bold text-[#1f1b19]">Productos Más Vendidos</h3>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#9f3c16] dark:bg-[#ff9973]"></span>
+                  <h3 className="text-sm font-bold text-[#1f1b19] dark:text-stone-100">Productos Más Vendidos</h3>
                 </div>
-                <div className="flex items-center bg-[#f5ece8] p-0.5 rounded-full text-[11px]">
+                <div className="flex items-center bg-[#f5ece8] dark:bg-stone-800 p-0.5 rounded-full text-[11px]">
                   <button
                     id="btn-top-unidades"
                     type="button"
@@ -478,7 +478,7 @@ export const ReportesScreen: React.FC = () => {
                     className={`px-2 py-0.5 rounded-full font-bold transition-all cursor-pointer ${
                       topModeMonth === 'unidades'
                         ? 'bg-[#9f3c16] text-white shadow-xs'
-                        : 'text-[#57423b] hover:text-[#1f1b19]'
+                        : 'text-[#57423b] dark:text-stone-300 hover:text-[#1f1b19] dark:hover:text-stone-100'
                     }`}
                   >
                     Unidades
@@ -490,7 +490,7 @@ export const ReportesScreen: React.FC = () => {
                     className={`px-2 py-0.5 rounded-full font-bold transition-all cursor-pointer ${
                       topModeMonth === 'ingresos'
                         ? 'bg-[#9f3c16] text-white shadow-xs'
-                        : 'text-[#57423b] hover:text-[#1f1b19]'
+                        : 'text-[#57423b] dark:text-stone-300 hover:text-[#1f1b19] dark:hover:text-stone-100'
                     }`}
                   >
                     Bs.
@@ -500,27 +500,27 @@ export const ReportesScreen: React.FC = () => {
 
               <div className="space-y-3" id="month-top-products-list">
                 {(topModeMonth === 'unidades' ? monthlyStats.topUnidades : monthlyStats.topIngresos).length === 0 ? (
-                  <p className="text-xs text-[#8a726a] text-center py-4">No hay ventas registradas en este mes.</p>
+                  <p className="text-xs text-[#8a726a] dark:text-stone-400 text-center py-4">No hay ventas registradas en este mes.</p>
                 ) : (
                   (topModeMonth === 'unidades' ? monthlyStats.topUnidades : monthlyStats.topIngresos).map((p) => (
                     <div key={p.rank} className="space-y-1">
-                      <div className="flex justify-between items-center text-[#1f1b19]">
+                      <div className="flex justify-between items-center text-[#1f1b19] dark:text-stone-100">
                         <div className="flex items-center gap-2 min-w-0">
                           <span
                             className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-bold ${
-                              p.rank === 1 ? 'bg-[#ffdbcf] text-[#9f3c16]' : 'bg-[#f5ece8] text-[#57423b]'
+                              p.rank === 1 ? 'bg-[#ffdbcf] dark:bg-[#5c2411] text-[#9f3c16] dark:text-[#ff9973]' : 'bg-[#f5ece8] dark:bg-stone-800 text-[#57423b] dark:text-stone-300'
                             }`}
                           >
                             {p.rank}
                           </span>
                           <span className="text-xs font-bold truncate">{p.name}</span>
                         </div>
-                        <span className="text-xs font-extrabold text-[#9f3c16] shrink-0">{p.qty}</span>
+                        <span className="text-xs font-extrabold text-[#9f3c16] dark:text-[#ff9973] shrink-0">{p.qty}</span>
                       </div>
-                      <div className="w-full bg-[#f5ece8] rounded-full h-2.5 overflow-hidden">
+                      <div className="w-full bg-[#f5ece8] dark:bg-stone-800 rounded-full h-2.5 overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all duration-700 ${
-                            p.rank === 1 ? 'bg-[#9f3c16]' : p.rank === 2 ? 'bg-[#bf542c]' : 'bg-[#fea619]'
+                            p.rank === 1 ? 'bg-[#9f3c16] dark:bg-[#ff8659]' : p.rank === 2 ? 'bg-[#bf542c]' : 'bg-[#fea619]'
                           }`}
                           style={{ width: p.barW }}
                         />
@@ -532,13 +532,13 @@ export const ReportesScreen: React.FC = () => {
             </section>
 
             {/* Salidas y Gastos del Mes (Donut Chart Dinámico) */}
-            <section className="bg-white rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 space-y-3">
+            <section className="bg-white dark:bg-[#201815] rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 dark:border-stone-800 space-y-3 transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#2a6651]"></span>
-                  <h3 className="text-sm font-bold text-[#1f1b19]">Gastos y Salidas</h3>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#2a6651] dark:bg-emerald-400"></span>
+                  <h3 className="text-sm font-bold text-[#1f1b19] dark:text-stone-100">Gastos y Salidas</h3>
                 </div>
-                <span className="text-xs font-bold text-[#57423b] bg-[#f5ece8] px-2.5 py-0.5 rounded-full">
+                <span className="text-xs font-bold text-[#57423b] dark:text-stone-300 bg-[#f5ece8] dark:bg-stone-800 px-2.5 py-0.5 rounded-full">
                   Bs. {monthlyStats.totalGastos.toFixed(2)} total
                 </span>
               </div>
@@ -547,7 +547,7 @@ export const ReportesScreen: React.FC = () => {
                 {/* SVG Donut */}
                 <div className="relative w-36 h-36 flex items-center justify-center shrink-0">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" fill="transparent" r="38" stroke="#f5ece8" strokeWidth="15" />
+                    <circle cx="50" cy="50" fill="transparent" r="38" className="stroke-[#f5ece8] dark:stroke-[#332420]" strokeWidth="15" />
                     {monthlyStats.donutCircles.map((c, i) => (
                       <circle
                         key={i}
@@ -563,11 +563,11 @@ export const ReportesScreen: React.FC = () => {
                     ))}
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center px-1">
-                    <span className="text-[10px] text-[#57423b] font-medium leading-none">Mayor gasto</span>
-                    <span id="mes-donut-major-percent" className="text-xl font-extrabold text-[#1f1b19] leading-tight">
+                    <span className="text-[10px] text-[#57423b] dark:text-stone-400 font-medium leading-none">Mayor gasto</span>
+                    <span id="mes-donut-major-percent" className="text-xl font-extrabold text-[#1f1b19] dark:text-stone-100 leading-tight">
                       {monthlyStats.majorGastoPct}
                     </span>
-                    <span id="mes-donut-major-name" className="text-[10px] text-[#9f3c16] font-bold truncate max-w-[80px]">
+                    <span id="mes-donut-major-name" className="text-[10px] text-[#9f3c16] dark:text-[#ff9973] font-bold truncate max-w-[80px]">
                       {monthlyStats.majorGastoName}
                     </span>
                   </div>
@@ -576,12 +576,12 @@ export const ReportesScreen: React.FC = () => {
                 {/* Expense categories list */}
                 <div className="flex-1 w-full space-y-1.5" id="mes-gastos-list">
                   {monthlyStats.gastosItems.length === 0 ? (
-                    <p className="text-xs text-[#8a726a] py-3 text-center">No hay compras ni gastos registrados en este mes.</p>
+                    <p className="text-xs text-[#8a726a] dark:text-stone-400 py-3 text-center">No hay compras ni gastos registrados en este mes.</p>
                   ) : (
                     monthlyStats.gastosItems.map((item) => (
                       <div
                         key={item.name}
-                        className="flex items-center justify-between text-[#1f1b19] bg-[#fbf2ee] p-2 rounded-xl text-xs"
+                        className="flex items-center justify-between text-[#1f1b19] dark:text-stone-200 bg-[#fbf2ee] dark:bg-[#2b1f1b] p-2 rounded-xl text-xs"
                       >
                         <div className="flex items-center gap-2 min-w-0">
                           <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
@@ -589,7 +589,7 @@ export const ReportesScreen: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0 font-bold">
                           <span>{item.pct}</span>
-                          <span className="text-[#57423b] font-normal">({item.bs})</span>
+                          <span className="text-[#57423b] dark:text-stone-400 font-normal">({item.bs})</span>
                         </div>
                       </div>
                     ))
@@ -604,36 +604,36 @@ export const ReportesScreen: React.FC = () => {
         {activeTab === 'semana' && (
           <div className="space-y-3.5" id="view-semana">
             {/* KPI Cards: Ganancia Neta Semanal y Día Estrella */}
-            <section className="bg-gradient-to-br from-[#ffddb8]/40 via-[#fbf2ee] to-[#f5ece8] rounded-2xl p-3.5 shadow-xs border border-[#dec0b7]/40">
-              <div className="grid grid-cols-2 gap-2 bg-white/80 backdrop-blur-xs rounded-xl p-3 border border-[#dec0b7]/30">
-                <div className="flex flex-col min-w-0 border-r border-[#eae1dd] px-1">
-                  <span className="text-[11px] text-[#57423b] flex items-center gap-1 truncate font-medium">
-                    <span className="material-symbols-outlined text-[15px] text-[#9f3c16]">
+            <section className="bg-gradient-to-br from-[#ffddb8]/40 dark:from-[#352119] via-[#fbf2ee] dark:via-[#221815] to-[#f5ece8] dark:to-[#1c1411] rounded-2xl p-3.5 shadow-xs border border-[#dec0b7]/40 dark:border-stone-800">
+              <div className="grid grid-cols-2 gap-2 bg-white/90 dark:bg-[#1a1311]/90 backdrop-blur-xs rounded-xl p-3 border border-[#dec0b7]/30 dark:border-stone-800">
+                <div className="flex flex-col min-w-0 border-r border-[#eae1dd] dark:border-stone-800 px-1">
+                  <span className="text-[11px] text-[#57423b] dark:text-stone-400 flex items-center gap-1 truncate font-medium">
+                    <span className="material-symbols-outlined text-[15px] text-[#9f3c16] dark:text-[#ff9973]">
                       account_balance_wallet
                     </span>
                     Ganancia Neta
                   </span>
                   <div className="flex items-baseline gap-1 mt-1">
-                    <span className="text-2xl font-extrabold text-[#9f3c16] truncate">
+                    <span className="text-2xl font-extrabold text-[#9f3c16] dark:text-[#ff9973] truncate">
                       {weeklyStats.gananciaNeta.toLocaleString('es-BO', { maximumFractionDigits: 0 })}
                     </span>
                   </div>
-                  <span className="text-[10px] text-[#2a6651] font-bold leading-none mt-0.5">Bs. (Semana Actual)</span>
+                  <span className="text-[10px] text-[#2a6651] dark:text-emerald-400 font-bold leading-none mt-0.5">Bs. (Semana Actual)</span>
                 </div>
 
                 <div className="flex flex-col min-w-0 px-2">
-                  <span className="text-[11px] text-[#57423b] flex items-center gap-1 truncate font-medium">
-                    <span className="material-symbols-outlined text-[15px] text-[#855300]">
+                  <span className="text-[11px] text-[#57423b] dark:text-stone-400 flex items-center gap-1 truncate font-medium">
+                    <span className="material-symbols-outlined text-[15px] text-[#855300] dark:text-amber-400">
                       workspace_premium
                     </span>
                     Día Estrella
                   </span>
                   <div className="flex items-baseline gap-1 mt-1 truncate">
-                    <span className="text-2xl font-extrabold text-[#855300] truncate">
+                    <span className="text-2xl font-extrabold text-[#855300] dark:text-amber-400 truncate">
                       {weeklyStats.diaEstrella}
                     </span>
                   </div>
-                  <span className="text-[10px] text-[#57423b] font-medium leading-none mt-0.5">
+                  <span className="text-[10px] text-[#57423b] dark:text-stone-400 font-medium leading-none mt-0.5">
                     {weeklyStats.diaEstrellaBs}
                   </span>
                 </div>
@@ -641,20 +641,20 @@ export const ReportesScreen: React.FC = () => {
             </section>
 
             {/* Top Productos Semanales */}
-            <section className="bg-white rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 space-y-3">
+            <section className="bg-white dark:bg-[#201815] rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 dark:border-stone-800 space-y-3 transition-colors">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#9f3c16]"></span>
-                  <h3 className="text-sm font-bold text-[#1f1b19]">Más Vendidos de la Semana</h3>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#9f3c16] dark:bg-[#ff9973]"></span>
+                  <h3 className="text-sm font-bold text-[#1f1b19] dark:text-stone-100">Más Vendidos de la Semana</h3>
                 </div>
-                <div className="flex items-center bg-[#f5ece8] p-0.5 rounded-full text-[11px]">
+                <div className="flex items-center bg-[#f5ece8] dark:bg-stone-800 p-0.5 rounded-full text-[11px]">
                   <button
                     type="button"
                     onClick={() => setTopModeSemana('unidades')}
                     className={`px-2 py-0.5 rounded-full font-bold transition-all cursor-pointer ${
                       topModeSemana === 'unidades'
                         ? 'bg-[#9f3c16] text-white shadow-xs'
-                        : 'text-[#57423b] hover:text-[#1f1b19]'
+                        : 'text-[#57423b] dark:text-stone-300 hover:text-[#1f1b19] dark:hover:text-stone-100'
                     }`}
                   >
                     Unidades
@@ -665,7 +665,7 @@ export const ReportesScreen: React.FC = () => {
                     className={`px-2 py-0.5 rounded-full font-bold transition-all cursor-pointer ${
                       topModeSemana === 'ingresos'
                         ? 'bg-[#9f3c16] text-white shadow-xs'
-                        : 'text-[#57423b] hover:text-[#1f1b19]'
+                        : 'text-[#57423b] dark:text-stone-300 hover:text-[#1f1b19] dark:hover:text-stone-100'
                     }`}
                   >
                     Bs.
@@ -675,27 +675,27 @@ export const ReportesScreen: React.FC = () => {
 
               <div className="space-y-3">
                 {(topModeSemana === 'ingresos' ? weeklyStats.topIngresos : weeklyStats.topUnidades).length === 0 ? (
-                  <p className="text-xs text-[#8a726a] text-center py-4">Aún no hay ventas registradas esta semana.</p>
+                  <p className="text-xs text-[#8a726a] dark:text-stone-400 text-center py-4">Aún no hay ventas registradas esta semana.</p>
                 ) : (
                   (topModeSemana === 'ingresos' ? weeklyStats.topIngresos : weeklyStats.topUnidades).map((p) => (
                     <div key={p.rank} className="space-y-1">
-                      <div className="flex justify-between items-center text-[#1f1b19]">
+                      <div className="flex justify-between items-center text-[#1f1b19] dark:text-stone-100">
                         <div className="flex items-center gap-2 min-w-0">
                           <span
                             className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-bold ${
-                              p.rank === 1 ? 'bg-[#ffdbcf] text-[#9f3c16]' : 'bg-[#f5ece8] text-[#57423b]'
+                              p.rank === 1 ? 'bg-[#ffdbcf] dark:bg-[#5c2411] text-[#9f3c16] dark:text-[#ff9973]' : 'bg-[#f5ece8] dark:bg-stone-800 text-[#57423b] dark:text-stone-300'
                             }`}
                           >
                             {p.rank}
                           </span>
                           <span className="text-xs font-bold truncate">{p.name}</span>
                         </div>
-                        <span className="text-xs font-extrabold text-[#9f3c16] shrink-0">{p.qty}</span>
+                        <span className="text-xs font-extrabold text-[#9f3c16] dark:text-[#ff9973] shrink-0">{p.qty}</span>
                       </div>
-                      <div className="w-full bg-[#f5ece8] rounded-full h-2.5 overflow-hidden">
+                      <div className="w-full bg-[#f5ece8] dark:bg-stone-800 rounded-full h-2.5 overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all duration-700 ${
-                            p.rank === 1 ? 'bg-[#9f3c16]' : 'bg-[#bf542c]'
+                            p.rank === 1 ? 'bg-[#9f3c16] dark:bg-[#ff8659]' : 'bg-[#bf542c]'
                           }`}
                           style={{ width: p.barW }}
                         />
@@ -707,15 +707,15 @@ export const ReportesScreen: React.FC = () => {
             </section>
 
             {/* Ventas por Día (Lun - Dom) */}
-            <section className="bg-white rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 space-y-2">
+            <section className="bg-white dark:bg-[#201815] rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 dark:border-stone-800 space-y-2 transition-colors">
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#fea619]"></span>
-                  <h3 className="text-sm font-bold text-[#1f1b19]">Ventas por Día</h3>
+                  <h3 className="text-sm font-bold text-[#1f1b19] dark:text-stone-100">Ventas por Día</h3>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] text-[#57423b] block uppercase font-medium">Total Semana</span>
-                  <span className="text-sm font-extrabold text-[#9f3c16]">
+                  <span className="text-[10px] text-[#57423b] dark:text-stone-400 block uppercase font-medium">Total Semana</span>
+                  <span className="text-sm font-extrabold text-[#9f3c16] dark:text-[#ff9973]">
                     Bs. {weeklyStats.totalVentas.toLocaleString('es-BO', { maximumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -725,16 +725,16 @@ export const ReportesScreen: React.FC = () => {
                 <div className="h-40 w-full flex items-end justify-between px-1 gap-1.5">
                   {weeklyStats.chartDays.map((d) => (
                     <div key={d.day} className="flex-1 flex flex-col items-center h-full justify-end">
-                      <span className={`text-[9px] font-bold mb-1 ${d.peak ? 'text-[#9f3c16] font-extrabold' : 'text-[#57423b]'}`}>
+                      <span className={`text-[9px] font-bold mb-1 ${d.peak ? 'text-[#9f3c16] dark:text-[#ff9973] font-extrabold' : 'text-[#57423b] dark:text-stone-400'}`}>
                         {d.val > 0 ? d.val : '0'}
                       </span>
                       <div
                         className={`w-full max-w-[28px] rounded-t-lg transition-all duration-300 ${
-                          d.peak ? 'bg-[#9f3c16] shadow-xs' : 'bg-[#fea619]'
+                          d.peak ? 'bg-[#9f3c16] dark:bg-[#ff8659] shadow-xs' : 'bg-[#fea619] dark:bg-[#d97706]'
                         }`}
                         style={{ height: d.h }}
                       />
-                      <span className={`text-[10px] font-semibold mt-1 ${d.peak ? 'text-[#9f3c16] font-bold' : 'text-[#57423b]'}`}>
+                      <span className={`text-[10px] font-semibold mt-1 ${d.peak ? 'text-[#9f3c16] dark:text-[#ff9973] font-bold' : 'text-[#57423b] dark:text-stone-400'}`}>
                         {d.day}
                       </span>
                     </div>
@@ -744,13 +744,13 @@ export const ReportesScreen: React.FC = () => {
             </section>
 
             {/* Gastos y Salidas Semanal */}
-            <section className="bg-white rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 space-y-3">
+            <section className="bg-white dark:bg-[#201815] rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 dark:border-stone-800 space-y-3 transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#2a6651]"></span>
-                  <h3 className="text-sm font-bold text-[#1f1b19]">Gastos y Salidas</h3>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#2a6651] dark:bg-emerald-400"></span>
+                  <h3 className="text-sm font-bold text-[#1f1b19] dark:text-stone-100">Gastos y Salidas</h3>
                 </div>
-                <span className="text-xs font-bold text-[#57423b] bg-[#f5ece8] px-2.5 py-0.5 rounded-full">
+                <span className="text-xs font-bold text-[#57423b] dark:text-stone-300 bg-[#f5ece8] dark:bg-stone-800 px-2.5 py-0.5 rounded-full">
                   Bs. {weeklyStats.totalGastos.toFixed(2)} total
                 </span>
               </div>
@@ -758,7 +758,7 @@ export const ReportesScreen: React.FC = () => {
               <div className="flex flex-col sm:flex-row items-center gap-4 pt-1">
                 <div className="relative w-36 h-36 flex items-center justify-center shrink-0">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" fill="transparent" r="38" stroke="#f5ece8" strokeWidth="15" />
+                    <circle cx="50" cy="50" fill="transparent" r="38" className="stroke-[#f5ece8] dark:stroke-[#332420]" strokeWidth="15" />
                     {weeklyStats.donutCircles.map((c, i) => (
                       <circle
                         key={i}
@@ -774,25 +774,25 @@ export const ReportesScreen: React.FC = () => {
                     ))}
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                    <span className="text-[10px] text-[#57423b]">Mayor gasto</span>
-                    <span className="text-xl font-extrabold text-[#1f1b19]">{weeklyStats.majorGastoPct}</span>
-                    <span className="text-[10px] text-[#9f3c16] font-bold truncate max-w-[80px]">{weeklyStats.majorGastoName}</span>
+                    <span className="text-[10px] text-[#57423b] dark:text-stone-400">Mayor gasto</span>
+                    <span className="text-xl font-extrabold text-[#1f1b19] dark:text-stone-100">{weeklyStats.majorGastoPct}</span>
+                    <span className="text-[10px] text-[#9f3c16] dark:text-[#ff9973] font-bold truncate max-w-[80px]">{weeklyStats.majorGastoName}</span>
                   </div>
                 </div>
 
                 <div className="flex-1 w-full space-y-1.5">
                   {weeklyStats.gastosItems.length === 0 ? (
-                    <p className="text-xs text-[#8a726a] text-center py-3">No hay compras ni gastos esta semana.</p>
+                    <p className="text-xs text-[#8a726a] dark:text-stone-400 text-center py-3">No hay compras ni gastos esta semana.</p>
                   ) : (
                     weeklyStats.gastosItems.map((item) => (
-                      <div key={item.name} className="flex items-center justify-between text-[#1f1b19] bg-[#fbf2ee] p-2 rounded-xl text-xs">
+                      <div key={item.name} className="flex items-center justify-between text-[#1f1b19] dark:text-stone-200 bg-[#fbf2ee] dark:bg-[#2b1f1b] p-2 rounded-xl text-xs">
                         <div className="flex items-center gap-2 min-w-0">
                           <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
                           <span className="font-semibold truncate">{item.name}</span>
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0 font-bold">
                           <span>{item.pct}</span>
-                          <span className="text-[#57423b] font-normal">({item.bs})</span>
+                          <span className="text-[#57423b] dark:text-stone-400 font-normal">({item.bs})</span>
                         </div>
                       </div>
                     ))
