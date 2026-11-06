@@ -189,52 +189,52 @@ _Generado automáticamente desde Metrika._`;
       <section className="flex-none w-full bg-[#fff8f5] dark:bg-[#171210] z-30 px-4 pt-2 pb-3 space-y-2 border-b border-[#eae1dd]/60 dark:border-stone-800 shadow-[0_2px_8px_rgba(0,0,0,0.02)] max-w-md mx-auto transition-colors">
         <div className="bg-white dark:bg-[#231b17] rounded-xl p-2.5 shadow-xs border border-[#dec0b7]/40 dark:border-stone-800 flex items-center gap-2">
           <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-            <span className="text-[11px] text-[#57423b] font-bold tracking-wider uppercase px-0.5">
+            <span className="text-[11px] text-[#57423b] dark:text-stone-300 font-bold tracking-wider uppercase px-0.5">
               Desde
             </span>
             <button
               id="btn-date-start"
               type="button"
               onClick={() => setShowCalendarModal(true)}
-              className="w-full h-10 px-2.5 bg-[#fbf2ee] hover:bg-[#f5ece8] border border-[#dec0b7]/40 rounded-xl flex items-center justify-between gap-1.5 text-[#1f1b19] transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+              className="w-full h-10 px-2.5 bg-[#fbf2ee] dark:bg-[#2c221e] hover:bg-[#f5ece8] dark:hover:bg-[#382b26] border border-[#dec0b7]/40 dark:border-stone-700 rounded-xl flex items-center justify-between gap-1.5 text-[#1f1b19] dark:text-stone-100 transition-all active:scale-[0.98] cursor-pointer shadow-xs"
             >
               <div className="flex items-center gap-1.5 min-w-0">
-                <span className="material-symbols-outlined text-[#9f3c16] text-[18px] shrink-0">
+                <span className="material-symbols-outlined text-[#9f3c16] dark:text-[#ff9973] text-[18px] shrink-0">
                   calendar_month
                 </span>
                 <span id="btn-date-start-text" className="font-bold text-[13px] truncate">
                   {startDate}
                 </span>
               </div>
-              <span className="material-symbols-outlined text-[#8a726a] text-[18px] shrink-0">
+              <span className="material-symbols-outlined text-[#8a726a] dark:text-stone-400 text-[18px] shrink-0">
                 expand_more
               </span>
             </button>
           </div>
 
-          <div className="flex items-center justify-center pt-4 text-[#8a726a] shrink-0">
+          <div className="flex items-center justify-center pt-4 text-[#8a726a] dark:text-stone-400 shrink-0">
             <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
           </div>
 
           <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-            <span className="text-[11px] text-[#57423b] font-bold tracking-wider uppercase px-0.5">
+            <span className="text-[11px] text-[#57423b] dark:text-stone-300 font-bold tracking-wider uppercase px-0.5">
               Hasta
             </span>
             <button
               id="btn-date-end"
               type="button"
               onClick={() => setShowCalendarModal(true)}
-              className="w-full h-10 px-2.5 bg-[#fbf2ee] hover:bg-[#f5ece8] border border-[#dec0b7]/40 rounded-xl flex items-center justify-between gap-1.5 text-[#1f1b19] transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+              className="w-full h-10 px-2.5 bg-[#fbf2ee] dark:bg-[#2c221e] hover:bg-[#f5ece8] dark:hover:bg-[#382b26] border border-[#dec0b7]/40 dark:border-stone-700 rounded-xl flex items-center justify-between gap-1.5 text-[#1f1b19] dark:text-stone-100 transition-all active:scale-[0.98] cursor-pointer shadow-xs"
             >
               <div className="flex items-center gap-1.5 min-w-0">
-                <span className="material-symbols-outlined text-[#9f3c16] text-[18px] shrink-0">
+                <span className="material-symbols-outlined text-[#9f3c16] dark:text-[#ff9973] text-[18px] shrink-0">
                   calendar_month
                 </span>
                 <span id="btn-date-end-text" className="font-bold text-[13px] truncate">
                   {endDate}
                 </span>
               </div>
-              <span className="material-symbols-outlined text-[#8a726a] text-[18px] shrink-0">
+              <span className="material-symbols-outlined text-[#8a726a] dark:text-stone-400 text-[18px] shrink-0">
                 expand_more
               </span>
             </button>
@@ -403,7 +403,7 @@ _Generado automáticamente desde Metrika._`;
       </main>
 
       {/* Barra de Acciones Fija: Descarga Real de Excel y Enlace WhatsApp */}
-      <div className="fixed bottom-20 left-0 right-0 z-40 bg-[#fff8f5]/95 backdrop-blur-md border-t border-[#eae1dd] px-4 py-2.5 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
+      <div className="fixed bottom-20 left-0 right-0 z-40 bg-[#fff8f5]/95 dark:bg-[#1a1412]/95 backdrop-blur-md border-t border-[#eae1dd] dark:border-stone-800 px-4 py-2.5 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
         <div className="flex flex-col gap-1.5 max-w-md mx-auto w-full">
           <button
             id="btn-download-report"
@@ -418,7 +418,7 @@ _Generado automáticamente desde Metrika._`;
             id="btn-share-report"
             type="button"
             onClick={handleShareWhatsApp}
-            className="w-full h-10 bg-white hover:bg-[#f5ece8] text-[#9f3c16] border border-[#dec0b7] rounded-xl flex items-center justify-center gap-2 text-xs font-bold transition-all active:scale-[0.98] cursor-pointer"
+            className="w-full h-10 bg-white dark:bg-[#201814] hover:bg-[#f5ece8] dark:hover:bg-[#2b1f1a] text-[#9f3c16] dark:text-[#ff9973] border border-[#dec0b7] dark:border-stone-700 rounded-xl flex items-center justify-center gap-2 text-xs font-bold transition-all active:scale-[0.98] cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">share</span>
             <span>Enviar Balance por WhatsApp</span>
@@ -429,21 +429,21 @@ _Generado automáticamente desde Metrika._`;
       {/* Modal Preview Comprobante Adjunto */}
       {selectedReceiptImage && (
         <div className="fixed inset-0 z-60 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-4 max-w-sm w-full space-y-3 shadow-2xl">
-            <div className="flex items-center justify-between pb-2 border-b border-stone-200">
+          <div className="bg-white dark:bg-[#1f1815] text-[#1f1b19] dark:text-stone-100 rounded-3xl p-4 max-w-sm w-full space-y-3 shadow-2xl border border-stone-200 dark:border-stone-800">
+            <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#9f3c16]">document_scanner</span>
-                <h4 className="text-sm font-extrabold text-[#1f1b19]">Comprobante Escaneado</h4>
+                <span className="material-symbols-outlined text-[#9f3c16] dark:text-[#ff9973]">document_scanner</span>
+                <h4 className="text-sm font-extrabold text-[#1f1b19] dark:text-stone-100">Comprobante Escaneado</h4>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedReceiptImage(null)}
-                className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 hover:bg-stone-200 cursor-pointer"
+                className="w-7 h-7 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-200 cursor-pointer"
               >
                 ✕
               </button>
             </div>
-            <div className="rounded-2xl overflow-hidden border border-stone-200 bg-stone-100 max-h-80 flex items-center justify-center">
+            <div className="rounded-2xl overflow-hidden border border-stone-200 dark:border-stone-700 bg-stone-100 dark:bg-stone-900 max-h-80 flex items-center justify-center">
               <img
                 src={selectedReceiptImage}
                 alt="Comprobante"
@@ -453,7 +453,7 @@ _Generado automáticamente desde Metrika._`;
             <button
               type="button"
               onClick={() => setSelectedReceiptImage(null)}
-              className="w-full py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold cursor-pointer"
+              className="w-full py-2.5 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 text-xs font-bold cursor-pointer"
             >
               Cerrar vista
             </button>
@@ -464,13 +464,13 @@ _Generado automáticamente desde Metrika._`;
       {/* Modal Calendario con Selección Dinámica de Rango */}
       {showCalendarModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end justify-center">
-          <div className="bg-white w-full max-w-md rounded-t-3xl p-5 shadow-2xl border-t border-stone-200 space-y-3.5 max-h-[88vh] overflow-y-auto">
-            <div className="w-10 h-1.5 bg-[#dec0b7] rounded-full mx-auto mb-1"></div>
+          <div className="bg-white dark:bg-[#1f1815] text-[#1f1b19] dark:text-stone-100 w-full max-w-md rounded-t-3xl p-5 shadow-2xl border-t border-stone-200 dark:border-stone-800 space-y-3.5 max-h-[88vh] overflow-y-auto">
+            <div className="w-10 h-1.5 bg-[#dec0b7] dark:bg-stone-700 rounded-full mx-auto mb-1"></div>
 
-            <div className="flex items-center justify-between pb-2 border-b border-stone-200">
+            <div className="flex items-center justify-between pb-2 border-b border-stone-200 dark:border-stone-800">
               <div>
-                <h3 className="font-bold text-base text-[#1f1b19]">Período de Consulta</h3>
-                <p className="text-xs text-[#7a5a4e]">Elige un atajo o ingresa fechas específicas</p>
+                <h3 className="font-bold text-base text-[#1f1b19] dark:text-stone-100">Período de Consulta</h3>
+                <p className="text-xs text-[#7a5a4e] dark:text-stone-400">Elige un atajo o ingresa fechas específicas</p>
               </div>
               <button
                 type="button"

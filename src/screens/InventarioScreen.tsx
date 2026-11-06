@@ -202,20 +202,20 @@ export const InventarioScreen: React.FC = () => {
         {/* Search bar */}
         <div className="relative flex items-center">
           <span className="absolute left-3.5 text-[#8a726a] flex items-center pointer-events-none">
-            <span className="material-symbols-outlined text-[20px]">search</span>
+            <span className="material-symbols-outlined text-[20px] text-stone-400">search</span>
           </span>
           <input
             type="text"
             placeholder="Buscar producto..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-11 pl-10 pr-3.5 rounded-xl border border-[#dec0b7] bg-white text-sm font-medium text-[#1f1b19] placeholder-[#8a726a] focus:outline-none focus:border-[#9f3c16] shadow-xs"
+            className="w-full h-11 pl-10 pr-3.5 rounded-xl border border-[#dec0b7] dark:border-stone-700 bg-white dark:bg-[#201814] text-sm font-medium text-[#1f1b19] dark:text-stone-100 placeholder-[#8a726a] dark:placeholder-stone-400 focus:outline-none focus:border-[#9f3c16] dark:focus:border-[#ff9973] shadow-xs"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 text-[#8a726a] hover:text-[#1f1b19] cursor-pointer"
+              className="absolute right-3 text-[#8a726a] hover:text-[#1f1b19] dark:hover:text-stone-200 cursor-pointer"
             >
               <span className="material-symbols-outlined text-[18px]">close</span>
             </button>
@@ -230,7 +230,7 @@ export const InventarioScreen: React.FC = () => {
             className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
               selectedCategory === 'Todos'
                 ? 'bg-[#9f3c16] text-white shadow-xs'
-                : 'bg-white text-[#57423b] border border-[#dec0b7] hover:bg-[#f5ece8]'
+                : 'bg-white dark:bg-[#201814] text-[#57423b] dark:text-stone-300 border border-[#dec0b7] dark:border-stone-700 hover:bg-[#f5ece8] dark:hover:bg-[#2b1f1a]'
             }`}
           >
             Todos <span className="opacity-80 ml-0.5">{products.length}</span>
@@ -242,12 +242,12 @@ export const InventarioScreen: React.FC = () => {
             className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1 ${
               selectedCategory === '¡Poco Stock!'
                 ? 'bg-[#ba1a1a] text-white shadow-xs'
-                : 'bg-[#ffdad6] text-[#ba1a1a] hover:bg-[#ffc8c1]'
+                : 'bg-[#ffdad6] dark:bg-rose-950/80 text-[#ba1a1a] dark:text-rose-300 hover:bg-[#ffc8c1]'
             }`}
           >
             <span className="material-symbols-outlined text-[14px]">warning</span>
             <span>¡Poco Stock!</span>
-            <span className="ml-0.5 bg-white/40 px-1 rounded-full text-[10px]">{lowStockCount}</span>
+            <span className="ml-0.5 bg-white/40 dark:bg-black/30 px-1 rounded-full text-[10px]">{lowStockCount}</span>
           </button>
 
           {allCategories.map((cat) => (
@@ -258,7 +258,7 @@ export const InventarioScreen: React.FC = () => {
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
                 selectedCategory === cat
                   ? 'bg-[#9f3c16] text-white shadow-xs'
-                  : 'bg-white text-[#57423b] border border-[#dec0b7] hover:bg-[#f5ece8]'
+                  : 'bg-white dark:bg-[#201814] text-[#57423b] dark:text-stone-300 border border-[#dec0b7] dark:border-stone-700 hover:bg-[#f5ece8] dark:hover:bg-[#2b1f1a]'
               }`}
             >
               {cat}
@@ -269,10 +269,10 @@ export const InventarioScreen: React.FC = () => {
         {/* Products List */}
         <div className="space-y-2.5">
           {filteredProducts.length === 0 ? (
-            <div className="bg-white rounded-2xl p-8 text-center border border-[#dec0b7]/50 space-y-2">
-              <span className="material-symbols-outlined text-4xl text-[#8a726a]">inventory</span>
-              <p className="text-sm font-bold text-[#1f1b19]">No se encontraron productos</p>
-              <p className="text-xs text-[#8a726a]">Intenta con otro término de búsqueda o categoría</p>
+            <div className="bg-white dark:bg-[#1f1815] rounded-2xl p-8 text-center border border-[#dec0b7]/50 dark:border-stone-800 space-y-2">
+              <span className="material-symbols-outlined text-4xl text-[#8a726a] dark:text-stone-500">inventory</span>
+              <p className="text-sm font-bold text-[#1f1b19] dark:text-stone-200">No se encontraron productos</p>
+              <p className="text-xs text-[#8a726a] dark:text-stone-400">Intenta con otro término de búsqueda o categoría</p>
             </div>
           ) : (
             filteredProducts.map((p) => {
@@ -283,11 +283,11 @@ export const InventarioScreen: React.FC = () => {
                 <div
                   key={p.id}
                   onClick={() => handleOpenEdit(p)}
-                  className="bg-white rounded-2xl p-3.5 shadow-xs border border-[#dec0b7]/60 hover:border-[#9f3c16]/60 transition-all flex items-center justify-between gap-3 cursor-pointer active:scale-[0.99] group"
+                  className="bg-white dark:bg-[#1f1815] rounded-2xl p-3.5 shadow-xs border border-[#dec0b7]/60 dark:border-stone-800 hover:border-[#9f3c16]/60 dark:hover:border-stone-600 transition-all flex items-center justify-between gap-3 cursor-pointer active:scale-[0.99] group"
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     {/* Icon / Thumbnail Box */}
-                    <div className="relative w-14 h-14 rounded-xl bg-[#f5ece8] border border-[#dec0b7]/50 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs group-hover:bg-[#ffdbcf] transition-colors">
+                    <div className="relative w-14 h-14 rounded-xl bg-[#f5ece8] dark:bg-[#2b1f1a] border border-[#dec0b7]/50 dark:border-stone-700 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs group-hover:bg-[#ffdbcf] dark:group-hover:bg-[#382620] transition-colors">
                       {p.imageUrl ? (
                         <img
                           src={p.imageUrl}
@@ -295,14 +295,14 @@ export const InventarioScreen: React.FC = () => {
                           className="w-full h-full object-cover rounded-xl"
                         />
                       ) : (
-                        <span className="material-symbols-outlined text-[28px] text-[#9f3c16]">
+                        <span className="material-symbols-outlined text-[28px] text-[#9f3c16] dark:text-[#ff9973]">
                           {p.icon}
                         </span>
                       )}
                       {isLow && (
-                        <div className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#ba1a1a] ring-2 ring-white"></div>
+                        <div className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#ba1a1a] ring-2 ring-white dark:ring-black"></div>
                       )}
-                      <span className="absolute bottom-0.5 right-1 text-[9px] font-extrabold uppercase bg-white/90 px-1 rounded-sm text-[#57423b]">
+                      <span className="absolute bottom-0.5 right-1 text-[9px] font-extrabold uppercase bg-white/90 dark:bg-stone-900/90 px-1 rounded-sm text-[#57423b] dark:text-stone-300">
                         {p.unit}
                       </span>
                     </div>
@@ -310,23 +310,23 @@ export const InventarioScreen: React.FC = () => {
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[10px] font-bold text-[#8a726a] uppercase tracking-wider">
+                        <span className="text-[10px] font-bold text-[#8a726a] dark:text-stone-400 uppercase tracking-wider">
                           {p.category}
                         </span>
                         {isLow && (
-                          <span className="bg-[#ffdad6] text-[#ba1a1a] text-[9.5px] font-extrabold px-1.5 py-0.2 rounded-full flex items-center gap-0.5">
+                          <span className="bg-[#ffdad6] dark:bg-rose-950/80 text-[#ba1a1a] dark:text-rose-300 text-[9.5px] font-extrabold px-1.5 py-0.2 rounded-full flex items-center gap-0.5">
                             <span className="material-symbols-outlined text-[11px]">warning</span>
                             ¡Poco Stock!
                           </span>
                         )}
                       </div>
 
-                      <h3 className="text-sm font-bold text-[#1f1b19] truncate leading-tight mt-0.5">
+                      <h3 className="text-sm font-bold text-[#1f1b19] dark:text-stone-100 truncate leading-tight mt-0.5">
                         {p.name}
                       </h3>
 
                       <div className="flex items-baseline gap-1 mt-0.5">
-                        <span className="text-sm font-extrabold text-[#9f3c16]">
+                        <span className="text-sm font-extrabold text-[#9f3c16] dark:text-[#ff9973]">
                           Bs. {p.price.toFixed(2).replace('.', ',')}
                         </span>
                         <span className="text-[11px] text-[#8a726a]">/{p.unit}</span>
@@ -361,9 +361,9 @@ export const InventarioScreen: React.FC = () => {
 
       {/* MODAL: Detalle y Edición de Producto al Clic 100% Funcional */}
       {editingProduct && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-3">
-          <div className="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl border border-stone-200 max-h-[92vh] overflow-y-auto space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-stone-200">
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-[#1f1815] text-[#1f1b19] dark:text-stone-100 w-full max-w-sm rounded-2xl p-5 shadow-2xl border border-stone-200 dark:border-stone-800 max-h-[92vh] overflow-y-auto space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800">
               <div className="flex items-center gap-3">
                 {/* Photo/Camera Button Avatar Container (acts as both photo and button) */}
                 <div className="relative shrink-0 group">
@@ -699,9 +699,9 @@ export const InventarioScreen: React.FC = () => {
 
       {/* MODAL: Registrar Nuevo Producto */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-3">
-          <div className="bg-white w-full max-w-sm rounded-2xl p-5 shadow-2xl border border-stone-200 max-h-[92vh] overflow-y-auto space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-stone-200">
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-[#1f1815] text-[#1f1b19] dark:text-stone-100 w-full max-w-sm rounded-2xl p-5 shadow-2xl border border-stone-200 dark:border-stone-800 max-h-[92vh] overflow-y-auto space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800">
               <div className="flex items-center gap-3">
                 <div className="relative shrink-0 group">
                   <input
