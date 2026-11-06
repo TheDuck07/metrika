@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
 import { AppHeader } from '../components/AppHeader';
 import { BottomNav } from '../components/BottomNav';
+import { exportAndSaveExcel } from '../utils/excelExporter';
 import {
   getTodayDateStr,
   getYesterdayDateStr,
@@ -11,7 +12,7 @@ import {
 } from '../utils/dateUtils';
 
 export const HistorialScreen: React.FC = () => {
-  const { transactions, showToast } = useStore();
+  const { transactions, storeInfo, showToast } = useStore();
 
   const todayStr = getTodayDateStr();
   const yesterdayStr = getYesterdayDateStr();
@@ -124,41 +125,30 @@ export const HistorialScreen: React.FC = () => {
     showToast(`Filtro personalizado: ${s} al ${e}`);
   };
 
-  // Real CSV export
-  const handleDownloadReport = () => {
+  // Real Excel export with mobile save dialog
+  const handleDownloadReport = async () => {
     if (filteredTxs.length === 0) {
       showToast('No hay transacciones en el rango para exportar', 'warning');
       return;
     }
 
-    const headers = ['ID', 'Fecha', 'Hora', 'Tipo', 'Categoria', 'Detalle_Producto', 'Monto_Bs'];
-    const rows = filteredTxs.map((t) => [
-      t.id,
-      t.date,
-      t.time,
-      t.type.toUpperCase(),
-      `"${(t.category || '').replace(/"/g, '""')}"`,
-      `"${(t.title || '').replace(/"/g, '""')}"`,
-      t.amount.toFixed(2),
-    ]);
+    const res = await exportAndSaveExcel(
+      {
+        title: 'Historial de Transacciones',
+        storeName: storeInfo?.name || 'Mi Negocio',
+        ownerName: storeInfo?.owner || 'Administrador',
+        periodLabel: `Del ${startDate} al ${endDate}`,
+        transactions: filteredTxs,
+        summary: {
+          totalIngresos: totalIncome,
+          totalGastos: totalExpense,
+          balanceNeto: totalIncome - totalExpense,
+        },
+      },
+      `Historial_Metrika_${startDate.replace(/\//g, '-')}_al_${endDate.replace(/\//g, '-')}.xls`
+    );
 
-    rows.push([]);
-    rows.push(['', '', '', '', 'TOTAL INGRESOS (+)', '', totalIncome.toFixed(2)]);
-    rows.push(['', '', '', '', 'TOTAL SALIDAS (-)', '', totalExpense.toFixed(2)]);
-    rows.push(['', '', '', '', 'BALANCE NETO', '', (totalIncome - totalExpense).toFixed(2)]);
-
-    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\r\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `reporte_metrika_${startDate.replace(/\//g, '-')}_al_${endDate.replace(/\//g, '-')}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    showToast('¡Reporte en Excel (CSV) descargado con éxito!', 'success');
+    showToast(res.message, res.success ? 'success' : 'warning');
   };
 
   // Real WhatsApp sharing

@@ -4,7 +4,6 @@ import { AppHeader } from '../components/AppHeader';
 import { BottomNav } from '../components/BottomNav';
 import { ProductScanModal } from '../components/ProductScanModal';
 import { VoiceRecorderModal } from '../components/VoiceRecorderModal';
-import { ApiKeyModal } from '../components/ApiKeyModal';
 import { getTodayDateStr } from '../utils/dateUtils';
 
 export const InicioScreen: React.FC = () => {
@@ -26,7 +25,6 @@ export const InicioScreen: React.FC = () => {
   const [showProductScanModal, setShowProductScanModal] = useState(false);
   const [productScanMode, setProductScanMode] = useState<'venta' | 'inventario'>('venta');
   const [showVoiceModal, setShowVoiceModal] = useState(false);
-  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
 
   // Quick Sale State
   const [selectedProductId, setSelectedProductId] = useState(products[0]?.id || '');
@@ -325,18 +323,6 @@ export const InicioScreen: React.FC = () => {
                 </span>
               </div>
             </button>
-
-            {/* Gemini API Key Configuration link */}
-            <div className="flex justify-end pt-0.5">
-              <button
-                type="button"
-                onClick={() => setShowApiKeyModal(true)}
-                className="text-[11px] font-bold text-stone-500 hover:text-stone-800 flex items-center gap-1 transition-colors cursor-pointer py-0.5 px-1.5 rounded-lg hover:bg-stone-100"
-              >
-                <span className="material-symbols-outlined text-[14px]">key</span>
-                <span>Configurar Gemini API Key</span>
-              </button>
-            </div>
           </div>
         </section>
 
@@ -1018,12 +1004,6 @@ export const InicioScreen: React.FC = () => {
       <VoiceRecorderModal
         isOpen={showVoiceModal}
         onClose={() => setShowVoiceModal(false)}
-      />
-
-      {/* Gemini API Key Modal */}
-      <ApiKeyModal
-        isOpen={showApiKeyModal}
-        onClose={() => setShowApiKeyModal(false)}
       />
 
       <BottomNav />

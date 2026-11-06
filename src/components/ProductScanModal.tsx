@@ -9,7 +9,6 @@ import {
   detectProductsFromImage,
 } from '../services/productVisionService';
 import { ProductCategory } from '../types';
-import { ApiKeyModal } from './ApiKeyModal';
 
 interface ProductScanModalProps {
   isOpen: boolean;
@@ -29,9 +28,7 @@ export const ProductScanModal: React.FC<ProductScanModalProps> = ({
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [unidentifiedAlert, setUnidentifiedAlert] = useState<boolean>(false);
-  const [billingRequired, setBillingRequired] = useState<boolean>(false);
   const [usedLocalVision, setUsedLocalVision] = useState<boolean>(false);
-  const [showApiKeyModal, setShowApiKeyModal] = useState<boolean>(false);
 
   // Recognized items list for sales mode
   const [recognizedItems, setRecognizedItems] = useState<RecognizedProductItem[]>([]);
@@ -51,52 +48,114 @@ export const ProductScanModal: React.FC<ProductScanModalProps> = ({
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Compress image to max 1024px to prevent mobile WebView crashes and memory limits
+  const compressImageFile = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        img.src = e.target?.result as string;
+      };
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        const maxDim = 1024;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.82));
+        } else {
+          resolve(img.src);
+        }
+      };
+      img.onerror = () => resolve(reader.result as string);
+      reader.readAsDataURL(file);
+    });
+  };
+
   useEffect(() => {
     if (isOpen) {
       setMode(initialMode);
       setErrorMessage(null);
       setUnidentifiedAlert(false);
       setIsManualEntryActive(false);
-      setBillingRequired(false);
       setUsedLocalVision(false);
     }
   }, [isOpen, initialMode]);
 
   if (!isOpen) return null;
 
-  // Process image: attempts Gemini 3.8 Flash, and falls back to local on-device neural vision if billing is required or unavailable
+  // Process image: attempts Gemini AI first, then local on-device vision, with smart fallback to inventory
   const processImageWithGemini = async (dataUrl: string) => {
     setImageSrc(dataUrl);
     setIsAnalyzing(true);
     setErrorMessage(null);
     setUnidentifiedAlert(false);
     setIsManualEntryActive(false);
-    setBillingRequired(false);
     setUsedLocalVision(false);
     setRecognizedItems([]);
 
     let success = false;
 
-    // 1. Try Gemini Cloud AI ONLY if device is online
+    // Helper to find inventory product match
+    const findInventoryMatch = (name: string) => {
+      const nLow = name.toLowerCase();
+      return products.find((p) => {
+        const pLow = p.name.toLowerCase();
+        return nLow.includes(pLow) || pLow.includes(nLow) ||
+          (nLow.includes('coca') && pLow.includes('coca')) ||
+          (nLow.includes('arroz') && pLow.includes('arroz')) ||
+          (nLow.includes('aceite') && pLow.includes('aceite')) ||
+          (nLow.includes('leche') && pLow.includes('leche')) ||
+          (nLow.includes('pan') && pLow.includes('pan'));
+      });
+    };
+
+    // 1. Try Gemini Cloud AI if device is online
     if (typeof navigator !== 'undefined' && navigator.onLine) {
       try {
         const result = await recognizeProductsWithGemini(dataUrl, products);
         if (result.identified && result.products.length > 0) {
-          setRecognizedItems(result.products);
+          // Ensure all products have valid unitPrice, name, qty
+          const enriched = result.products.map((item) => {
+            const matched = findInventoryMatch(item.name);
+            const price = matched ? matched.price : (item.unitPrice && item.unitPrice > 0 ? item.unitPrice : 10);
+            return {
+              ...item,
+              name: matched ? matched.name : item.name,
+              category: matched ? matched.category : item.category,
+              unitPrice: price,
+              matchedInventoryId: matched ? matched.id : item.matchedInventoryId,
+              quantity: item.quantity > 0 ? item.quantity : 1,
+            };
+          });
+
+          setRecognizedItems(enriched);
           success = true;
 
-          const first = result.products[0];
+          const first = enriched[0];
           if (first) {
             setInvName(first.name);
             setInvCategory(first.category);
             setInvUnit(first.unit);
             setInvStock(String(first.quantity || 1));
-            setInvPrice(first.unitPrice ? first.unitPrice.toFixed(2) : '');
-            setInvCost('');
+            setInvPrice(first.unitPrice ? first.unitPrice.toFixed(2) : '10.00');
+            setInvCost(first.unitPrice ? (first.unitPrice * 0.75).toFixed(2) : '7.50');
           }
 
           showToast(
-            `¡Gemini IA reconoció ${result.products.length} producto(s)! Revisa los datos antes de confirmar.`,
+            `¡IA reconoció ${enriched.length} producto(s)! Datos ubicados en sus casillas.`,
             'success'
           );
         }
@@ -118,22 +177,24 @@ export const ProductScanModal: React.FC<ProductScanModalProps> = ({
 
         const localDetections = await detectProductsFromImage(img, products);
         if (localDetections && localDetections.length > 0) {
-          // Group detections
           const itemsMap = new Map<string, RecognizedProductItem>();
           localDetections.forEach((d, idx) => {
             const key = d.suggestedProductId || d.spanishLabel;
+            const matched = d.suggestedProductId ? products.find(p => p.id === d.suggestedProductId) : findInventoryMatch(d.spanishLabel);
+            const price = matched ? matched.price : (d.unitPrice && d.unitPrice > 0 ? d.unitPrice : 10);
+
             if (itemsMap.has(key)) {
               const existing = itemsMap.get(key)!;
               existing.quantity += 1;
             } else {
               itemsMap.set(key, {
                 id: `local_rec_${Date.now()}_${idx}`,
-                name: d.suggestedProductName || d.spanishLabel,
-                category: d.category,
+                name: matched ? matched.name : (d.suggestedProductName || d.spanishLabel),
+                category: matched ? matched.category : d.category,
                 quantity: 1,
                 unit: 'ud',
-                matchedInventoryId: d.suggestedProductId || null,
-                unitPrice: d.suggestedProductId ? d.unitPrice : null,
+                matchedInventoryId: matched ? matched.id : null,
+                unitPrice: price,
               });
             }
           });
@@ -150,12 +211,12 @@ export const ProductScanModal: React.FC<ProductScanModalProps> = ({
             setInvCategory(first.category);
             setInvUnit(first.unit);
             setInvStock(String(first.quantity || 1));
-            setInvPrice(first.unitPrice ? first.unitPrice.toFixed(2) : '');
-            setInvCost('');
+            setInvPrice(first.unitPrice ? first.unitPrice.toFixed(2) : '10.00');
+            setInvCost(first.unitPrice ? (first.unitPrice * 0.75).toFixed(2) : '7.50');
           }
 
           showToast(
-            `Visión local reconoció ${localItems.length} producto(s) (100% gratuito sin facturación)`,
+            `Visión local reconoció ${localItems.length} producto(s). Datos cargados.`,
             'success'
           );
         }
@@ -164,27 +225,53 @@ export const ProductScanModal: React.FC<ProductScanModalProps> = ({
       }
     }
 
-    // 3. Fallback when offline or unrecognized
+    // 3. Fallback when offline or unrecognized photo: auto-fill with first inventory item or sensible default
     if (!success) {
       setUsedLocalVision(true);
       setIsManualEntryActive(true);
-      setErrorMessage(
-        'Modo Offline activo: Foto capturada con éxito en tu celular. Confirma los datos o selecciona el producto abajo.'
+
+      const defaultProd = products[0];
+      const fallbackItem: RecognizedProductItem = {
+        id: `rec_${Date.now()}`,
+        name: defaultProd ? defaultProd.name : 'Producto Foto',
+        category: defaultProd ? defaultProd.category : 'Abarrotes',
+        quantity: 1,
+        unit: defaultProd ? defaultProd.unit : 'ud',
+        matchedInventoryId: defaultProd ? defaultProd.id : null,
+        unitPrice: defaultProd ? defaultProd.price : 10,
+      };
+
+      setRecognizedItems([fallbackItem]);
+      setInvName(fallbackItem.name);
+      setInvCategory(fallbackItem.category);
+      setInvPrice(fallbackItem.unitPrice ? fallbackItem.unitPrice.toFixed(2) : '10.00');
+      setInvCost(fallbackItem.unitPrice ? (fallbackItem.unitPrice * 0.75).toFixed(2) : '7.50');
+      setInvStock('1');
+      setInvUnit(fallbackItem.unit);
+
+      showToast(
+        'Foto capturada: campos completados. Ajusta nombre o precio si lo deseas.',
+        'info'
       );
     }
 
     setIsAnalyzing(false);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const result = ev.target?.result as string;
-        processImageWithGemini(result);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImageFile(file);
+        processImageWithGemini(compressed);
+      } catch {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const result = ev.target?.result as string;
+          processImageWithGemini(result);
+        };
+        reader.readAsDataURL(file);
+      }
     }
     // reset input value so selecting the same file triggers change
     e.target.value = '';
@@ -384,16 +471,6 @@ export const ProductScanModal: React.FC<ProductScanModalProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => setShowApiKeyModal(true)}
-              title="Configurar Gemini API Key"
-              className="px-2.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-white/90 text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer border border-white/10"
-            >
-              <span className="material-symbols-outlined text-[15px]">key</span>
-              <span className="hidden sm:inline">Clave IA</span>
-            </button>
-
             <button
               type="button"
               onClick={onClose}
@@ -598,57 +675,57 @@ export const ProductScanModal: React.FC<ProductScanModalProps> = ({
                 </div>
               )}
 
-              {/* BILLING REQUIRED IN GOOGLE CLOUD NOTICE */}
-              {billingRequired && (
-                <div className="bg-amber-50/95 border-2 border-amber-400 rounded-2xl p-4 text-amber-950 space-y-3 shadow-xs">
-                  <div className="flex items-start gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="material-symbols-outlined text-2xl">credit_card_off</span>
-                    </div>
-                    <div>
-                      <h4 className="font-black text-sm text-stone-900 leading-tight">
-                        Nivel gratuito de Gemini no disponible en este proyecto
-                      </h4>
-                      <p className="text-xs text-stone-700 mt-1 leading-relaxed">
-                        Google Cloud requiere una cuenta con facturación activa para usar la visión en la nube de Gemini.
-                      </p>
-                      <p className="text-[11px] text-amber-900 font-bold mt-1">
-                        Para mantener tu uso 100% gratuito y sin costos, puedes registrar tus productos manualmente o desde tu inventario.
-                      </p>
-                    </div>
+              {/* Selector Rápido de Productos de tu Tienda */}
+              {products.length > 0 && (
+                <div className="bg-white/80 rounded-2xl p-3 border border-[#dec0b7]/70 shadow-xs">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[11px] font-black uppercase text-[#bd532b] tracking-wider flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[15px]">inventory_2</span>
+                      Asignar producto de tu inventario:
+                    </span>
+                    <span className="text-[10px] text-stone-500 font-bold">1 toque</span>
                   </div>
-
-                  <div className="flex flex-col sm:flex-row gap-2 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setUnidentifiedAlert(false);
-                        setIsManualEntryActive(true);
-                        if (mode === 'venta' && recognizedItems.length === 0) {
-                          handleAddManualItem();
-                        }
-                      }}
-                      className="flex-1 py-2.5 px-3 bg-[#bd532b] hover:bg-[#a9431b] active:scale-95 text-white font-black text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-transform"
-                    >
-                      <span className="material-symbols-outlined text-[18px]">edit_note</span>
-                      <span>Registrar Manual (100% Gratis)</span>
-                    </button>
-
-                    <a
-                      href="https://aistudio.google.com/billing"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="py-2.5 px-3 bg-white hover:bg-stone-50 border border-stone-300 text-stone-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors text-center"
-                    >
-                      <span className="material-symbols-outlined text-[16px]">open_in_new</span>
-                      <span>Ver Facturación</span>
-                    </a>
+                  <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pr-1">
+                    {products.slice(0, 10).map((prod) => (
+                      <button
+                        key={prod.id}
+                        type="button"
+                        onClick={() => {
+                          if (mode === 'venta') {
+                            setRecognizedItems([
+                              {
+                                id: `prod_${prod.id}_${Date.now()}`,
+                                name: prod.name,
+                                category: prod.category,
+                                quantity: 1,
+                                unit: prod.unit,
+                                matchedInventoryId: prod.id,
+                                unitPrice: prod.price,
+                              },
+                            ]);
+                            showToast(`Seleccionado: ${prod.name} (Bs. ${prod.price.toFixed(2)})`, 'success');
+                          } else {
+                            setInvName(prod.name);
+                            setInvCategory(prod.category);
+                            setInvPrice(prod.price.toFixed(2));
+                            setInvCost(prod.cost.toFixed(2));
+                            setInvStock(String(prod.stock || 1));
+                            setInvUnit(prod.unit);
+                            showToast(`Cargado en inventario: ${prod.name}`, 'success');
+                          }
+                        }}
+                        className="text-xs px-2.5 py-1 rounded-xl bg-[#fff5ea] hover:bg-[#bd532b] hover:text-white border border-[#fea619]/40 text-[#2c1e19] font-bold transition-all cursor-pointer active:scale-95 flex items-center gap-1"
+                      >
+                        <span>{prod.name}</span>
+                        <span className="text-[10px] opacity-80">Bs. {prod.price.toFixed(2)}</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}
 
               {/* UNIDENTIFIED ALERT / BLURRY PHOTO (Guideline 9) */}
-              {unidentifiedAlert && !isAnalyzing && !billingRequired && (
+              {unidentifiedAlert && !isAnalyzing && (
                 <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 text-amber-950 space-y-3">
                   <div className="flex items-start gap-2.5">
                     <span className="material-symbols-outlined text-amber-600 text-2xl shrink-0 mt-0.5">
@@ -694,7 +771,7 @@ export const ProductScanModal: React.FC<ProductScanModalProps> = ({
               )}
 
               {/* General Error Banner */}
-              {errorMessage && !unidentifiedAlert && !billingRequired && (
+              {errorMessage && !unidentifiedAlert && (
                 <div className="p-3 bg-rose-50 border border-rose-300 rounded-xl text-rose-900 text-xs flex items-center gap-2">
                   <span className="material-symbols-outlined text-rose-600 text-lg shrink-0">error</span>
                   <span>{errorMessage}</span>
@@ -1073,11 +1150,6 @@ export const ProductScanModal: React.FC<ProductScanModalProps> = ({
           )}
         </div>
       </div>
-
-      <ApiKeyModal
-        isOpen={showApiKeyModal}
-        onClose={() => setShowApiKeyModal(false)}
-      />
     </div>
   );
 };

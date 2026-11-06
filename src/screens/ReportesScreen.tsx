@@ -3,6 +3,7 @@ import { useStore } from '../context/StoreContext';
 import { AppHeader } from '../components/AppHeader';
 import { BottomNav } from '../components/BottomNav';
 import { getTodayDateStr } from '../utils/dateUtils';
+import { exportAndSaveExcel } from '../utils/excelExporter';
 
 const CATEGORY_COLORS: Record<string, string> = {
   Mercadería: '#2563eb',
@@ -26,11 +27,12 @@ const MONTH_NAMES = [
 ];
 
 export const ReportesScreen: React.FC = () => {
-  const { transactions } = useStore();
+  const { transactions, storeInfo, user, showToast } = useStore();
 
   const [activeTab, setActiveTab] = useState<'semana' | 'mes'>('mes');
   const [topModeMonth, setTopModeMonth] = useState<'unidades' | 'ingresos'>('unidades');
   const [topModeSemana, setTopModeSemana] = useState<'unidades' | 'ingresos'>('ingresos');
+  const [isExporting, setIsExporting] = useState<boolean>(false);
 
   // Today reference
   const today = useMemo(() => new Date(), []);
@@ -296,6 +298,7 @@ export const ReportesScreen: React.FC = () => {
     const majorGastoName = majorGasto[0] as string;
 
     return {
+      weekTxs,
       totalVentas,
       totalGastos,
       gananciaNeta,
@@ -310,6 +313,29 @@ export const ReportesScreen: React.FC = () => {
       majorGastoName,
     };
   }, [transactions]);
+
+  const handleExportExcel = async () => {
+    setIsExporting(true);
+    const txsToExport = activeTab === 'mes' ? monthTransactions : weeklyStats.weekTxs;
+    const period = activeTab === 'mes' ? monthDisplayName : 'Semana Actual';
+    const stats = activeTab === 'mes' ? monthlyStats : weeklyStats;
+
+    const res = await exportAndSaveExcel({
+      title: 'Informe Contable y Balance',
+      storeName: storeInfo?.name || user?.storeName || 'Mi Negocio',
+      ownerName: storeInfo?.owner || user?.name || 'Administrador',
+      periodLabel: period,
+      transactions: txsToExport,
+      summary: {
+        totalIngresos: stats.totalVentas,
+        totalGastos: stats.totalGastos,
+        balanceNeto: stats.gananciaNeta,
+      },
+    });
+
+    setIsExporting(false);
+    showToast(res.message, res.success ? 'success' : 'warning');
+  };
 
   return (
     <div className="bg-[#fff8f5] dark:bg-[#171210] text-[#1f1b19] dark:text-stone-100 min-h-screen flex flex-col pb-28 select-none transition-colors">
@@ -344,6 +370,26 @@ export const ReportesScreen: React.FC = () => {
               Mensual
             </button>
           </div>
+        </div>
+
+        {/* Botón de Descarga de Informe en Excel */}
+        <div className="w-full">
+          <button
+            id="btn-export-excel"
+            type="button"
+            disabled={isExporting}
+            onClick={handleExportExcel}
+            className="w-full h-11 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 active:scale-[0.98] text-white rounded-2xl flex items-center justify-center gap-2 font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer disabled:opacity-50"
+          >
+            <span className="material-symbols-outlined text-[20px]">
+              {isExporting ? 'hourglass_top' : 'table_view'}
+            </span>
+            <span>
+              {isExporting
+                ? 'Generando archivo Excel...'
+                : `Descargar Informe en Excel (${activeTab === 'mes' ? monthDisplayName : 'Semana Actual'})`}
+            </span>
+          </button>
         </div>
 
         {/* ================= VISTA MENSUAL ================= */}

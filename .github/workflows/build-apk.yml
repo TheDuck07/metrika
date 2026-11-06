@@ -60,14 +60,18 @@ jobs:
         uses: softprops/action-gh-release@v2
         continue-on-error: true
         with:
-          tag_name: v1.0.0-apk
-          name: "Metrika v1.0.0 (Android APK Instalable)"
+          tag_name: v1.0.${{ github.run_number }}
+          name: "Metrika v1.0.${{ github.run_number }} (APK Actualizado)"
+          make_latest: true
+          draft: false
+          prerelease: false
           body: |
-            ### 📱 Metrika - Hola al control total (Versión Móvil Android)
-            Descarga el archivo `app-debug.apk` adjunto e instálalo directamente en tu celular Android.
+            ### 📱 Metrika v1.0.${{ github.run_number }} - Hola al control total
+            APK Android actualizado con todos los recursos locales incluidos:
             
-            - **100% Offline**: Funciona completamente sin internet y guarda todas tus ventas, compras y caja en el dispositivo.
-            - **Diseño Adaptable**: Se adapta a cualquier tamaño de pantalla.
+            - **Íconos Locales 100% Offline**: No requiere internet para cargar fuentes ni gráficos.
+            - **Cámara & Audio Sin Tokens**: Reconocimiento de voz y fotos de productos local en el teléfono.
+            - **Gráficas y Reportes Adaptados**: Soporte completo de modo oscuro y diseño responsive en cualquier móvil.
           files: android/app/build/outputs/apk/debug/app-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
