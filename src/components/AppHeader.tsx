@@ -31,12 +31,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
           title="Toca para cambiar de negocio o crear otro"
           className="flex items-center gap-2.5 min-w-0 flex-1 text-left group p-1 -ml-1 rounded-2xl hover:bg-white/10 transition-all cursor-pointer"
         >
-          {/* Official Metrika Logo - Clean, without white background or icon clash */}
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform overflow-hidden">
+          {/* Official Metrika Logo - Clean, transparent without white background or icon clash */}
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
             <img
-              src="/logo-m.jpg"
+              src="/logo-m.png"
               alt="Metrika Logo"
-              className="w-full h-full object-contain rounded-xl"
+              className="w-full h-full object-contain"
             />
           </div>
           <div className="flex flex-col min-w-0 flex-1">

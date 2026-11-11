@@ -60,19 +60,23 @@ jobs:
         uses: softprops/action-gh-release@v2
         continue-on-error: true
         with:
-          tag_name: v1.5.0
-          name: "Metrika v1.5.0 - Logo Oficial, Pantalla de Ingreso y Cuentas"
+          tag_name: v2.0
+          name: "Metrika v2.0 - APK Android Oficial con Logo Transparente"
           make_latest: true
           draft: false
           prerelease: false
           body: |
-            ### 📱 Metrika v1.5.0 - Nueva Identidad de Marca y Cuentas
+            ### 📱 Metrika v2.0 - Release Oficial Android
 
-            APK Android generado automáticamente con el logo oficial de Metrika y todas las mejoras solicitadas:
+            APK Android generado automáticamente con la versión 2.0 y el logo oficial transparente de Metrika:
 
-            - 🏷️ **Logo Oficial en la APK Android**: Iconos launcher adaptativos y redondos (`ic_launcher`, `ic_launcher_round`, `ic_launcher_foreground`) con el isotipo oficial de Metrika en todas las densidades (mdpi, hdpi, xhdpi, xxhdpi, xxxhdpi).
-            - 🔐 **Pantalla de Inicio de Sesión Oficial**: Rediseño exacto del Mockup Pantalla 1 con cabecera azul `#1E70BA`, isotipo "M", destellos, onda de transición verde lima `#9EC84A`, botones redondeados "Iniciar sesión", "Crear cuenta", Google y Modo Demo.
-            - 👤 **Sistema de Cuentas y Perfil**: Cierre de sesión, personalización de nombre de tienda y comerciante, foto de perfil desde cámara o galería y selector de tema Claro / Oscuro.
+            - 🏷️ **Logo Oficial Transparente en la APK Android**: Iconos launcher adaptativos y redondos (`ic_launcher`, `ic_launcher_round`, `ic_launcher_foreground`) con fondo transparente y diseño limpio.
+            - 🔐 **Inicio con Google Real y Limpio**: Conexión con tu cuenta de Google sin simulaciones ni errores de autorización.
+            - 👤 **Sistema de Cuentas y Perfil**: Cierre de sesión, gestión de nombre de tienda, foto de perfil personalizada y selector de tema Claro / Oscuro.
+            - 🌸 **Reconocimiento Visual Offline**: Identificación inteligente de productos (ramos de flores, abarrotes, bebidas) mediante análisis de píxeles sin conexión.
+            - 🎙️ **Dictado por Voz Offline**: Compatible con el micrófono integrado de Android (Gboard) y procesador NLP local sin conexión.
+            - 📊 **Exportador Excel Funcional**: Descarga directa de reportes de ventas y balance a formatos CSV y hojas de cálculo.
+            - 👵 **Accesibilidad para Adultos Mayores**: Botones de gran tamaño, contraste visual optimizado y tipografía clara.
             - 🔑 **Inicio con Google Real**: Compatibilidad con Google Identity Services (GIS), inicio con tu propio correo `@gmail.com` y funcionamiento continuo en modo offline.
             - 📊 **Exportador Excel Funcional**: Descarga directa de reportes de ventas y balance a formatos CSV con BOM UTF-8 y hoja de cálculo `.xls`, además de copiado al portapapeles en 1 toque.
             - 📸 **Inventario con Cámara IA y Modo Manual**: Agregado de productos por fotografía de etiquetas con IA, dictado por voz o ingreso manual.
