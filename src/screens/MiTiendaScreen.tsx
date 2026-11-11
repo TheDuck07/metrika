@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useStore } from '../context/StoreContext';
 import { AppHeader } from '../components/AppHeader';
 import { BottomNav } from '../components/BottomNav';
@@ -10,6 +10,7 @@ export const MiTiendaScreen: React.FC = () => {
     loginWithGoogle,
     storeInfo,
     updateStoreInfo,
+    updateUserProfile,
     products,
     transactions,
     navigateWithPushBack,
@@ -20,6 +21,8 @@ export const MiTiendaScreen: React.FC = () => {
     availableStores,
     setShowBusinessSwitcher,
   } = useStore();
+
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   // Modals
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
@@ -145,9 +148,49 @@ _Copia de seguridad generada automáticamente por Metrika._`;
 
           <div className="flex items-center gap-3.5 relative">
             <div className="relative shrink-0">
-              <div className="w-18 h-18 rounded-full bg-[#fceede] dark:bg-[#33221b] border-2 border-[#ffddb8] dark:border-stone-700 flex items-center justify-center text-[#bd532b] dark:text-[#ff9973] shadow-xs overflow-hidden">
-                {user?.avatarUrl ? (
-                  <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+              <input
+                type="file"
+                ref={photoInputRef}
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      const img = new Image();
+                      img.src = event.target?.result as string;
+                      img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const maxDim = 512;
+                        let { width, height } = img;
+                        if (width > maxDim || height > maxDim) {
+                          if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                          } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                          }
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        if (ctx) {
+                          ctx.drawImage(img, 0, 0, width, height);
+                          const compressed = canvas.toDataURL('image/jpeg', 0.85);
+                          updateUserProfile({ avatarUrl: compressed });
+                          showToast('¡Foto de perfil actualizada!', 'success');
+                        }
+                      };
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
+              <div className="w-18 h-18 rounded-full bg-[#fceede] dark:bg-[#33221b] border-2 border-[#1E70BA] dark:border-stone-700 flex items-center justify-center text-[#1E70BA] shadow-xs overflow-hidden">
+                {user?.avatarUrl || storeInfo.logoUrl ? (
+                  <img src={user?.avatarUrl || storeInfo.logoUrl} alt={user?.name || storeInfo.owner} className="w-full h-full object-cover" />
                 ) : (
                   <span className="material-symbols-outlined text-[36px]">storefront</span>
                 )}
@@ -156,10 +199,11 @@ _Copia de seguridad generada automáticamente por Metrika._`;
                 id="btn-edit-photo"
                 type="button"
                 aria-label="Editar foto"
-                onClick={() => showToast('Cámara / Galería: Selecciona foto para tu tienda')}
-                className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-[#9f3c16] text-white flex items-center justify-center shadow-md active:scale-90 transition-transform cursor-pointer"
+                onClick={() => photoInputRef.current?.click()}
+                className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-[#9EC84A] text-slate-950 flex items-center justify-center shadow-md active:scale-90 transition-transform cursor-pointer border-2 border-white dark:border-slate-800"
+                title="Tomar o cambiar foto"
               >
-                <span className="material-symbols-outlined text-[14px]">photo_camera</span>
+                <span className="material-symbols-outlined text-[15px]">photo_camera</span>
               </button>
             </div>
 

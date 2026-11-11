@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
 import { AppHeader } from '../components/AppHeader';
 import { BottomNav } from '../components/BottomNav';
-import { exportAndSaveExcel } from '../utils/excelExporter';
+import { exportAndSaveExcel, copyTransactionsToClipboard, ExportReportParams } from '../utils/excelExporter';
 
 const CATEGORY_COLORS: Record<string, string> = {
   Mercadería: '#1E70BA',
@@ -290,12 +290,12 @@ export const ReportesScreen: React.FC = () => {
   // Current active data scope
   const activeStats = activeTab === 'semana' ? weeklyStats : monthlyStats;
 
-  const handleExportExcel = async () => {
-    setIsExporting(true);
+  const [showExportModal, setShowExportModal] = useState(false);
+
+  const getExportParams = (): ExportReportParams => {
     const txsToExport = activeTab === 'semana' ? weeklyStats.weekTxs : monthTransactions;
     const period = activeTab === 'semana' ? 'Esta Semana (Lun-Dom)' : monthDisplayName;
-
-    const res = await exportAndSaveExcel({
+    return {
       title: 'Informe Contable y Balance',
       storeName: storeInfo?.name || user?.storeName || 'Mi Negocio',
       ownerName: storeInfo?.owner || user?.name || 'Administrador',
@@ -306,9 +306,28 @@ export const ReportesScreen: React.FC = () => {
         totalGastos: activeStats.totalGastos,
         balanceNeto: activeStats.gananciaNeta,
       },
-    });
+    };
+  };
 
+  const handleDownloadCsv = async () => {
+    setIsExporting(true);
+    const params = getExportParams();
+    const res = await exportAndSaveExcel(params, 'csv');
     setIsExporting(false);
+    showToast(res.message, res.success ? 'success' : 'warning');
+  };
+
+  const handleDownloadXls = async () => {
+    setIsExporting(true);
+    const params = getExportParams();
+    const res = await exportAndSaveExcel(params, 'xls');
+    setIsExporting(false);
+    showToast(res.message, res.success ? 'success' : 'warning');
+  };
+
+  const handleCopyTable = async () => {
+    const params = getExportParams();
+    const res = await copyTransactionsToClipboard(params);
     showToast(res.message, res.success ? 'success' : 'warning');
   };
 
@@ -389,12 +408,11 @@ export const ReportesScreen: React.FC = () => {
 
           <button
             type="button"
-            disabled={isExporting}
-            onClick={handleExportExcel}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#EBF5EC] dark:bg-[#1B2F23] text-[#2D8A4E] dark:text-emerald-300 rounded-full border border-emerald-200 text-xs font-black hover:bg-emerald-100 transition-all cursor-pointer shadow-xs"
+            onClick={() => setShowExportModal(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#EBF5EC] dark:bg-[#1B2F23] text-[#2D8A4E] dark:text-emerald-300 rounded-full border border-emerald-200 text-xs font-black hover:bg-emerald-100 transition-all cursor-pointer shadow-xs active:scale-95"
           >
             <span className="material-symbols-outlined text-[16px]">table_view</span>
-            <span>Descargar Excel</span>
+            <span>Generar Excel</span>
           </button>
         </div>
 
@@ -644,6 +662,178 @@ export const ReportesScreen: React.FC = () => {
           </section>
         )}
       </main>
+
+      {/* ================= MODAL: EXPORTAR A EXCEL ================= */}
+      {showExportModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-[#1A1F26] text-[#252524] dark:text-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[92vh] overflow-y-auto flex flex-col">
+            {/* Modal Header */}
+            <div className="p-4 bg-[#2D8A4E] text-white rounded-t-3xl sm:rounded-t-3xl flex items-center justify-between shrink-0 shadow-md">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[22px]">table_view</span>
+                </div>
+                <div>
+                  <h3 className="font-black text-base leading-tight">Exportar Resumen de Ventas</h3>
+                  <p className="text-[11px] text-emerald-100">
+                    {activeTab === 'semana' ? 'Esta Semana (Lun-Dom)' : monthDisplayName} • {activeStats.totalVentas.toFixed(2)} Bs.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowExportModal(false)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-lg">close</span>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-5 space-y-4 flex-1">
+              {/* Summary KPIs */}
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="p-2.5 rounded-xl bg-[#EBF5EC] dark:bg-[#1B2F23] border border-emerald-200/60">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block">Ventas</span>
+                  <span className="text-xs sm:text-sm font-black text-[#2D8A4E] dark:text-emerald-300">
+                    Bs. {activeStats.totalVentas.toFixed(2)}
+                  </span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-[#FDEFEA] dark:bg-[#341F1A] border border-orange-200/60">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block">Salidas</span>
+                  <span className="text-xs sm:text-sm font-black text-[#EE6B4D]">
+                    Bs. {activeStats.totalGastos.toFixed(2)}
+                  </span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-[#EAF2F9] dark:bg-[#162738] border border-blue-200/60">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block">Balance</span>
+                  <span className="text-xs sm:text-sm font-black text-[#1E70BA] dark:text-[#60A5FA]">
+                    Bs. {activeStats.gananciaNeta.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Download Buttons */}
+              <div className="space-y-2">
+                <label className="block text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Opciones de Descarga
+                </label>
+
+                {/* Option 1: CSV for Excel */}
+                <button
+                  type="button"
+                  disabled={isExporting}
+                  onClick={handleDownloadCsv}
+                  className="w-full p-3 rounded-2xl bg-gradient-to-br from-[#EBF5EC] to-[#ddf0df] dark:from-[#1B2F23] dark:to-[#14231a] border-2 border-emerald-400/50 hover:border-emerald-500 transition-all flex items-center justify-between text-left cursor-pointer shadow-xs active:scale-98 group disabled:opacity-50"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#2D8A4E] text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+                      <span className="material-symbols-outlined text-2xl font-bold">description</span>
+                    </div>
+                    <div>
+                      <div className="text-xs font-black text-slate-900 dark:text-white leading-tight">
+                        Descargar archivo CSV para Excel
+                      </div>
+                      <div className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
+                        Compatible con Excel, Sheets y móvil (UTF-8 con tildes)
+                      </div>
+                    </div>
+                  </div>
+                  <span className="material-symbols-outlined text-emerald-600 text-xl">download</span>
+                </button>
+
+                {/* Option 2: XLS Formatted */}
+                <button
+                  type="button"
+                  disabled={isExporting}
+                  onClick={handleDownloadXls}
+                  className="w-full p-3 rounded-2xl bg-white dark:bg-[#20252D] border-2 border-slate-200 dark:border-slate-700 hover:border-[#1E70BA] transition-all flex items-center justify-between text-left cursor-pointer shadow-xs active:scale-98 group disabled:opacity-50"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#1E70BA] text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+                      <span className="material-symbols-outlined text-2xl font-bold">table_chart</span>
+                    </div>
+                    <div>
+                      <div className="text-xs font-black text-slate-900 dark:text-white leading-tight">
+                        Descargar formato Excel (.xls con colores)
+                      </div>
+                      <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                        Tabla estilizada con diseño oficial de Metrika
+                      </div>
+                    </div>
+                  </div>
+                  <span className="material-symbols-outlined text-[#1E70BA] text-xl">download</span>
+                </button>
+
+                {/* Option 3: Copy to clipboard */}
+                <button
+                  type="button"
+                  onClick={handleCopyTable}
+                  className="w-full p-3 rounded-2xl bg-white dark:bg-[#20252D] border border-slate-200 dark:border-slate-700 hover:border-slate-400 transition-all flex items-center justify-between text-left cursor-pointer shadow-xs active:scale-98 group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+                      <span className="material-symbols-outlined text-2xl">content_copy</span>
+                    </div>
+                    <div>
+                      <div className="text-xs font-black text-slate-900 dark:text-white leading-tight">
+                        Copiar tabla al portapapeles
+                      </div>
+                      <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                        Para pegar directo en Excel con Ctrl + V
+                      </div>
+                    </div>
+                  </div>
+                  <span className="material-symbols-outlined text-slate-500 text-xl">copy_all</span>
+                </button>
+              </div>
+
+              {/* Transactions Preview Table */}
+              <div className="space-y-1.5 pt-2 border-t border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Vista previa ({activeTab === 'semana' ? weeklyStats.weekTxs.length : monthTransactions.length} registros)
+                  </span>
+                </div>
+
+                <div className="max-h-40 overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
+                  <table className="w-full text-left border-collapse">
+                    <thead className="bg-slate-100 dark:bg-slate-800 text-[10px] uppercase font-bold sticky top-0 text-slate-600 dark:text-slate-300">
+                      <tr>
+                        <th className="p-1.5">Fecha</th>
+                        <th className="p-1.5">Detalle</th>
+                        <th className="p-1.5 text-right">Monto</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                      {(activeTab === 'semana' ? weeklyStats.weekTxs : monthTransactions).map((tx) => (
+                        <tr key={tx.id} className="text-[11px]">
+                          <td className="p-1.5 text-slate-500 dark:text-slate-400 whitespace-nowrap">{tx.date}</td>
+                          <td className="p-1.5 font-semibold truncate max-w-[150px]">{tx.title}</td>
+                          <td className={`p-1.5 text-right font-black whitespace-nowrap ${tx.type === 'venta' ? 'text-[#2D8A4E]' : 'text-[#EE6B4D]'}`}>
+                            {tx.type === 'venta' ? '+' : '-'}Bs. {tx.amount.toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowExportModal(false)}
+                className="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold hover:bg-slate-300 cursor-pointer"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <BottomNav />
     </div>

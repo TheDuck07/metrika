@@ -7,22 +7,23 @@ interface AppHeaderProps {
 
 export const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
   const {
+    user,
     storeInfo,
     showToast,
     isDarkMode,
     toggleDarkMode,
     setShowTutorial,
     setShowBusinessSwitcher,
+    setShowAccountModal,
   } = useStore();
 
-  const initials = storeInfo.name
-    ? storeInfo.name
-        .split(' ')
-        .map((w) => w[0])
-        .slice(0, 2)
-        .join('')
-        .toUpperCase()
-    : 'MT';
+  const userAvatar = user?.avatarUrl || storeInfo.logoUrl || storeInfo.avatarUrl;
+  const initials = (user?.name || storeInfo.owner || storeInfo.name || 'MT')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('');
 
   return (
     <header className="flex-none w-full z-40 bg-[#1E70BA] dark:bg-[#155A96] text-white shadow-[0_2px_12px_rgba(30,112,186,0.25)] transition-colors">
@@ -105,10 +106,25 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
             <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#9EC84A] ring-1 ring-white"></span>
           </button>
 
-          {/* Profile Badge */}
-          <div className="w-8.5 h-8.5 rounded-xl bg-[#9EC84A] text-slate-950 flex items-center justify-center font-black text-[11px] shadow-sm ml-0.5 border border-white/20">
-            {initials}
-          </div>
+          {/* Interactive Profile Photo Avatar Button */}
+          <button
+            type="button"
+            onClick={() => setShowAccountModal(true)}
+            aria-label="Abrir mi cuenta, perfil y configuración"
+            title={`Perfil de ${user?.name || storeInfo.owner || 'Comerciante'} - Toca para ver cuenta y tema`}
+            className="relative w-9 h-9 rounded-xl bg-[#9EC84A] text-slate-950 flex items-center justify-center font-black text-xs shadow-sm ml-0.5 border-2 border-white/30 hover:border-white active:scale-95 transition-all cursor-pointer overflow-hidden group"
+          >
+            {userAvatar ? (
+              <img
+                src={userAvatar}
+                alt={user?.name || 'Perfil'}
+                className="w-full h-full object-cover rounded-lg group-hover:scale-105 transition-transform"
+              />
+            ) : (
+              <span>{initials}</span>
+            )}
+            <span className="absolute bottom-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-1 ring-white"></span>
+          </button>
         </div>
       </div>
     </header>

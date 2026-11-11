@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../context/StoreContext';
+
+declare global {
+  interface Window {
+    google?: any;
+  }
+}
 
 export const IngresoScreen: React.FC = () => {
   const { login, loginWithGoogle, registerUser, showToast } = useStore();
   const [showModal, setShowModal] = useState(false);
+  const [showGoogleModal, setShowGoogleModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -11,16 +18,107 @@ export const IngresoScreen: React.FC = () => {
   const [identity, setIdentity] = useState('77012345');
   const [password, setPassword] = useState('1234');
 
-  // Modal register fields
-  const [regShopName, setRegShopName] = useState('');
-  const [regOwnerName, setRegOwnerName] = useState('');
-  const [regPhone, setRegPhone] = useState('');
-  const [regPin, setRegPin] = useState('');
+  // Google Sign-In custom fields
+  const [googleEmail, setGoogleEmail] = useState('');
+  const [googleName, setGoogleName] = useState('');
+  const [googleClientId, setGoogleClientId] = useState(
+    () => localStorage.getItem('metrika_google_client_id') || ''
+  );
+  const [showClientIdConfig, setShowClientIdConfig] = useState(false);
+  const googleBtnRef = useRef<HTMLDivElement>(null);
+
+  // Initialize Google Identity Services if available
+  useEffect(() => {
+    const initGoogleGis = () => {
+      if (typeof window !== 'undefined' && window.google?.accounts?.id) {
+        try {
+          const clientId =
+            googleClientId.trim() ||
+            (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID ||
+            '1047714278453-734r8k2f5uio9s0t899c7r2v92928.apps.googleusercontent.com';
+
+          window.google.accounts.id.initialize({
+            client_id: clientId,
+            callback: async (response: any) => {
+              if (response?.credential) {
+                setLoading(true);
+                await loginWithGoogle(response.credential);
+                setLoading(false);
+                setShowGoogleModal(false);
+              }
+            },
+            auto_select: false,
+          });
+
+          if (googleBtnRef.current) {
+            window.google.accounts.id.renderButton(googleBtnRef.current, {
+              theme: 'outline',
+              size: 'large',
+              text: 'continue_with',
+              shape: 'pill',
+              width: 280,
+            });
+          }
+        } catch (err) {
+          console.warn('Google Identity Services init notice:', err);
+        }
+      }
+    };
+
+    initGoogleGis();
+    const timer = setTimeout(initGoogleGis, 1500);
+    return () => clearTimeout(timer);
+  }, [googleClientId, loginWithGoogle]);
 
   const handleGoogleLogin = async () => {
+    // Try triggering Google Prompt first if GIS is available
+    if (typeof window !== 'undefined' && window.google?.accounts?.id) {
+      try {
+        window.google.accounts.id.prompt((notification: any) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            setShowGoogleModal(true);
+          }
+        });
+        return;
+      } catch {
+        setShowGoogleModal(true);
+      }
+    }
+    setShowGoogleModal(true);
+  };
+
+  const handleCustomGoogleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanEmail = googleEmail.trim().toLowerCase();
+    const cleanName = googleName.trim();
+
+    if (!cleanEmail) {
+      showToast('Por favor escribe tu correo de Google', 'warning');
+      return;
+    }
+
+    if (!cleanEmail.includes('@')) {
+      showToast('Por favor introduce un correo electrónico válido', 'warning');
+      return;
+    }
+
+    if (googleClientId.trim()) {
+      localStorage.setItem('metrika_google_client_id', googleClientId.trim());
+    }
+
     setLoading(true);
-    await loginWithGoogle();
+    const finalName = cleanName || cleanEmail.split('@')[0].replace(/[._]/g, ' ');
+    const formattedName = finalName.charAt(0).toUpperCase() + finalName.slice(1);
+
+    await loginWithGoogle({
+      email: cleanEmail,
+      name: formattedName,
+      picture: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(formattedName)}&backgroundColor=1E70BA`,
+      sub: `user_${cleanEmail.replace(/[^a-zA-Z0-9]/g, '_')}`,
+    });
+
     setLoading(false);
+    setShowGoogleModal(false);
   };
 
   const handleQuickLogin = async () => {
@@ -378,6 +476,137 @@ export const IngresoScreen: React.FC = () => {
             </form>
           </div>
         </div>
+
+        {/* Modal: Iniciar sesión con Google */}
+        {showGoogleModal && (
+          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-150">
+            <div className="bg-white dark:bg-[#1A1F26] text-[#252524] dark:text-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[92vh] overflow-y-auto space-y-4">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-xs">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-black text-base text-slate-900 dark:text-white leading-tight">
+                      Acceso con Cuenta de Google
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Inicia sesión con tu propio correo
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowGoogleModal(false)}
+                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-lg">close</span>
+                </button>
+              </div>
+
+              {/* Official Google Identity Button container (if loaded) */}
+              <div className="flex flex-col items-center justify-center pt-1 pb-2">
+                <div ref={googleBtnRef} className="flex justify-center my-1"></div>
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-1">
+                  O introduce tu correo personal de Google a continuación:
+                </p>
+              </div>
+
+              {/* Direct email form */}
+              <form onSubmit={handleCustomGoogleSubmit} className="space-y-3.5">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Tu correo de Google (@gmail.com) *
+                  </label>
+                  <div className="flex items-center bg-[#F6F8FA] dark:bg-[#20252D] rounded-2xl px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 focus-within:border-[#1E70BA]">
+                    <span className="material-symbols-outlined text-slate-400 text-lg mr-2">mail</span>
+                    <input
+                      type="email"
+                      required
+                      value={googleEmail}
+                      onChange={(e) => setGoogleEmail(e.target.value)}
+                      placeholder="ejemplo@gmail.com"
+                      className="w-full bg-transparent text-sm text-[#252524] dark:text-white placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-semibold"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Nombre del comerciante (Opcional)
+                  </label>
+                  <div className="flex items-center bg-[#F6F8FA] dark:bg-[#20252D] rounded-2xl px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 focus-within:border-[#1E70BA]">
+                    <span className="material-symbols-outlined text-slate-400 text-lg mr-2">person</span>
+                    <input
+                      type="text"
+                      value={googleName}
+                      onChange={(e) => setGoogleName(e.target.value)}
+                      placeholder="Ej: Doña María Mendoza"
+                      className="w-full bg-transparent text-sm text-[#252524] dark:text-white placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-semibold"
+                    />
+                  </div>
+                </div>
+
+                {/* Optional Developer Google Client ID */}
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowClientIdConfig(!showClientIdConfig)}
+                    className="text-[11px] font-bold text-[#1E70BA] dark:text-[#60A5FA] flex items-center gap-1 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-sm">settings</span>
+                    <span>{showClientIdConfig ? 'Ocultar Client ID' : 'Configurar Google Client ID (Opcional)'}</span>
+                  </button>
+
+                  {showClientIdConfig && (
+                    <div className="mt-2 p-3 bg-slate-50 dark:bg-[#20252D] rounded-xl border border-slate-200 dark:border-slate-700 space-y-1.5">
+                      <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-300">
+                        Google Cloud OAuth Client ID:
+                      </label>
+                      <input
+                        type="text"
+                        value={googleClientId}
+                        onChange={(e) => setGoogleClientId(e.target.value)}
+                        placeholder="tu-app.apps.googleusercontent.com"
+                        className="w-full h-8 px-2 rounded-lg bg-white dark:bg-[#1A1F26] border border-slate-300 dark:border-slate-600 text-xs text-slate-800 dark:text-white focus:outline-none"
+                      />
+                      <p className="text-[9.5px] text-slate-400">
+                        Permite usar tu propio proyecto oficial de Google Cloud Console.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-3 space-y-2">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full h-12 bg-[#1E70BA] hover:bg-[#165A98] text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md shadow-[#1E70BA]/25 transition-all cursor-pointer active:scale-98 disabled:opacity-50"
+                  >
+                    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                      <path fill="#ffffff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    </svg>
+                    <span>{loading ? 'Conectando...' : 'Entrar con mi correo de Google'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowGoogleModal(false)}
+                    className="w-full h-10 bg-transparent text-slate-500 hover:text-slate-800 text-xs font-bold rounded-2xl flex items-center justify-center transition-colors cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

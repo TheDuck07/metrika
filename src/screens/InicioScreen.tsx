@@ -20,6 +20,7 @@ export const InicioScreen: React.FC = () => {
     showToast,
     setShowTutorial,
     setCurrentScreen,
+    setShowAccountModal,
   } = useStore();
 
   // Modals
@@ -220,19 +221,44 @@ export const InicioScreen: React.FC = () => {
 
   const lowStockCount = products.filter((p) => p.stock <= p.minStock).length;
 
+  const userAvatar = user?.avatarUrl || storeInfo.logoUrl || storeInfo.avatarUrl;
+
   return (
     <div className="bg-[#F6F8FA] dark:bg-[#13171D] text-[#252524] dark:text-stone-100 min-h-screen flex flex-col pb-28 select-none transition-colors">
       <AppHeader title="Inicio" />
 
       <main className="flex-1 max-w-md mx-auto w-full px-4 pt-3 space-y-4">
-        {/* Top Greeting */}
-        <section className="pt-1 px-1">
-          <h2 className="text-xl sm:text-2xl font-black text-[#252524] dark:text-white leading-tight">
-            ¡Hola, {ownerGreetingName}!
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-semibold mt-0.5">
-            Así va tu negocio hoy
-          </p>
+        {/* Top Greeting with User Profile Avatar */}
+        <section className="pt-1 px-1 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-black text-[#252524] dark:text-white leading-tight">
+              ¡Hola, {ownerGreetingName}!
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-semibold mt-0.5">
+              Así va tu negocio hoy
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowAccountModal(true)}
+            className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#1E70BA] to-[#165A98] p-0.5 shadow-sm border border-slate-200 dark:border-slate-700 cursor-pointer active:scale-95 transition-transform shrink-0"
+            title="Mi perfil y tema"
+          >
+            <div className="w-full h-full rounded-[14px] overflow-hidden bg-white dark:bg-slate-800 flex items-center justify-center">
+              {userAvatar ? (
+                <img
+                  src={userAvatar}
+                  alt={user?.name || 'Perfil'}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="material-symbols-outlined text-[#1E70BA] dark:text-[#60A5FA] text-2xl">
+                  account_circle
+                </span>
+              )}
+            </div>
+          </button>
         </section>
 
         {/* 1. THE 4 KPI CARDS (Real-time dynamic data with actual store figures) */}

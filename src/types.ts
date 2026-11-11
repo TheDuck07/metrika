@@ -63,6 +63,8 @@ export interface StoreInfo {
   phone: string;
   city: string;
   type: string;
+  logoUrl?: string;
+  avatarUrl?: string;
 }
 
 export interface UserSession {

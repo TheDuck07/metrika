@@ -53,6 +53,16 @@ interface StoreContextType {
   setShowBusinessSwitcher: (show: boolean) => void;
   showCreateBusinessModal: boolean;
   setShowCreateBusinessModal: (show: boolean) => void;
+  showAccountModal: boolean;
+  setShowAccountModal: (show: boolean) => void;
+  updateUserProfile: (updates: {
+    name?: string;
+    storeName?: string;
+    avatarUrl?: string;
+    phone?: string;
+    email?: string;
+  }) => void;
+  setThemeMode: (mode: 'light' | 'dark') => void;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -244,6 +254,26 @@ function getLocalOfflineUsers(): OfflineUserRecord[] {
   return [DEFAULT_DEMO_USER];
 }
 
+function parseGoogleJwt(token: string): { email?: string; name?: string; picture?: string; sub?: string } {
+  try {
+    const parts = token.split('.');
+    if (parts.length >= 2) {
+      const base64Url = parts[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    }
+  } catch (err) {
+    console.warn('Error parsing Google JWT:', err);
+  }
+  return {};
+}
+
 function saveLocalOfflineUser(record: OfflineUserRecord) {
   try {
     const list = getLocalOfflineUsers().filter((u) => u.id !== record.id);
@@ -330,6 +360,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   >([]);
   const [showBusinessSwitcher, setShowBusinessSwitcher] = useState<boolean>(false);
   const [showCreateBusinessModal, setShowCreateBusinessModal] = useState<boolean>(false);
+  const [showAccountModal, setShowAccountModal] = useState<boolean>(false);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastType, setToastType] = useState<'success' | 'info' | 'warning'>('success');
@@ -724,13 +755,42 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const loginWithGoogle = async (credentialOrData?: any): Promise<boolean> => {
     try {
+      let email = 'mi.tienda@gmail.com';
+      let name = 'Comerciante Google';
+      let picture = 'https://lh3.googleusercontent.com/a/default-user';
+      let sub = `g-${Date.now()}`;
+
+      if (typeof credentialOrData === 'string') {
+        const decoded = parseGoogleJwt(credentialOrData);
+        email = decoded.email || email;
+        name = decoded.name || name;
+        picture = decoded.picture || picture;
+        sub = decoded.sub || sub;
+      } else if (credentialOrData && typeof credentialOrData === 'object') {
+        if (credentialOrData.credential) {
+          const decoded = parseGoogleJwt(credentialOrData.credential);
+          email = decoded.email || credentialOrData.email || email;
+          name = decoded.name || credentialOrData.name || name;
+          picture = decoded.picture || credentialOrData.picture || picture;
+          sub = decoded.sub || credentialOrData.sub || sub;
+        } else {
+          email = credentialOrData.email || email;
+          name = credentialOrData.name || name;
+          picture = credentialOrData.picture || credentialOrData.avatarUrl || picture;
+          sub = credentialOrData.sub || credentialOrData.id || sub;
+        }
+      }
+
       // 1. Try online Google auth endpoint if online
       if (typeof navigator !== 'undefined' && navigator.onLine) {
         try {
-          const body =
-            typeof credentialOrData === 'string'
-              ? { credential: credentialOrData }
-              : credentialOrData || { email: 'comerciante@gmail.com', name: 'Comerciante Metrika' };
+          const body = {
+            credential: typeof credentialOrData === 'string' ? credentialOrData : undefined,
+            email,
+            name,
+            picture,
+            sub,
+          };
 
           const res = await fetch('/api/auth/google', {
             method: 'POST',
@@ -743,15 +803,23 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             if (data.success && data.user) {
               const sessionUser: UserSession = {
                 ...data.user,
+                avatarUrl: data.user.avatarUrl || picture,
                 token: data.token,
               };
 
               localStorage.setItem(STORAGE_KEYS.TOKEN, data.token);
               localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(sessionUser));
               setUser(sessionUser);
+              setStoreInfo((prev) => ({
+                ...prev,
+                owner: sessionUser.name,
+                name: sessionUser.storeName || `Tienda de ${sessionUser.name.split(' ')[0]}`,
+                logoUrl: sessionUser.avatarUrl,
+                avatarUrl: sessionUser.avatarUrl,
+              }));
               await loadUserData(sessionUser);
 
-              showToast(`¡Conectado con Google! Hola, ${sessionUser.name}`, 'success');
+              showToast(`¡Conectado con Google (${sessionUser.email || sessionUser.name})!`, 'success');
               setCurrentScreen('inicio');
               return true;
             }
@@ -761,14 +829,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
       }
 
-      // 2. Offline / local Google sign in (zero friction for non-technical adult users)
+      // 2. Offline / local Google sign in using user's real email, name and picture
+      const storeName = `Tienda de ${name.split(' ')[0]}`;
       const offlineGoogleUser: UserSession = {
-        id: `google-user-${Date.now()}`,
-        name: 'Comerciante Google',
-        storeName: 'Mi Tiendita Metrika',
+        id: `google-user-${sub}`,
+        name,
+        storeName,
         phone: '77012345',
-        email: 'mi.tienda@gmail.com',
-        avatarUrl: 'https://lh3.googleusercontent.com/a/default-user',
+        email,
+        avatarUrl: picture,
         authProvider: 'google',
         token: `google-token-${Date.now()}`,
       };
@@ -785,9 +854,16 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         createdAt: new Date().toISOString(),
       });
       setUser(offlineGoogleUser);
+      setStoreInfo((prev) => ({
+        ...prev,
+        owner: offlineGoogleUser.name,
+        name: offlineGoogleUser.storeName,
+        logoUrl: picture,
+        avatarUrl: picture,
+      }));
       await loadUserData(offlineGoogleUser);
 
-      showToast('¡Conectado con tu Cuenta de Google! Modo inteligente activo.', 'success');
+      showToast(`¡Conectado con tu cuenta Google (${email})!`, 'success');
       setCurrentScreen('inicio');
       return true;
     } catch (err) {
@@ -887,9 +963,56 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.removeItem(STORAGE_KEYS.TOKEN);
     localStorage.removeItem(STORAGE_KEYS.USER);
     setUser(null);
+    setShowAccountModal(false);
     setCurrentScreen('ingreso');
     showToast('Sesión cerrada. ¡Buen descanso!');
   };
+
+  const setThemeMode = useCallback((mode: 'light' | 'dark') => {
+    setIsDarkMode(mode === 'dark');
+  }, []);
+
+  const updateUserProfile = useCallback(
+    (updates: {
+      name?: string;
+      storeName?: string;
+      avatarUrl?: string;
+      phone?: string;
+      email?: string;
+    }) => {
+      setUser((prev) => {
+        if (!prev) return null;
+        const updated: UserSession = {
+          ...prev,
+          name: updates.name !== undefined ? updates.name : prev.name,
+          storeName: updates.storeName !== undefined ? updates.storeName : prev.storeName,
+          avatarUrl: updates.avatarUrl !== undefined ? updates.avatarUrl : prev.avatarUrl,
+          phone: updates.phone !== undefined ? updates.phone : prev.phone,
+          email: updates.email !== undefined ? updates.email : prev.email,
+        };
+        try {
+          localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updated));
+        } catch {}
+        return updated;
+      });
+
+      setStoreInfo((prev) => {
+        const updated: StoreInfo = {
+          ...prev,
+          owner: updates.name !== undefined ? updates.name : prev.owner,
+          name: updates.storeName !== undefined ? updates.storeName : prev.name,
+          phone: updates.phone !== undefined ? updates.phone : prev.phone,
+          logoUrl: updates.avatarUrl !== undefined ? updates.avatarUrl : prev.logoUrl,
+          avatarUrl: updates.avatarUrl !== undefined ? updates.avatarUrl : prev.avatarUrl,
+        };
+        persistStoreData(updated, products, transactions);
+        return updated;
+      });
+
+      showToast('¡Perfil y foto actualizados!', 'success');
+    },
+    [products, transactions, persistStoreData, showToast]
+  );
 
   const updateStoreInfo = (updates: Partial<StoreInfo>) => {
     setStoreInfo((prev) => {
@@ -1161,6 +1284,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setShowBusinessSwitcher,
       showCreateBusinessModal,
       setShowCreateBusinessModal,
+      showAccountModal,
+      setShowAccountModal,
+      updateUserProfile,
+      setThemeMode,
     }),
     [
       user,
@@ -1177,6 +1304,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       refreshAvailableStores,
       showBusinessSwitcher,
       showCreateBusinessModal,
+      showAccountModal,
+      updateUserProfile,
+      setThemeMode,
     ]
   );
 

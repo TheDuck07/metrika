@@ -9,6 +9,7 @@ import { ReportesScreen } from './screens/ReportesScreen';
 import { OnboardingTutorialModal } from './components/OnboardingTutorialModal';
 import { BusinessSwitcherModal } from './components/BusinessSwitcherModal';
 import { CreateBusinessModal } from './components/CreateBusinessModal';
+import { AccountProfileModal } from './components/AccountProfileModal';
 
 const MainAppContent: React.FC = () => {
   const {
@@ -21,6 +22,8 @@ const MainAppContent: React.FC = () => {
     setShowBusinessSwitcher,
     showCreateBusinessModal,
     setShowCreateBusinessModal,
+    showAccountModal,
+    setShowAccountModal,
   } = useStore();
 
   return (
@@ -73,6 +76,12 @@ const MainAppContent: React.FC = () => {
       <CreateBusinessModal
         isOpen={showCreateBusinessModal}
         onClose={() => setShowCreateBusinessModal(false)}
+      />
+
+      {/* Account & Profile Modal */}
+      <AccountProfileModal
+        isOpen={showAccountModal}
+        onClose={() => setShowAccountModal(false)}
       />
     </div>
   );
