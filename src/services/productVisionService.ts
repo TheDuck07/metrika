@@ -47,8 +47,179 @@ export const VISION_LABEL_MAP: Record<
   'cell phone': { nameEs: 'Celular / Accesorio', category: 'Abarrotes', defaultUnit: 'ud', defaultPrice: 15.0 },
   book: { nameEs: 'Cuaderno / Libreta', category: 'Abarrotes', defaultUnit: 'ud', defaultPrice: 8.0 },
   scissors: { nameEs: 'Tijeras / Útiles', category: 'Abarrotes', defaultUnit: 'ud', defaultPrice: 6.0 },
-  'potted plant': { nameEs: 'Planta de adorno', category: 'Abarrotes', defaultUnit: 'ud', defaultPrice: 20.0 },
+  'potted plant': { nameEs: 'Ramo / Planta / Flores', category: 'Otros', defaultUnit: 'ud', defaultPrice: 20.0 },
+  vase: { nameEs: 'Ramo de flores / Florero', category: 'Otros', defaultUnit: 'ud', defaultPrice: 25.0 },
+  flower: { nameEs: 'Ramo de flores frescas', category: 'Otros', defaultUnit: 'ud', defaultPrice: 25.0 },
+  bouquet: { nameEs: 'Ramo de flores', category: 'Otros', defaultUnit: 'ud', defaultPrice: 30.0 },
 };
+
+// 100% Offline Canvas Color and Feature Classifier
+export function analyzeImageColorsOffline(
+  img: HTMLImageElement
+): {
+  isFloralBouquet: boolean;
+  isBottle: boolean;
+  isBakery: boolean;
+  isGreenPlant: boolean;
+  isRedFruit: boolean;
+  suggestedName: string;
+  category: ProductCategory;
+  unitPrice: number;
+} {
+  try {
+    const canvas = document.createElement('canvas');
+    const width = 64;
+    const height = 64;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Canvas not available');
+
+    ctx.drawImage(img, 0, 0, width, height);
+    const imgData = ctx.getImageData(0, 0, width, height);
+    const data = imgData.data;
+
+    const totalPixels = width * height;
+    let greenCount = 0;
+    let floralColorCount = 0; // Pinks, purples, violets, petals, roses
+    let warmBakeryCount = 0; // Golden bread tones
+    let redFruitCount = 0; // Deep red (tomato/apple)
+    let brightColorsCount = 0;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+
+      // Green vegetation / leaves
+      if (g > 65 && g > r * 1.15 && g > b * 1.15) {
+        greenCount++;
+      }
+
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      const sat = max > 0 ? (max - min) / max : 0;
+
+      // Floral colors: Pinks, Magenta, Violet, Red Petals, Bright Warm Blossoms
+      if (sat > 0.22) {
+        if (
+          (r > 120 && b > 85 && g < 160) || // Magenta / Pink / Violet
+          (r > 150 && g < 95 && b < 130) || // Red / Rose / Crimson
+          (r > 160 && g > 130 && b < 70)    // Yellow / Orange blossom
+        ) {
+          floralColorCount++;
+        }
+      }
+
+      // Golden bread / pastry
+      if (r > 150 && g > 100 && g < 170 && b < 90) {
+        warmBakeryCount++;
+      }
+
+      // Deep pure red fruit (tomato/apple)
+      if (r > 170 && g < 75 && b < 75) {
+        redFruitCount++;
+      }
+
+      if (sat > 0.35) {
+        brightColorsCount++;
+      }
+    }
+
+    const greenRatio = greenCount / totalPixels;
+    const floralRatio = floralColorCount / totalPixels;
+    const bakeryRatio = warmBakeryCount / totalPixels;
+    const redRatio = redFruitCount / totalPixels;
+    const aspect = (img.naturalHeight || img.height || 100) / (img.naturalWidth || img.width || 100);
+
+    // 1. Bouquet / Ramo de flores (Mix of foliage/green + vibrant floral petal colors)
+    if (
+      (floralRatio > 0.07 && greenRatio > 0.05) ||
+      floralRatio > 0.16 ||
+      (greenRatio > 0.12 && brightColorsCount / totalPixels > 0.18)
+    ) {
+      return {
+        isFloralBouquet: true,
+        isBottle: false,
+        isBakery: false,
+        isGreenPlant: false,
+        isRedFruit: false,
+        suggestedName: 'Ramo de flores / Arreglo floral',
+        category: 'Otros',
+        unitPrice: 25.0,
+      };
+    }
+
+    // 2. Tall Bottle
+    if (aspect > 1.6) {
+      return {
+        isFloralBouquet: false,
+        isBottle: true,
+        isBakery: false,
+        isGreenPlant: false,
+        isRedFruit: false,
+        suggestedName: 'Botella de refresco / Bebida',
+        category: 'Refrescos',
+        unitPrice: 14.0,
+      };
+    }
+
+    // 3. Bakery / Pan
+    if (bakeryRatio > 0.25) {
+      return {
+        isFloralBouquet: false,
+        isBottle: false,
+        isBakery: true,
+        isGreenPlant: false,
+        isRedFruit: false,
+        suggestedName: 'Panadería / Pan fresco',
+        category: 'Abarrotes',
+        unitPrice: 5.0,
+      };
+    }
+
+    // 4. Red Fruit / Tomate (only when truly deep red without floral petals)
+    if (redRatio > 0.28) {
+      return {
+        isFloralBouquet: false,
+        isBottle: false,
+        isBakery: false,
+        isGreenPlant: false,
+        isRedFruit: true,
+        suggestedName: 'Tomate / Manzana fresca',
+        category: 'Verduras / Frutas',
+        unitPrice: 8.0,
+      };
+    }
+
+    // 5. Green Plant
+    if (greenRatio > 0.3) {
+      return {
+        isFloralBouquet: false,
+        isBottle: false,
+        isBakery: false,
+        isGreenPlant: true,
+        isRedFruit: false,
+        suggestedName: 'Planta / Verdura verde',
+        category: 'Verduras / Frutas',
+        unitPrice: 6.0,
+      };
+    }
+  } catch (e) {
+    console.warn('Canvas color analysis notice:', e);
+  }
+
+  return {
+    isFloralBouquet: false,
+    isBottle: false,
+    isBakery: false,
+    isGreenPlant: false,
+    isRedFruit: false,
+    suggestedName: 'Producto fotografiado',
+    category: 'Abarrotes',
+    unitPrice: 10.0,
+  };
+}
 
 let cachedModel: any = null;
 let modelLoadingPromise: Promise<any> | null = null;
@@ -109,7 +280,27 @@ export function findBestMatchingProduct(
 ): Product | undefined {
   const normLabel = label.toLowerCase();
 
-  // 1. Direct label or keyword matching
+  // 1. Flowers / Bouquet / Plants / Ramo
+  if (
+    normLabel.includes('ramo') ||
+    normLabel.includes('flor') ||
+    normLabel.includes('rosa') ||
+    normLabel.includes('vase') ||
+    normLabel.includes('plant') ||
+    normLabel.includes('bouquet')
+  ) {
+    const flowerMatch = products.find(
+      (p) =>
+        p.name.toLowerCase().includes('ramo') ||
+        p.name.toLowerCase().includes('flor') ||
+        p.name.toLowerCase().includes('rosa') ||
+        p.name.toLowerCase().includes('planta') ||
+        p.name.toLowerCase().includes('arreglo')
+    );
+    if (flowerMatch) return flowerMatch;
+  }
+
+  // 2. Direct label or keyword matching
   if (normLabel.includes('bottle') || normLabel.includes('botella') || normLabel.includes('refresco')) {
     const drink = products.find(
       (p) =>
@@ -130,22 +321,27 @@ export function findBestMatchingProduct(
     if (banana) return banana;
   }
 
-  if (normLabel.includes('apple') || normLabel.includes('manzana') || normLabel.includes('tomate')) {
-    const fruit = products.find(
-      (p) =>
-        p.name.toLowerCase().includes('manzana') ||
-        p.name.toLowerCase().includes('tomate') ||
-        p.category === 'Verduras / Frutas'
-    );
-    if (fruit) return fruit;
+  if (normLabel.includes('apple') || normLabel.includes('manzana')) {
+    const apple = products.find((p) => p.name.toLowerCase().includes('manzana'));
+    if (apple) return apple;
   }
 
-  // 2. Category matching
+  if (normLabel.includes('tomate') || normLabel.includes('tomato')) {
+    const tomato = products.find((p) => p.name.toLowerCase().includes('tomate'));
+    if (tomato) return tomato;
+  }
+
+  if (normLabel.includes('bread') || normLabel.includes('pan') || normLabel.includes('sandwich')) {
+    const bread = products.find((p) => p.name.toLowerCase().includes('pan'));
+    if (bread) return bread;
+  }
+
+  // 3. Category matching
   const catMatch = products.find((p) => p.category.toLowerCase() === category.toLowerCase());
   if (catMatch) return catMatch;
 
-  // 3. Fallback to first product or undefined
-  return products[0];
+  // Never return products[0] blindly
+  return undefined;
 }
 
 // Perform real visual detection on an HTMLImageElement with 100% offline fallback
@@ -255,19 +451,25 @@ export async function detectProductsFromImage(
     // Barcode detector not supported or no barcode found
   }
 
-  // 100% Offline Heuristic Matcher: connects the photo with matching store item
-  const fallbackProd = inventoryProducts[0];
+  // 100% Offline Intelligent Image Classifier using native Canvas pixel analysis
+  const colorAnalysis = analyzeImageColorsOffline(imageElement);
+  const matchedProd = findBestMatchingProduct(
+    colorAnalysis.suggestedName,
+    colorAnalysis.category,
+    inventoryProducts
+  );
+
   return [
     {
       id: `offline-${Date.now()}`,
-      rawLabel: 'producto_tienda',
-      spanishLabel: fallbackProd ? fallbackProd.name : 'Producto fotografiado',
-      category: fallbackProd ? fallbackProd.category : 'Abarrotes',
-      score: 85,
+      rawLabel: colorAnalysis.isFloralBouquet ? 'ramo_flores' : 'producto_tienda',
+      spanishLabel: matchedProd ? matchedProd.name : colorAnalysis.suggestedName,
+      category: matchedProd ? matchedProd.category : colorAnalysis.category,
+      score: 90,
       bbox: [10, 10, (imageElement.width || 300) - 20, (imageElement.height || 300) - 20],
-      suggestedProductId: fallbackProd?.id,
-      suggestedProductName: fallbackProd?.name || 'Producto fotografiado',
-      unitPrice: fallbackProd ? fallbackProd.price : 10.0,
+      suggestedProductId: matchedProd?.id,
+      suggestedProductName: matchedProd ? matchedProd.name : colorAnalysis.suggestedName,
+      unitPrice: matchedProd ? matchedProd.price : colorAnalysis.unitPrice,
       quantity: 1,
     },
   ];

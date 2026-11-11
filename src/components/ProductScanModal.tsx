@@ -7,6 +7,7 @@ import {
 import {
   generateCounterSceneImage,
   detectProductsFromImage,
+  analyzeImageColorsOffline,
 } from '../services/productVisionService';
 import { ProductCategory } from '../types';
 
@@ -225,20 +226,40 @@ export const ProductScanModal: React.FC<ProductScanModalProps> = ({
       }
     }
 
-    // 3. Fallback when offline or unrecognized photo: auto-fill with first inventory item or sensible default
+    // 3. Fallback when offline or unrecognized photo: analyze visual colors and features
     if (!success) {
       setUsedLocalVision(true);
       setIsManualEntryActive(true);
 
-      const defaultProd = products[0];
+      let colorAnalysis = {
+        suggestedName: 'Producto fotografiado',
+        category: 'Abarrotes' as ProductCategory,
+        unitPrice: 10.0,
+      };
+
+      try {
+        const fallbackImg = new Image();
+        fallbackImg.crossOrigin = 'anonymous';
+        fallbackImg.src = dataUrl;
+        await new Promise<void>((resolve) => {
+          if (fallbackImg.complete) return resolve();
+          fallbackImg.onload = () => resolve();
+          fallbackImg.onerror = () => resolve();
+        });
+        colorAnalysis = analyzeImageColorsOffline(fallbackImg);
+      } catch (err) {
+        console.warn('Canvas color analysis notice:', err);
+      }
+
+      const matched = findInventoryMatch(colorAnalysis.suggestedName);
       const fallbackItem: RecognizedProductItem = {
         id: `rec_${Date.now()}`,
-        name: defaultProd ? defaultProd.name : 'Producto Foto',
-        category: defaultProd ? defaultProd.category : 'Abarrotes',
+        name: matched ? matched.name : colorAnalysis.suggestedName,
+        category: matched ? matched.category : colorAnalysis.category,
         quantity: 1,
-        unit: defaultProd ? defaultProd.unit : 'ud',
-        matchedInventoryId: defaultProd ? defaultProd.id : null,
-        unitPrice: defaultProd ? defaultProd.price : 10,
+        unit: matched ? matched.unit : 'ud',
+        matchedInventoryId: matched ? matched.id : null,
+        unitPrice: matched ? matched.price : colorAnalysis.unitPrice,
       };
 
       setRecognizedItems([fallbackItem]);
@@ -250,7 +271,7 @@ export const ProductScanModal: React.FC<ProductScanModalProps> = ({
       setInvUnit(fallbackItem.unit);
 
       showToast(
-        'Foto capturada: campos completados. Ajusta nombre o precio si lo deseas.',
+        `Foto analizada (${fallbackItem.name}). Ajusta el nombre o precio si lo deseas.`,
         'info'
       );
     }

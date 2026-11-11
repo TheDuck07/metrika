@@ -24,8 +24,9 @@ interface ParsedTransaction {
 
 const SAMPLE_COMMANDS = [
   'Venta de 2 Coca-Cola 2L',
-  'Gasto de 45 bolivianos de luz',
+  'Venta 1 Ramo de flores por 25 Bs',
   'Compré 10 kilos de arroz por 70 Bs',
+  'Gasto de 45 bolivianos de luz',
   'Venta fiada de aceite a Don Pedro',
   'Cobré 15 Bs con QR por galletas',
 ];
@@ -40,6 +41,9 @@ export const VoiceRecorderModal: React.FC<VoiceRecorderModalProps> = ({ isOpen, 
   const [parsedTx, setParsedTx] = useState<ParsedTransaction | null>(null);
   const [audioFeedbackEnabled, setAudioFeedbackEnabled] = useState(true);
   const [speechApiSupported, setSpeechApiSupported] = useState(true);
+  const [isOfflineVoice, setIsOfflineVoice] = useState(
+    typeof navigator !== 'undefined' ? !navigator.onLine : false
+  );
   const [engineUsed, setEngineUsed] = useState<'gemini' | 'local'>('local');
 
   const recognitionRef = useRef<any>(null);
@@ -56,14 +60,27 @@ export const VoiceRecorderModal: React.FC<VoiceRecorderModalProps> = ({ isOpen, 
   }, []);
 
   useEffect(() => {
+    const handleOnline = () => setIsOfflineVoice(false);
+    const handleOffline = () => setIsOfflineVoice(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
     if (isOpen) {
       setTranscript('');
       setInterimText('');
       setParsedTx(null);
       setIsProcessing(false);
-      // Automatically prompt to listen if supported
-      if (speechApiSupported) {
+      // Automatically prompt to listen if supported and online
+      if (speechApiSupported && (typeof navigator === 'undefined' || navigator.onLine)) {
         startListening();
+      } else if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        setIsOfflineVoice(true);
       }
     } else {
       stopListening();
@@ -72,6 +89,21 @@ export const VoiceRecorderModal: React.FC<VoiceRecorderModalProps> = ({ isOpen, 
       stopListening();
     };
   }, [isOpen, speechApiSupported]);
+
+  const handleMicClick = () => {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setIsOfflineVoice(true);
+      showToast('Modo Offline: Toca el recuadro de texto y usa el micrófono 🎙️ de tu teclado (Gboard).', 'info');
+      const el = document.getElementById('voice-manual-input');
+      if (el) el.focus();
+      return;
+    }
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
 
   const startListening = () => {
     const SpeechRecognition =
@@ -129,7 +161,10 @@ export const VoiceRecorderModal: React.FC<VoiceRecorderModalProps> = ({ isOpen, 
         if (event.error === 'not-allowed') {
           showToast('Permiso de micrófono denegado. Puedes escribir o tocar los ejemplos abajo.', 'info');
         } else if (event.error === 'network') {
-          showToast('Reconocimiento por voz offline: Escribe o toca los ejemplos rápidos abajo.', 'info');
+          setIsOfflineVoice(true);
+          showToast('Modo Offline: Para dictar sin internet, usa el micrófono 🎙️ de tu teclado (Gboard).', 'info');
+          const el = document.getElementById('voice-manual-input');
+          if (el) el.focus();
         }
       };
 
@@ -334,7 +369,7 @@ export const VoiceRecorderModal: React.FC<VoiceRecorderModalProps> = ({ isOpen, 
             {/* Animated Mic Button */}
             <button
               type="button"
-              onClick={isListening ? stopListening : startListening}
+              onClick={handleMicClick}
               className={`w-20 h-20 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-lg relative ${
                 isListening
                   ? 'bg-rose-500 text-white scale-110 shadow-rose-500/50'
@@ -350,7 +385,7 @@ export const VoiceRecorderModal: React.FC<VoiceRecorderModalProps> = ({ isOpen, 
             </button>
 
             <span className="mt-3 text-xs font-bold tracking-wide uppercase text-stone-300">
-              {isListening ? '🔴 Escuchando... Habla ahora' : 'Toca el micrófono para hablar'}
+              {isListening ? '🔴 Escuchando... Habla ahora' : (isOfflineVoice || (typeof navigator !== 'undefined' && !navigator.onLine)) ? 'Modo sin internet (Offline)' : 'Toca el micrófono para hablar'}
             </span>
 
             {/* Live Transcript / Feedback */}
@@ -365,7 +400,7 @@ export const VoiceRecorderModal: React.FC<VoiceRecorderModalProps> = ({ isOpen, 
                 </p>
               ) : (
                 <p className="text-xs text-stone-400">
-                  Ejemplo: "Venta de 2 Coca-Colas" o "Gasto 40 Bs de luz"
+                  Ejemplo: "Venta de 2 Coca-Colas" o "Venta 1 Ramo por 25 Bs"
                 </p>
               )}
             </div>
@@ -379,10 +414,25 @@ export const VoiceRecorderModal: React.FC<VoiceRecorderModalProps> = ({ isOpen, 
           </div>
         </div>
 
+        {/* Offline voice guidance banner */}
+        {(isOfflineVoice || (typeof navigator !== 'undefined' && !navigator.onLine)) && (
+          <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl flex items-start gap-2.5 text-xs text-amber-900 dark:text-amber-200">
+            <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-xl flex-shrink-0 mt-0.5">
+              mic
+            </span>
+            <div>
+              <p className="font-bold">Dictado por voz sin internet (Offline):</p>
+              <p className="text-[11px] text-amber-800 dark:text-amber-300 mt-0.5 leading-snug">
+                Toca el recuadro de abajo y presiona el <strong>micrófono 🎙️ de tu teclado (Gboard/Android)</strong> para dictar por voz sin internet. La IA local lo interpretará de inmediato sin gastar megas.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Input manual alternative / edit transcript */}
         <div className="mt-3">
           <div className="flex items-center justify-between text-xs text-stone-500 mb-1">
-            <span>O escribe la frase si prefieres:</span>
+            <span>O escribe o dicta con tu teclado:</span>
             <button
               type="button"
               onClick={() => setAudioFeedbackEnabled(!audioFeedbackEnabled)}
@@ -396,6 +446,7 @@ export const VoiceRecorderModal: React.FC<VoiceRecorderModalProps> = ({ isOpen, 
           </div>
           <div className="flex gap-2">
             <input
+              id="voice-manual-input"
               type="text"
               value={transcript}
               onChange={(e) => setTranscript(e.target.value)}

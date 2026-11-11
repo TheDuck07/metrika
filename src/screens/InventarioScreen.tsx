@@ -100,23 +100,33 @@ export const InventarioScreen: React.FC = () => {
     }
   };
 
-  // Quick Dictation for Product Name using Web Speech API if supported
+  // Quick Dictation for Product Name using Web Speech API with Offline fallback
   const handleQuickDictation = () => {
+    // If device is offline, prompt and focus input for keyboard offline mic (Gboard)
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      showToast('Modo offline: Usa el micrófono 🎙️ de tu teclado de celular para dictar el nombre.', 'info');
+      const inputEl = document.getElementById('new-product-name') as HTMLInputElement;
+      if (inputEl) inputEl.focus();
+      return;
+    }
+
     const SpeechRecognition =
       (window as unknown as { SpeechRecognition?: new () => SpeechRecognitionInstance; webkitSpeechRecognition?: new () => SpeechRecognitionInstance }).SpeechRecognition ||
       (window as unknown as { SpeechRecognition?: new () => SpeechRecognitionInstance; webkitSpeechRecognition?: new () => SpeechRecognitionInstance }).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      setShowVoiceModal(true);
+      showToast('Toca el campo y usa el micrófono 🎙️ del teclado de tu teléfono para dictar.', 'info');
+      const inputEl = document.getElementById('new-product-name') as HTMLInputElement;
+      if (inputEl) inputEl.focus();
       return;
     }
 
     try {
       const rec = new SpeechRecognition();
-      rec.lang = 'es-ES';
+      rec.lang = 'es-BO';
       rec.interimResults = false;
       rec.maxAlternatives = 1;
-      showToast('Escuchando... Di el nombre del producto', 'info');
+      showToast('Escuchando... Di el nombre del producto (ej: Ramo de flores)', 'info');
       rec.onresult = (ev: SpeechRecognitionEvent) => {
         const spoken = ev.results[0][0].transcript;
         if (spoken) {
@@ -125,11 +135,15 @@ export const InventarioScreen: React.FC = () => {
         }
       };
       rec.onerror = () => {
-        setShowVoiceModal(true);
+        showToast('Para dictar sin conexión, usa el micrófono 🎙️ de tu teclado de celular.', 'info');
+        const inputEl = document.getElementById('new-product-name') as HTMLInputElement;
+        if (inputEl) inputEl.focus();
       };
       rec.start();
     } catch {
-      setShowVoiceModal(true);
+      showToast('Toca el campo y usa el micrófono 🎙️ de tu teclado.', 'info');
+      const inputEl = document.getElementById('new-product-name') as HTMLInputElement;
+      if (inputEl) inputEl.focus();
     }
   };
 
