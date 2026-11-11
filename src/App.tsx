@@ -24,17 +24,17 @@ const MainAppContent: React.FC = () => {
   } = useStore();
 
   return (
-    <div className="min-h-screen bg-[#241a16] dark:bg-[#120d0b] text-[#1f1b19] dark:text-stone-100 font-['Plus_Jakarta_Sans',sans-serif] transition-colors duration-200">
+    <div className="min-h-screen bg-[#F6F8FA] dark:bg-[#13171D] text-[#252524] dark:text-stone-100 font-['Plus_Jakarta_Sans',sans-serif] transition-colors duration-200">
       {/* Global floating toast notification */}
       {toastMessage && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 w-[90%] max-w-[370px] z-70 bg-[#2c1e19]/95 text-white backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white/15 flex items-center gap-3 animate-bounce">
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 w-[90%] max-w-[370px] z-70 bg-[#1E70BA] text-white backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white/20 flex items-center gap-3 animate-bounce">
           <div
             className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
               toastType === 'success'
-                ? 'bg-[#fceede] text-[#bd532b]'
+                ? 'bg-[#9EC84A] text-slate-900'
                 : toastType === 'warning'
                 ? 'bg-amber-100 text-amber-800'
-                : 'bg-blue-100 text-blue-800'
+                : 'bg-white text-[#1E70BA]'
             }`}
           >
             <span className="material-symbols-outlined text-2xl font-bold">
@@ -42,7 +42,7 @@ const MainAppContent: React.FC = () => {
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <h4 className="font-bold text-sm leading-tight text-[#fceede]">Metrika</h4>
+            <h4 className="font-bold text-sm leading-tight text-white">Metrika</h4>
             <p className="text-xs text-white/90 mt-0.5 truncate">{toastMessage}</p>
           </div>
         </div>

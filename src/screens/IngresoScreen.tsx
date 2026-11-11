@@ -64,169 +64,177 @@ export const IngresoScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-[#241a16] flex justify-center items-center p-0 sm:p-4 select-none">
+    <div className="min-h-[100dvh] bg-[#EDF2F7] dark:bg-[#13171D] flex justify-center items-center p-0 sm:p-4 select-none">
       <div
-        className="relative w-full max-w-[414px] min-h-[100dvh] sm:min-h-[780px] sm:max-h-[920px] bg-[#bd532b] flex flex-col justify-between overflow-y-auto shadow-2xl sm:rounded-[46px] border-0 sm:border-[8px] sm:border-stone-800 pt-4 pb-2"
+        className="relative w-full max-w-[420px] min-h-[100dvh] sm:min-h-[780px] sm:max-h-[920px] bg-white dark:bg-[#1A1F26] flex flex-col justify-between overflow-y-auto shadow-2xl sm:rounded-[40px] border-0 sm:border sm:border-slate-200 dark:border-slate-800"
         data-purpose="mobile-viewport"
       >
-        {/* Brand Hero */}
-        <section aria-label="Identidad de marca" className="flex flex-col items-center justify-center pt-4 pb-3 px-6 text-center z-10">
-          <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-[#fceede] flex items-center justify-center shadow-lg mb-3">
-            <svg aria-label="Icono de tiendita de barrio Metrika" className="w-22 h-22 sm:w-26 sm:h-26 fill-[#bd532b]" role="img" viewBox="0 0 100 100">
-              <path d="M 28 20 C 24 20 22 25 21 29 L 16 38 C 14 43 17 48 22 48 C 26 48 28 44 31 40 C 34 44 38 48 43 48 C 47 48 50 44 53 40 C 56 44 60 48 65 48 C 69 48 72 44 75 40 C 78 44 82 48 87 48 C 91 48 94 43 92 38 L 87 29 C 86 25 84 20 80 20 Z" />
-              <path d="M 24 45 L 24 74 L 84 74 L 84 45 C 81 47 77 48 74 48 C 69 48 65 45 63 43 C 60 45 56 48 51 48 C 46 48 43 45 40 43 C 37 45 33 48 29 48 C 27 48 25 47 24 45 Z M 31 54 L 77 54 L 77 68 L 31 68 Z" />
-              <rect height="6.5" rx="3.25" width="78" x="15" y="74" />
-            </svg>
+        {/* Top Blue Hero with Logo M (Matches Mockup Screen 1) */}
+        <section className="relative w-full bg-[#1E70BA] pt-12 pb-14 px-6 rounded-b-[40px] shadow-lg flex flex-col items-center text-center overflow-hidden">
+          {/* Subtle decorative circles */}
+          <div className="absolute -top-12 -right-12 w-44 h-44 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
+          <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-[#9EC84A]/20 blur-lg pointer-events-none"></div>
+
+          {/* White Card holding the METRIKA Cut-Out M Logo */}
+          <div className="relative w-28 h-28 sm:w-32 sm:h-32 bg-white rounded-3xl p-3 shadow-xl flex items-center justify-center mb-4 transition-transform hover:scale-105 border-4 border-white">
+            <img
+              src="/logo-m.jpg"
+              alt="Metrika M Logo"
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                // Fallback icon
+                (e.currentTarget as HTMLElement).style.display = 'none';
+              }}
+            />
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white font-display mb-1 drop-shadow-sm">
-            Metrika
+
+          <h1 className="text-3xl font-black text-white tracking-wide drop-shadow-sm">
+            METRIKA
           </h1>
-          <p className="text-white/95 text-xs sm:text-sm font-bold tracking-[0.2em] uppercase mb-2">
-            HOLA AL CONTROL TOTAL
-          </p>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-black/15 backdrop-blur-sm rounded-full text-white/90 text-[11px] font-medium border border-white/10">
-            <span>🇧🇴 Hecho para tienditas y almacenes de Bolivia</span>
+
+          {/* Dotted decorative green line like in mockup */}
+          <div className="flex items-center gap-1.5 my-2.5">
+            <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
+            <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
+            <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
+            <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
+            <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
           </div>
+
+          <p className="text-white/95 text-xs sm:text-sm font-semibold max-w-[260px] leading-snug">
+            Control de stock y ventas para tu negocio
+          </p>
         </section>
 
         {/* Form and actions */}
-        <main className="w-full flex flex-col justify-end">
-          {/* Continuar con Google (1 Clic - Recomendado para adultos) */}
-          <div className="px-7 mb-2.5">
+        <main className="w-full flex-1 flex flex-col justify-between px-6 pt-5 pb-6">
+          <div className="space-y-3">
+            {/* 1-Tap Google Login */}
             <button
               id="btn-google-login"
               type="button"
               disabled={loading}
               onClick={handleGoogleLogin}
-              className="w-full h-12 bg-white hover:bg-[#fff9f5] active:scale-[0.98] transition-all text-[#2c1e19] rounded-2xl px-4 shadow-lg border border-white/60 flex items-center justify-between cursor-pointer disabled:opacity-50"
+              className="w-full h-12 bg-white hover:bg-slate-50 active:scale-[0.98] transition-all text-[#252524] rounded-2xl px-4 shadow-sm border border-slate-300 flex items-center justify-between cursor-pointer disabled:opacity-50"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                  </svg>
-                </div>
+                <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                </svg>
                 <div className="text-left">
-                  <span className="text-[10px] font-black uppercase text-[#bd532b] block leading-none">
-                    Sin contraseñas
-                  </span>
-                  <span className="text-xs sm:text-sm font-black text-[#2c1e19]">
+                  <span className="text-xs sm:text-sm font-bold text-slate-800">
                     Continuar con Google
                   </span>
                 </div>
               </div>
-              <span className="bg-[#bd532b] text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full">
-                1 clic
+              <span className="bg-[#1E70BA]/10 text-[#1E70BA] text-[10px] font-black px-2 py-0.5 rounded-full">
+                Rápido
               </span>
             </button>
-          </div>
 
-          {/* Quick Login button (sin clave / demo) */}
-          <div className="px-7 mb-3">
+            {/* Quick Demo Login (Special for senior/adult users) */}
             <button
               id="btn-quick-login"
               type="button"
               disabled={loading}
               onClick={handleQuickLogin}
-              className="group relative w-full bg-gradient-to-r from-[#ffe4cb] to-[#fceede] hover:from-[#ffeedf] hover:to-[#fff5ea] active:scale-[0.98] transition-all text-[#2c1e19] rounded-2xl p-3 shadow-lg border border-white/40 flex items-center justify-between text-left cursor-pointer disabled:opacity-50"
+              className="w-full bg-[#EAF3FA] hover:bg-[#DEECF8] active:scale-[0.98] transition-all text-[#1E70BA] rounded-2xl p-3 border border-[#1E70BA]/20 flex items-center justify-between text-left cursor-pointer disabled:opacity-50"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#bd532b] text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                  <span className="material-symbols-outlined text-2xl font-bold">bolt</span>
+                <div className="w-9 h-9 rounded-xl bg-[#1E70BA] text-white flex items-center justify-center shadow-xs">
+                  <span className="material-symbols-outlined text-xl">bolt</span>
                 </div>
                 <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-black text-[#bd532b] uppercase tracking-wider">
-                      Entrada Rápida
-                    </span>
-                    <span className="bg-[#bd532b]/15 text-[#bd532b] text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">
-                      Demo Don Lucho
-                    </span>
-                  </div>
-                  <p className="text-xs font-bold text-[#3d271e]">Abrir tienda Don Lucho (1 clic)</p>
+                  <span className="text-[11px] font-black uppercase text-[#1E70BA] tracking-wider block">
+                    Modo Demostración
+                  </span>
+                  <p className="text-xs font-bold text-slate-800">Abrir tienda de prueba Don Lucho</p>
                 </div>
               </div>
-              <div className="w-8 h-8 rounded-full bg-white/70 flex items-center justify-center text-[#bd532b] group-hover:translate-x-0.5 transition-transform">
-                <span className="material-symbols-outlined text-xl">arrow_forward</span>
-              </div>
+              <span className="material-symbols-outlined text-lg text-[#1E70BA]">arrow_forward</span>
             </button>
-          </div>
 
-          {/* Credentials Inputs */}
-          <div className="px-7 space-y-2.5 mb-4" data-purpose="credentials-form">
-            <div className="relative flex items-center bg-transparent border-2 border-white/90 rounded-full h-12 py-2 px-4 shadow-sm focus-within:ring-2 focus-within:ring-white">
-              <div className="flex items-center pl-1 pr-2 text-white/90">
-                <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">
-                  <path clipRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fillRule="evenodd" />
-                </svg>
-              </div>
-              <input
-                id="user-identity"
-                name="identity"
-                value={identity}
-                onChange={(e) => setIdentity(e.target.value)}
-                placeholder="Teléfono o email (ej. 77012345)"
-                className="w-full bg-transparent border-none text-white placeholder-white/75 text-sm font-normal focus:ring-0 focus:outline-none px-2"
-                type="text"
-              />
+            {/* Divider */}
+            <div className="flex items-center gap-3 py-1">
+              <div className="flex-1 h-px bg-slate-200"></div>
+              <span className="text-[11px] font-bold text-slate-400 uppercase">o con tu teléfono</span>
+              <div className="flex-1 h-px bg-slate-200"></div>
             </div>
 
-            <div className="relative flex items-center bg-transparent border-2 border-white/90 rounded-full h-12 py-2 px-4 shadow-sm focus-within:ring-2 focus-within:ring-white">
-              <div className="flex items-center pl-1 pr-2 text-white/90">
-                <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">
-                  <path clipRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" fillRule="evenodd" />
-                </svg>
+            {/* Credentials Inputs */}
+            <div className="space-y-2">
+              <div className="flex items-center bg-[#F6F8FA] dark:bg-[#20252D] border-2 border-slate-200 dark:border-slate-700 rounded-2xl h-12 px-3.5 focus-within:border-[#1E70BA] focus-within:bg-white dark:focus-within:bg-[#252D37] transition-all">
+                <span className="material-symbols-outlined text-slate-400 text-lg mr-2">phone_android</span>
+                <input
+                  id="user-identity"
+                  name="identity"
+                  value={identity}
+                  onChange={(e) => setIdentity(e.target.value)}
+                  placeholder="Teléfono o email (ej. 77012345)"
+                  className="w-full bg-transparent border-none text-[#252524] dark:text-white placeholder-slate-400 text-sm font-semibold focus:ring-0 focus:outline-none"
+                  type="text"
+                />
               </div>
-              <input
-                id="password-input"
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                type={showPassword ? 'text' : 'password'}
-                placeholder="PIN o contraseña (ej. 1234)"
-                className="w-full bg-transparent border-none text-white placeholder-white/75 text-sm font-normal focus:ring-0 focus:outline-none px-2"
-              />
-              <button
-                type="button"
-                id="toggle-password"
-                onClick={() => setShowPassword(!showPassword)}
-                className="text-white/80 hover:text-white p-1.5 focus:outline-none cursor-pointer"
-                aria-label="Ver u ocultar contraseña"
-              >
-                <span className="material-symbols-outlined text-[20px]">
-                  {showPassword ? 'visibility_off' : 'visibility'}
-                </span>
-              </button>
+
+              <div className="flex items-center bg-[#F6F8FA] dark:bg-[#20252D] border-2 border-slate-200 dark:border-slate-700 rounded-2xl h-12 px-3.5 focus-within:border-[#1E70BA] focus-within:bg-white dark:focus-within:bg-[#252D37] transition-all">
+                <span className="material-symbols-outlined text-slate-400 text-lg mr-2">lock</span>
+                <input
+                  id="password-input"
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="PIN o contraseña (ej. 1234)"
+                  className="w-full bg-transparent border-none text-[#252524] dark:text-white placeholder-slate-400 text-sm font-semibold focus:ring-0 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  id="toggle-password"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                  aria-label="Ver u ocultar contraseña"
+                >
+                  <span className="material-symbols-outlined text-[19px]">
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Bottom Sheet Card */}
-          <section
-            aria-label="Acciones de cuenta"
-            className="bg-[#fceede] rounded-t-[2.5rem] pt-5 pb-5 px-7 flex flex-col items-center shadow-[0_-10px_25px_-5px_rgba(0,0,0,0.15)] text-center"
-          >
+          {/* Bottom Actions */}
+          <div className="pt-4 space-y-2.5 text-center">
+            {/* Primary Action Button (Matches Mockup Screen 1) */}
             <button
               id="btn-login"
               type="button"
               disabled={loading}
               onClick={handleStandardLogin}
-              className="w-full h-12 py-3 bg-[#bd532b] hover:bg-[#a94822] active:scale-[0.98] text-white text-base font-bold rounded-full flex items-center justify-center shadow-md shadow-[#bd532b]/30 transition-all mb-2.5 tracking-wide cursor-pointer disabled:opacity-50"
+              className="w-full h-12 bg-[#1E70BA] hover:bg-[#165A98] active:scale-[0.98] text-white text-base font-bold rounded-2xl flex items-center justify-center shadow-lg shadow-[#1E70BA]/25 transition-all cursor-pointer disabled:opacity-50"
             >
-              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              {loading ? 'Iniciando...' : 'Iniciar sesión'}
             </button>
 
             <button
               id="btn-open-register"
               type="button"
               onClick={() => setShowModal(true)}
-              className="w-full h-12 py-3 bg-transparent border-2 border-[#df9d83] hover:border-[#bd532b] hover:bg-[#fae7d4] active:scale-[0.98] text-[#2c1d17] text-sm sm:text-base font-bold rounded-full flex items-center justify-center transition-all cursor-pointer"
+              className="w-full h-12 bg-white border-2 border-slate-200 hover:border-[#1E70BA] hover:bg-slate-50 active:scale-[0.98] text-slate-700 text-sm font-bold rounded-2xl flex items-center justify-center transition-all cursor-pointer"
             >
-              Crear cuenta para mi tienda
+              Crear cuenta
             </button>
-          </section>
+
+            <button
+              type="button"
+              onClick={() => showToast('Para recuperar tu PIN, contacta soporte o usa la entrada rápida.', 'info')}
+              className="text-xs font-semibold text-slate-500 hover:text-[#1E70BA] transition-colors py-1 cursor-pointer"
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          </div>
         </main>
 
         {/* Modal: Registro de Tienda */}
@@ -242,26 +250,26 @@ export const IngresoScreen: React.FC = () => {
             onClick={() => setShowModal(false)}
           />
 
-          <div className="relative w-full max-w-[414px] bg-[#fff8f5] rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl z-10 border-t border-amber-100 max-h-[92vh] overflow-y-auto">
-            <div className="w-12 h-1.5 bg-[#dec0b7] rounded-full mx-auto mb-4 sm:hidden"></div>
+          <div className="relative w-full max-w-[414px] bg-white rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl z-10 border-t border-slate-100 max-h-[92vh] overflow-y-auto">
+            <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-4 sm:hidden"></div>
 
-            <div className="flex items-center justify-between pb-3 border-b border-[#dec0b7]/40 mb-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-full bg-[#fceede] flex items-center justify-center text-[#bd532b]">
+                <div className="w-9 h-9 rounded-full bg-[#EAF3FA] flex items-center justify-center text-[#1E70BA]">
                   <span className="material-symbols-outlined text-xl">storefront</span>
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-lg text-[#2c1e19] leading-tight">
+                  <h3 className="font-black text-lg text-[#252524] leading-tight">
                     Crear cuenta en Metrika
                   </h3>
-                  <p className="text-xs text-[#8e6858]">Registra tu tiendita en 1 minuto</p>
+                  <p className="text-xs text-slate-500">Registra tu tienda en 1 minuto</p>
                 </div>
               </div>
               <button
                 type="button"
                 id="btn-close-modal"
                 onClick={() => setShowModal(false)}
-                className="w-8 h-8 rounded-full bg-[#eae1dd]/60 hover:bg-[#eae1dd] text-[#57423b] flex items-center justify-center transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
               >
                 <span className="material-symbols-outlined text-xl">close</span>
               </button>
@@ -276,62 +284,62 @@ export const IngresoScreen: React.FC = () => {
               }}
             >
               <div>
-                <label className="block text-xs font-bold text-[#57423b] mb-1" htmlFor="reg-shop-name">
+                <label className="block text-xs font-bold text-slate-700 mb-1" htmlFor="reg-shop-name">
                   Nombre de la tienda
                 </label>
-                <div className="flex items-center bg-[#f5ece8] rounded-2xl px-3.5 py-2.5 border border-[#dec0b7] focus-within:border-[#bd532b]">
-                  <span className="material-symbols-outlined text-[#8a726a] text-lg mr-2">store</span>
+                <div className="flex items-center bg-[#F6F8FA] rounded-2xl px-3.5 py-2.5 border border-slate-200 focus-within:border-[#1E70BA] focus-within:bg-white">
+                  <span className="material-symbols-outlined text-slate-400 text-lg mr-2">store</span>
                   <input
                     id="reg-shop-name"
                     type="text"
                     value={regShopName}
                     onChange={(e) => setRegShopName(e.target.value)}
                     placeholder="Ej: Tienda Don Lucho / Abarrotes Mary"
-                    className="w-full bg-transparent text-sm text-[#1f1b19] placeholder-[#8a726a]/70 border-none p-0 focus:ring-0 focus:outline-none font-medium"
+                    className="w-full bg-transparent text-sm text-[#252524] placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-semibold"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#57423b] mb-1" htmlFor="reg-owner-name">
+                <label className="block text-xs font-bold text-slate-700 mb-1" htmlFor="reg-owner-name">
                   Nombre del dueño / comerciante
                 </label>
-                <div className="flex items-center bg-[#f5ece8] rounded-2xl px-3.5 py-2.5 border border-[#dec0b7] focus-within:border-[#bd532b]">
-                  <span className="material-symbols-outlined text-[#8a726a] text-lg mr-2">person</span>
+                <div className="flex items-center bg-[#F6F8FA] rounded-2xl px-3.5 py-2.5 border border-slate-200 focus-within:border-[#1E70BA] focus-within:bg-white">
+                  <span className="material-symbols-outlined text-slate-400 text-lg mr-2">person</span>
                   <input
                     id="reg-owner-name"
                     type="text"
                     value={regOwnerName}
                     onChange={(e) => setRegOwnerName(e.target.value)}
                     placeholder="Ej: Doña María Mendoza"
-                    className="w-full bg-transparent text-sm text-[#1f1b19] placeholder-[#8a726a]/70 border-none p-0 focus:ring-0 focus:outline-none font-medium"
+                    className="w-full bg-transparent text-sm text-[#252524] placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-semibold"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#57423b] mb-1" htmlFor="reg-phone">
+                <label className="block text-xs font-bold text-slate-700 mb-1" htmlFor="reg-phone">
                   Celular / WhatsApp (Bolivia)
                 </label>
-                <div className="flex items-center bg-[#f5ece8] rounded-2xl px-3.5 py-2.5 border border-[#dec0b7] focus-within:border-[#bd532b]">
-                  <span className="text-xs font-bold text-[#bd532b] mr-2">🇧🇴 +591</span>
+                <div className="flex items-center bg-[#F6F8FA] rounded-2xl px-3.5 py-2.5 border border-slate-200 focus-within:border-[#1E70BA] focus-within:bg-white">
+                  <span className="text-xs font-bold text-[#1E70BA] mr-2">🇧🇴 +591</span>
                   <input
                     id="reg-phone"
                     type="tel"
                     value={regPhone}
                     onChange={(e) => setRegPhone(e.target.value)}
                     placeholder="77012345"
-                    className="w-full bg-transparent text-sm text-[#1f1b19] placeholder-[#8a726a]/70 border-none p-0 focus:ring-0 focus:outline-none font-medium"
+                    className="w-full bg-transparent text-sm text-[#252524] placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-semibold"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#57423b] mb-1" htmlFor="reg-pin">
+                <label className="block text-xs font-bold text-slate-700 mb-1" htmlFor="reg-pin">
                   Crear PIN fácil de 4 números
                 </label>
-                <div className="flex items-center bg-[#f5ece8] rounded-2xl px-3.5 py-2.5 border border-[#dec0b7] focus-within:border-[#bd532b]">
-                  <span className="material-symbols-outlined text-[#8a726a] text-lg mr-2">pin</span>
+                <div className="flex items-center bg-[#F6F8FA] rounded-2xl px-3.5 py-2.5 border border-slate-200 focus-within:border-[#1E70BA] focus-within:bg-white">
+                  <span className="material-symbols-outlined text-slate-400 text-lg mr-2">pin</span>
                   <input
                     id="reg-pin"
                     type="password"
@@ -339,10 +347,10 @@ export const IngresoScreen: React.FC = () => {
                     value={regPin}
                     onChange={(e) => setRegPin(e.target.value)}
                     placeholder="Ej: 1234"
-                    className="w-full bg-transparent text-sm text-[#1f1b19] placeholder-[#8a726a]/70 border-none p-0 focus:ring-0 focus:outline-none font-medium tracking-widest"
+                    className="w-full bg-transparent text-sm text-[#252524] placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-bold tracking-widest"
                   />
                 </div>
-                <p className="text-[10.5px] text-[#8e6858] mt-1">
+                <p className="text-[10.5px] text-slate-500 mt-1">
                   Con este PIN podrás ingresar rápido sin recordar contraseñas largas.
                 </p>
               </div>
@@ -353,7 +361,7 @@ export const IngresoScreen: React.FC = () => {
                   type="button"
                   disabled={loading}
                   onClick={handleSubmitRegister}
-                  className="w-full h-12 bg-[#bd532b] hover:bg-[#a3421e] active:scale-[0.98] text-white font-bold text-sm rounded-full flex items-center justify-center gap-2 shadow-md shadow-[#bd532b]/25 transition-all cursor-pointer disabled:opacity-50"
+                  className="w-full h-12 bg-[#1E70BA] hover:bg-[#165A98] active:scale-[0.98] text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md shadow-[#1E70BA]/25 transition-all cursor-pointer disabled:opacity-50"
                 >
                   <span className="material-symbols-outlined text-lg">check_circle</span>
                   {loading ? 'Creando cuenta...' : 'Registrar mi tienda gratis'}
@@ -362,7 +370,7 @@ export const IngresoScreen: React.FC = () => {
                   id="btn-cancel-modal"
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="w-full h-10 bg-transparent text-[#8e6858] hover:text-[#2c1e19] text-xs font-bold rounded-full flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-full h-10 bg-transparent text-slate-500 hover:text-slate-800 text-xs font-bold rounded-2xl flex items-center justify-center transition-colors cursor-pointer"
                 >
                   Ya tengo cuenta / Cancelar
                 </button>

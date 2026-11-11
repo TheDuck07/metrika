@@ -255,6 +255,17 @@ function saveLocalOfflineUser(record: OfflineUserRecord) {
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserSession | null>(() => {
     try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('screen') && params.get('screen') !== 'ingreso') {
+          return {
+            id: 'user-demo',
+            name: 'Don Lucho',
+            storeName: 'Abarrotes Don Lucho',
+            token: 'demo-token',
+          };
+        }
+      }
       const savedUser = localStorage.getItem(STORAGE_KEYS.USER);
       return savedUser ? JSON.parse(savedUser) : null;
     } catch {
@@ -263,6 +274,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   });
 
   const [currentScreen, setCurrentScreen] = useState<ScreenId>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const req = params.get('screen') as ScreenId;
+      if (req) return req;
+    }
     // If user is already logged in, start at inicio, otherwise ingreso
     const savedToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
     return savedToken ? 'inicio' : 'ingreso';
@@ -322,9 +338,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Dark Mode State
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
     try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('theme') === 'light') return false;
+        if (params.get('theme') === 'dark') return true;
+      }
       const saved = localStorage.getItem('metrika_dark_mode');
       if (saved !== null) return saved === 'true';
-      return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return false;
     } catch {
       return false;
     }

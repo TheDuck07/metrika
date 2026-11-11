@@ -135,7 +135,7 @@ _Copia de seguridad generada automáticamente por Metrika._`;
   };
 
   return (
-    <div className="bg-[#fff8f5] dark:bg-[#171210] text-[#1f1b19] dark:text-stone-100 min-h-screen flex flex-col pb-28 select-none transition-colors">
+    <div className="bg-[#F6F8FA] dark:bg-[#13171D] text-[#252524] dark:text-stone-100 min-h-screen flex flex-col pb-28 select-none transition-colors">
       <AppHeader title="Mi Tienda" />
 
       <main className="flex-1 max-w-md mx-auto w-full px-4 pt-3 space-y-3.5">

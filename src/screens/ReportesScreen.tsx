@@ -2,23 +2,22 @@ import React, { useState, useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
 import { AppHeader } from '../components/AppHeader';
 import { BottomNav } from '../components/BottomNav';
-import { getTodayDateStr } from '../utils/dateUtils';
 import { exportAndSaveExcel } from '../utils/excelExporter';
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Mercadería: '#2563eb',
-  Abarrotes: '#2563eb',
-  Lácteos: '#0284c7',
-  Bebidas: '#0ea5e9',
-  Refrescos: '#0ea5e9',
-  Carnes: '#dc2626',
-  'Verduras / Frutas': '#16a34a',
-  Servicios: '#a855f7',
-  'Servicio eléctrico local': '#a855f7',
-  Alquiler: '#f97316',
-  'Fletes / Transporte': '#eab308',
-  Imprevistos: '#2a6651',
-  Varios: '#6b7280',
+  Mercadería: '#1E70BA',
+  Abarrotes: '#EE6B4D',
+  Lácteos: '#0284C7',
+  Bebidas: '#1E70BA',
+  Refrescos: '#1E70BA',
+  Carnes: '#EF4444',
+  'Verduras / Frutas': '#9EC84A',
+  Servicios: '#8B5CF6',
+  'Servicio eléctrico local': '#8B5CF6',
+  Alquiler: '#F97316',
+  'Panadería fresca': '#EAB308',
+  Snacks: '#9EC84A',
+  Otros: '#252524',
 };
 
 const MONTH_NAMES = [
@@ -29,30 +28,27 @@ const MONTH_NAMES = [
 export const ReportesScreen: React.FC = () => {
   const { transactions, storeInfo, user, showToast } = useStore();
 
-  const [activeTab, setActiveTab] = useState<'semana' | 'mes'>('mes');
-  const [topModeMonth, setTopModeMonth] = useState<'unidades' | 'ingresos'>('unidades');
-  const [topModeSemana, setTopModeSemana] = useState<'unidades' | 'ingresos'>('ingresos');
+  const [activeTab, setActiveTab] = useState<'semana' | 'mes' | 'productos'>('mes');
+  const [topMode, setTopMode] = useState<'ingresos' | 'unidades'>('ingresos');
   const [isExporting, setIsExporting] = useState<boolean>(false);
 
-  // Today reference
+  // Month Navigator reference
   const today = useMemo(() => new Date(), []);
-  const [selectedMonthOffset, setSelectedMonthOffset] = useState<number>(0); // 0 = current month, -1 = previous, etc.
+  const [selectedMonthOffset, setSelectedMonthOffset] = useState<number>(0);
 
   // Target month calculation
   const targetDate = useMemo(() => {
-    const d = new Date(today.getFullYear(), today.getMonth() + selectedMonthOffset, 1);
-    return d;
+    return new Date(today.getFullYear(), today.getMonth() + selectedMonthOffset, 1);
   }, [today, selectedMonthOffset]);
 
   const monthYearStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, '0')}`;
   const monthDisplayName = `${MONTH_NAMES[targetDate.getMonth()]} ${targetDate.getFullYear()}`;
 
-  // Transactions belonging to the selected month
+  // 1. REAL MONTHLY TRANSACTIONS & STATS
   const monthTransactions = useMemo(() => {
     return transactions.filter((t) => t.date && t.date.startsWith(monthYearStr));
   }, [transactions, monthYearStr]);
 
-  // Monthly KPIs
   const monthlyStats = useMemo(() => {
     const ventas = monthTransactions.filter((t) => t.type === 'venta');
     const comprasYGastos = monthTransactions.filter((t) => t.type === 'compra' || t.type === 'gasto');
@@ -61,7 +57,18 @@ export const ReportesScreen: React.FC = () => {
     const totalGastos = comprasYGastos.reduce((acc, t) => acc + t.amount, 0);
     const gananciaNeta = totalVentas - totalGastos;
 
-    // Weekly breakdown inside the month: [1-7, 8-14, 15-21, 22-28, 29-31]
+    // Previous month comparison
+    const prevDate = new Date(targetDate.getFullYear(), targetDate.getMonth() - 1, 1);
+    const prevMonthStr = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`;
+    const prevTxs = transactions.filter((t) => t.date && t.date.startsWith(prevMonthStr) && t.type === 'venta');
+    const prevTotalVentas = prevTxs.reduce((acc, t) => acc + t.amount, 0);
+
+    const diffPct = prevTotalVentas > 0
+      ? ((totalVentas - prevTotalVentas) / prevTotalVentas) * 100
+      : (totalVentas > 0 ? 100 : 0);
+    const diffPctLabel = `${diffPct >= 0 ? '+' : ''}${diffPct.toFixed(0)}% vs. mes anterior`;
+
+    // Weekly buckets inside the month: [1-7, 8-14, 15-21, 22-28, 29-31]
     const weekBuckets = [
       { label: '1-7', min: 1, max: 7, total: 0 },
       { label: '8-14', min: 8, max: 14, total: 0 },
@@ -71,74 +78,49 @@ export const ReportesScreen: React.FC = () => {
     ];
 
     ventas.forEach((tx) => {
-      const day = parseInt(tx.date.split('-')[2], 10);
-      const b = weekBuckets.find((w) => day >= w.min && day <= w.max);
-      if (b) b.total += tx.amount;
+      if (tx.date) {
+        const day = parseInt(tx.date.split('-')[2], 10);
+        const b = weekBuckets.find((w) => day >= w.min && day <= w.max);
+        if (b) b.total += tx.amount;
+      }
     });
 
     const maxWeekTotal = Math.max(...weekBuckets.map((w) => w.total), 1);
-    const semanas = weekBuckets.map((w) => {
+    const chartWeeks = weekBuckets.map((w, idx) => {
       const isPeak = w.total > 0 && w.total === maxWeekTotal;
-      const heightPct = Math.round((w.total / maxWeekTotal) * 80) + 10;
+      const x = 30 + idx * 62;
+      const y = totalVentas > 0 ? 110 - (w.total / maxWeekTotal) * 75 : 105;
       return {
-        label: w.label,
+        label: `Sem. ${w.label}`,
         val: w.total,
-        height: `${w.total > 0 ? heightPct : 6}%`,
         isPeak,
+        x,
+        y,
       };
     });
 
-    const peakWeek = weekBuckets.reduce((max, w) => (w.total > max.total ? w : max), weekBuckets[0]);
+    const svgPath = chartWeeks.reduce((acc, pt, idx) => {
+      return idx === 0 ? `M ${pt.x} ${pt.y}` : `${acc} L ${pt.x} ${pt.y}`;
+    }, '');
+    const svgArea = `${svgPath} L ${chartWeeks[chartWeeks.length - 1].x} 120 L ${chartWeeks[0].x} 120 Z`;
 
-    // Top Products of the Month
-    const prodMap: Record<string, { name: string; units: number; revenue: number }> = {};
-    ventas.forEach((tx) => {
-      const key = tx.title || 'Venta rápida';
-      if (!prodMap[key]) {
-        prodMap[key] = { name: key, units: 0, revenue: 0 };
-      }
-      prodMap[key].units += tx.qty || 1;
-      prodMap[key].revenue += tx.amount;
-    });
-
-    const prodList = Object.values(prodMap);
-    const byUnits = [...prodList].sort((a, b) => b.units - a.units).slice(0, 4);
-    const byRevenue = [...prodList].sort((a, b) => b.revenue - a.revenue).slice(0, 4);
-
-    const maxUnits = Math.max(...byUnits.map((p) => p.units), 1);
-    const maxRev = Math.max(...byRevenue.map((p) => p.revenue), 1);
-
-    const topUnidades = byUnits.map((p, idx) => ({
-      rank: idx + 1,
-      name: p.name,
-      qty: `${p.units} u.`,
-      barW: `${Math.round((p.units / maxUnits) * 90) + 10}%`,
-    }));
-
-    const topIngresos = byRevenue.map((p, idx) => ({
-      rank: idx + 1,
-      name: p.name,
-      qty: `Bs. ${p.revenue.toFixed(0)}`,
-      barW: `${Math.round((p.revenue / maxRev) * 90) + 10}%`,
-    }));
-
-    // Expenses breakdown
+    // Categories breakdown (from real transactions)
     const catMap: Record<string, number> = {};
-    comprasYGastos.forEach((tx) => {
-      const cat = tx.category || 'Mercadería';
+    monthTransactions.forEach((tx) => {
+      const cat = tx.category || 'Otros';
       catMap[cat] = (catMap[cat] || 0) + tx.amount;
     });
 
     const catEntries = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
-    const expensesTotalBs = totalGastos;
+    const grandTotal = totalVentas + totalGastos;
 
     const CIRCUMFERENCE = 238.7;
     let accumulatedOffset = 0;
     const donutCircles: Array<{ stroke: string; dash: string; offset: string }> = [];
 
-    const gastosItems = catEntries.map(([name, bs]) => {
-      const pctNum = expensesTotalBs > 0 ? (bs / expensesTotalBs) * 100 : 0;
-      const stroke = CATEGORY_COLORS[name] || '#9ca3af';
+    const categoryBreakdown = catEntries.map(([name, bs]) => {
+      const pctNum = grandTotal > 0 ? (bs / grandTotal) * 100 : 0;
+      const stroke = CATEGORY_COLORS[name] || '#1E70BA';
       const dashLength = (pctNum / 100) * CIRCUMFERENCE;
 
       donutCircles.push({
@@ -149,38 +131,46 @@ export const ReportesScreen: React.FC = () => {
       accumulatedOffset += dashLength;
 
       return {
-        color: stroke,
         name,
-        pct: `${Math.round(pctNum)}%`,
-        bs: `${bs.toFixed(0)} Bs`,
+        color: stroke,
+        pct: Math.round(pctNum),
+        bs,
       };
     });
 
-    const majorGasto = catEntries[0] || ['Sin gastos', 0];
-    const majorGastoPct = expensesTotalBs > 0 ? `${Math.round(((majorGasto[1] as number) / expensesTotalBs) * 100)}%` : '0%';
-    const majorGastoName = majorGasto[0] as string;
+    // Top Products
+    const prodMap: Record<string, { name: string; units: number; revenue: number }> = {};
+    ventas.forEach((tx) => {
+      const key = tx.title || 'Venta de mostrador';
+      if (!prodMap[key]) prodMap[key] = { name: key, units: 0, revenue: 0 };
+      prodMap[key].units += tx.qty || 1;
+      prodMap[key].revenue += tx.amount;
+    });
+
+    const topList = Object.values(prodMap).sort((a, b) =>
+      topMode === 'ingresos' ? b.revenue - a.revenue : b.units - a.units
+    );
 
     return {
       totalVentas,
       totalGastos,
       gananciaNeta,
-      semanas,
-      mejorSemanaLabel: peakWeek && peakWeek.total > 0 ? `Sem. ${peakWeek.label}` : 'En curso',
-      mejorSemanaBs: peakWeek && peakWeek.total > 0 ? `Bs. ${peakWeek.total.toFixed(0)}` : 'Bs. 0',
-      topUnidades,
-      topIngresos,
+      diffPctLabel,
+      chartWeeks,
+      svgPath,
+      svgArea,
+      categoryBreakdown,
       donutCircles,
-      gastosItems,
-      majorGastoPct,
-      majorGastoName,
+      topList,
+      salesCount: ventas.length,
+      expensesCount: comprasYGastos.length,
     };
-  }, [monthTransactions]);
+  }, [monthTransactions, targetDate, transactions, topMode]);
 
-  // Weekly Stats (last 7 days)
+  // 2. REAL WEEKLY STATS (Current 7 Days: Lun - Dom)
   const weeklyStats = useMemo(() => {
-    // Generate dates for the current week (Lun to Dom)
     const now = new Date();
-    const currentDay = now.getDay(); // 0 is Sunday, 1 is Monday...
+    const currentDay = now.getDay(); // 0 is Sun, 1 is Mon...
     const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
 
     const monday = new Date(now);
@@ -215,67 +205,41 @@ export const ReportesScreen: React.FC = () => {
     const gananciaNeta = totalVentas - totalGastos;
 
     const maxDayVal = Math.max(...daysData.map((d) => d.ventas), 1);
-    const chartDays = daysData.map((d) => {
+    const chartDays = daysData.map((d, idx) => {
       const isPeak = d.ventas > 0 && d.ventas === maxDayVal;
-      const hPct = Math.round((d.ventas / maxDayVal) * 80) + 10;
+      const x = 20 + idx * 45;
+      const y = totalVentas > 0 ? 110 - (d.ventas / maxDayVal) * 75 : 105;
       return {
         day: d.day,
-        val: Math.round(d.ventas),
-        h: `${d.ventas > 0 ? hPct : 6}%`,
-        peak: isPeak,
+        val: d.ventas,
+        isPeak,
+        x,
+        y,
       };
     });
 
-    const peakDay = daysData.reduce((max, d) => (d.ventas > max.ventas ? d : max), daysData[0]);
+    const svgPath = chartDays.reduce((acc, pt, idx) => {
+      return idx === 0 ? `M ${pt.x} ${pt.y}` : `${acc} L ${pt.x} ${pt.y}`;
+    }, '');
+    const svgArea = `${svgPath} L ${chartDays[chartDays.length - 1].x} 120 L ${chartDays[0].x} 120 Z`;
 
-    // Top products of the week
-    const weekVentas = weekTxs.filter((t) => t.type === 'venta');
-    const prodMap: Record<string, { name: string; units: number; revenue: number }> = {};
-    weekVentas.forEach((tx) => {
-      const key = tx.title || 'Venta de mostrador';
-      if (!prodMap[key]) prodMap[key] = { name: key, units: 0, revenue: 0 };
-      prodMap[key].units += tx.qty || 1;
-      prodMap[key].revenue += tx.amount;
-    });
-
-    const prodList = Object.values(prodMap);
-    const byUnits = [...prodList].sort((a, b) => b.units - a.units).slice(0, 3);
-    const byRevenue = [...prodList].sort((a, b) => b.revenue - a.revenue).slice(0, 3);
-
-    const maxUnits = Math.max(...byUnits.map((p) => p.units), 1);
-    const maxRev = Math.max(...byRevenue.map((p) => p.revenue), 1);
-
-    const topUnidades = byUnits.map((p, idx) => ({
-      rank: idx + 1,
-      name: p.name,
-      qty: `${p.units} u.`,
-      barW: `${Math.round((p.units / maxUnits) * 90) + 10}%`,
-    }));
-
-    const topIngresos = byRevenue.map((p, idx) => ({
-      rank: idx + 1,
-      name: p.name,
-      qty: `Bs. ${p.revenue.toFixed(0)}`,
-      barW: `${Math.round((p.revenue / maxRev) * 90) + 10}%`,
-    }));
-
-    // Weekly expenses breakdown
-    const weekExpenses = weekTxs.filter((t) => t.type === 'compra' || t.type === 'gasto');
+    // Category breakdown
     const catMap: Record<string, number> = {};
-    weekExpenses.forEach((tx) => {
-      const cat = tx.category || 'Mercadería';
+    weekTxs.forEach((tx) => {
+      const cat = tx.category || 'Otros';
       catMap[cat] = (catMap[cat] || 0) + tx.amount;
     });
 
     const catEntries = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
-    const expensesTotalBs = totalGastos;
+    const grandTotal = totalVentas + totalGastos;
+
     const CIRCUMFERENCE = 238.7;
     let accumulatedOffset = 0;
     const donutCircles: Array<{ stroke: string; dash: string; offset: string }> = [];
 
-    const gastosItems = catEntries.map(([name, bs]) => {
-      const pctNum = expensesTotalBs > 0 ? (bs / expensesTotalBs) * 100 : 0;
-      const stroke = CATEGORY_COLORS[name] || '#9ca3af';
+    const categoryBreakdown = catEntries.map(([name, bs]) => {
+      const pctNum = grandTotal > 0 ? (bs / grandTotal) * 100 : 0;
+      const stroke = CATEGORY_COLORS[name] || '#1E70BA';
       const dashLength = (pctNum / 100) * CIRCUMFERENCE;
 
       donutCircles.push({
@@ -286,16 +250,27 @@ export const ReportesScreen: React.FC = () => {
       accumulatedOffset += dashLength;
 
       return {
-        color: stroke,
         name,
-        pct: `${Math.round(pctNum)}%`,
-        bs: `${bs.toFixed(0)} Bs`,
+        color: stroke,
+        pct: Math.round(pctNum),
+        bs,
       };
     });
 
-    const majorGasto = catEntries[0] || ['Sin gastos', 0];
-    const majorGastoPct = expensesTotalBs > 0 ? `${Math.round(((majorGasto[1] as number) / expensesTotalBs) * 100)}%` : '0%';
-    const majorGastoName = majorGasto[0] as string;
+    // Top products
+    const prodMap: Record<string, { name: string; units: number; revenue: number }> = {};
+    weekTxs
+      .filter((t) => t.type === 'venta')
+      .forEach((tx) => {
+        const key = tx.title || 'Venta de mostrador';
+        if (!prodMap[key]) prodMap[key] = { name: key, units: 0, revenue: 0 };
+        prodMap[key].units += tx.qty || 1;
+        prodMap[key].revenue += tx.amount;
+      });
+
+    const topList = Object.values(prodMap).sort((a, b) =>
+      topMode === 'ingresos' ? b.revenue - a.revenue : b.units - a.units
+    );
 
     return {
       weekTxs,
@@ -303,22 +278,22 @@ export const ReportesScreen: React.FC = () => {
       totalGastos,
       gananciaNeta,
       chartDays,
-      diaEstrella: peakDay && peakDay.ventas > 0 ? peakDay.day : 'En curso',
-      diaEstrellaBs: peakDay && peakDay.ventas > 0 ? `Bs. ${peakDay.ventas.toFixed(0)}` : 'Bs. 0',
-      topUnidades,
-      topIngresos,
+      svgPath,
+      svgArea,
+      categoryBreakdown,
       donutCircles,
-      gastosItems,
-      majorGastoPct,
-      majorGastoName,
+      topList,
+      salesCount: weekTxs.filter((t) => t.type === 'venta').length,
     };
-  }, [transactions]);
+  }, [transactions, topMode]);
+
+  // Current active data scope
+  const activeStats = activeTab === 'semana' ? weeklyStats : monthlyStats;
 
   const handleExportExcel = async () => {
     setIsExporting(true);
-    const txsToExport = activeTab === 'mes' ? monthTransactions : weeklyStats.weekTxs;
-    const period = activeTab === 'mes' ? monthDisplayName : 'Semana Actual';
-    const stats = activeTab === 'mes' ? monthlyStats : weeklyStats;
+    const txsToExport = activeTab === 'semana' ? weeklyStats.weekTxs : monthTransactions;
+    const period = activeTab === 'semana' ? 'Esta Semana (Lun-Dom)' : monthDisplayName;
 
     const res = await exportAndSaveExcel({
       title: 'Informe Contable y Balance',
@@ -327,9 +302,9 @@ export const ReportesScreen: React.FC = () => {
       periodLabel: period,
       transactions: txsToExport,
       summary: {
-        totalIngresos: stats.totalVentas,
-        totalGastos: stats.totalGastos,
-        balanceNeto: stats.gananciaNeta,
+        totalIngresos: activeStats.totalVentas,
+        totalGastos: activeStats.totalGastos,
+        balanceNeto: activeStats.gananciaNeta,
       },
     });
 
@@ -338,515 +313,335 @@ export const ReportesScreen: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#fff8f5] dark:bg-[#171210] text-[#1f1b19] dark:text-stone-100 min-h-screen flex flex-col pb-28 select-none transition-colors">
+    <div className="bg-[#F6F8FA] dark:bg-[#13171D] text-[#252524] dark:text-stone-100 min-h-screen flex flex-col pb-28 select-none transition-colors">
       <AppHeader title="Reportes" />
 
       <main className="flex-1 max-w-md mx-auto w-full px-4 pt-3 space-y-3.5">
-        {/* Period Selector Tabs */}
-        <div className="w-full bg-[#efe6e3] dark:bg-[#251d19] p-1 rounded-full shadow-xs">
-          <div className="grid grid-cols-2 gap-1" id="timePeriodSelector">
-            <button
-              id="tab-semana"
-              type="button"
-              onClick={() => setActiveTab('semana')}
-              className={`py-2 rounded-full text-center text-xs font-bold transition-all cursor-pointer ${
-                activeTab === 'semana'
-                  ? 'bg-[#9f3c16] text-white shadow-xs'
-                  : 'text-[#57423b] dark:text-stone-400 hover:text-[#1f1b19] dark:hover:text-stone-200'
-              }`}
-            >
-              Esta Semana
-            </button>
-            <button
-              id="tab-mes"
-              type="button"
-              onClick={() => setActiveTab('mes')}
-              className={`py-2 rounded-full text-center text-xs font-bold transition-all cursor-pointer ${
-                activeTab === 'mes'
-                  ? 'bg-[#9f3c16] text-white shadow-xs'
-                  : 'text-[#57423b] dark:text-stone-400 hover:text-[#1f1b19] dark:hover:text-stone-200'
-              }`}
-            >
-              Mensual
-            </button>
-          </div>
-        </div>
-
-        {/* Botón de Descarga de Informe en Excel */}
-        <div className="w-full">
+        {/* Navigation Tabs (Semana, Mes, Productos) */}
+        <div className="flex items-center gap-2 pt-0.5">
           <button
-            id="btn-export-excel"
             type="button"
-            disabled={isExporting}
-            onClick={handleExportExcel}
-            className="w-full h-11 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 active:scale-[0.98] text-white rounded-2xl flex items-center justify-center gap-2 font-black text-xs sm:text-sm shadow-md transition-all cursor-pointer disabled:opacity-50"
+            onClick={() => setActiveTab('mes')}
+            className={`px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer ${
+              activeTab === 'mes'
+                ? 'bg-[#9EC84A] text-slate-950 shadow-xs ring-2 ring-[#9EC84A]/30'
+                : 'bg-white dark:bg-[#1A1F26] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800'
+            }`}
           >
-            <span className="material-symbols-outlined text-[20px]">
-              {isExporting ? 'hourglass_top' : 'table_view'}
-            </span>
-            <span>
-              {isExporting
-                ? 'Generando archivo Excel...'
-                : `Descargar Informe en Excel (${activeTab === 'mes' ? monthDisplayName : 'Semana Actual'})`}
-            </span>
+            Mensual
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('semana')}
+            className={`px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer ${
+              activeTab === 'semana'
+                ? 'bg-[#9EC84A] text-slate-950 shadow-xs ring-2 ring-[#9EC84A]/30'
+                : 'bg-white dark:bg-[#1A1F26] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800'
+            }`}
+          >
+            Esta Semana
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('productos')}
+            className={`px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer ${
+              activeTab === 'productos'
+                ? 'bg-[#9EC84A] text-slate-950 shadow-xs ring-2 ring-[#9EC84A]/30'
+                : 'bg-white dark:bg-[#1A1F26] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800'
+            }`}
+          >
+            Top Productos
           </button>
         </div>
 
-        {/* ================= VISTA MENSUAL ================= */}
-        {activeTab === 'mes' && (
-          <div className="space-y-3.5" id="view-mes">
-            {/* Month Navigator */}
-            <div className="bg-white dark:bg-[#201815] rounded-xl p-2.5 shadow-xs border border-[#dec0b7]/40 dark:border-stone-800 flex items-center justify-between transition-colors">
+        {/* Date Filter & Excel Download Bar */}
+        <div className="flex items-center justify-between">
+          {activeTab === 'mes' ? (
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white dark:bg-[#1A1F26] rounded-full border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 shadow-xs">
               <button
-                id="btn-prev-mes"
                 type="button"
-                aria-label="Mes anterior"
                 onClick={() => setSelectedMonthOffset((prev) => prev - 1)}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-[#f5ece8] dark:bg-stone-800 hover:bg-[#eae1dd] dark:hover:bg-stone-700 text-[#57423b] dark:text-stone-300 cursor-pointer active:scale-95 transition-all"
+                className="material-symbols-outlined text-sm text-slate-400 hover:text-[#1E70BA] cursor-pointer"
+                title="Mes anterior"
               >
-                <span className="material-symbols-outlined text-[20px]">chevron_left</span>
+                chevron_left
               </button>
-
-              <div className="flex items-center gap-1.5 select-none">
-                <span className="material-symbols-outlined text-[#9f3c16] dark:text-[#ff9973] text-[18px]">calendar_month</span>
-                <span id="mes-display-title" className="text-sm font-extrabold text-[#1f1b19] dark:text-stone-100">
-                  {monthDisplayName}
-                </span>
-                {selectedMonthOffset === 0 && (
-                  <span className="bg-[#b1f0d4] dark:bg-emerald-950/70 text-[#0f513c] dark:text-emerald-300 text-[10px] font-bold px-1.5 py-0.2 rounded-full border border-emerald-500/20">
-                    Actual
-                  </span>
-                )}
-              </div>
-
+              <span className="material-symbols-outlined text-[17px] text-[#1E70BA]">calendar_month</span>
+              <span>{monthDisplayName}</span>
               <button
-                id="btn-next-mes"
                 type="button"
-                aria-label="Mes siguiente"
                 disabled={selectedMonthOffset >= 0}
                 onClick={() => setSelectedMonthOffset((prev) => prev + 1)}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-[#f5ece8] dark:bg-stone-800 hover:bg-[#eae1dd] dark:hover:bg-stone-700 text-[#57423b] dark:text-stone-300 disabled:opacity-30 cursor-pointer active:scale-95 transition-all"
+                className="material-symbols-outlined text-sm text-slate-400 hover:text-[#1E70BA] disabled:opacity-30 cursor-pointer"
+                title="Mes siguiente"
               >
-                <span className="material-symbols-outlined text-[20px]">chevron_right</span>
+                chevron_right
               </button>
             </div>
+          ) : (
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white dark:bg-[#1A1F26] rounded-full border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 shadow-xs">
+              <span className="material-symbols-outlined text-[17px] text-[#1E70BA]">date_range</span>
+              <span>Semana Actual (Lun - Dom)</span>
+            </div>
+          )}
 
-            {/* KPI Cards: Ganancia Neta y Semana Estrella */}
-            <section className="bg-gradient-to-br from-[#ffddb8]/40 dark:from-[#352119] via-[#fbf2ee] dark:via-[#221815] to-[#f5ece8] dark:to-[#1c1411] rounded-2xl p-3.5 shadow-xs border border-[#dec0b7]/40 dark:border-stone-800">
-              <div className="grid grid-cols-2 gap-2 bg-white/90 dark:bg-[#1a1311]/90 backdrop-blur-xs rounded-xl p-3 border border-[#dec0b7]/30 dark:border-stone-800">
-                {/* Ganancia Neta */}
-                <div className="flex flex-col min-w-0 border-r border-[#eae1dd] dark:border-stone-800 px-1">
-                  <span className="text-[11px] text-[#57423b] dark:text-stone-400 flex items-center gap-1 truncate font-medium">
-                    <span className="material-symbols-outlined text-[15px] text-[#9f3c16] dark:text-[#ff9973]">
-                      account_balance_wallet
-                    </span>
-                    Ganancia Neta
-                  </span>
-                  <div className="flex items-baseline gap-1 mt-1">
-                    <span id="kpi-ganancia-mes" className="text-2xl font-extrabold text-[#9f3c16] dark:text-[#ff9973] truncate">
-                      {monthlyStats.gananciaNeta.toLocaleString('es-BO', { maximumFractionDigits: 0 })}
-                    </span>
-                  </div>
-                  <span id="kpi-ganancia-sub" className="text-[10px] text-[#2a6651] dark:text-emerald-400 font-bold leading-none mt-0.5">
-                    Bs. (Ventas - Salidas)
-                  </span>
-                </div>
+          <button
+            type="button"
+            disabled={isExporting}
+            onClick={handleExportExcel}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#EBF5EC] dark:bg-[#1B2F23] text-[#2D8A4E] dark:text-emerald-300 rounded-full border border-emerald-200 text-xs font-black hover:bg-emerald-100 transition-all cursor-pointer shadow-xs"
+          >
+            <span className="material-symbols-outlined text-[16px]">table_view</span>
+            <span>Descargar Excel</span>
+          </button>
+        </div>
 
-                {/* Semana Estrella */}
-                <div className="flex flex-col min-w-0 px-2">
-                  <span className="text-[11px] text-[#57423b] dark:text-stone-400 flex items-center gap-1 truncate font-medium">
-                    <span className="material-symbols-outlined text-[15px] text-[#855300] dark:text-amber-400">
-                      workspace_premium
-                    </span>
-                    Mejor Semana
-                  </span>
-                  <div className="flex items-baseline gap-1 mt-1 truncate">
-                    <span id="kpi-mejor-semana" className="text-2xl font-extrabold text-[#855300] dark:text-amber-400 truncate">
-                      {monthlyStats.mejorSemanaLabel}
-                    </span>
-                  </div>
-                  <span id="kpi-mejor-semana-bs" className="text-[10px] text-[#57423b] dark:text-stone-400 font-medium leading-none mt-0.5 truncate">
-                    {monthlyStats.mejorSemanaBs}
-                  </span>
-                </div>
+        {/* 1. VENTAS DEL PERÍODO CARD (Actual real-time figures in Bs.) */}
+        <section className="bg-white dark:bg-[#1A1F26] rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-[#EBF5EC] text-[#2D8A4E] flex items-center justify-center">
+                <span className="material-symbols-outlined text-xl">bar_chart</span>
               </div>
-            </section>
-
-            {/* Ventas del Mes: Gráfico Semanal Dinámico */}
-            <section className="bg-white dark:bg-[#201815] rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 dark:border-stone-800 space-y-2 transition-colors">
-              <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#9f3c16] dark:bg-[#ff9973]"></span>
-                  <h3 className="text-sm font-bold text-[#1f1b19] dark:text-stone-100">Ventas del Mes</h3>
-                </div>
-                <div className="text-right">
-                  <span className="text-[10px] text-[#57423b] dark:text-stone-400 block uppercase font-medium">Total Ventas</span>
-                  <span className="text-sm font-extrabold text-[#9f3c16] dark:text-[#ff9973]">
-                    Bs. {monthlyStats.totalVentas.toLocaleString('es-BO', { maximumFractionDigits: 2 })}
-                  </span>
-                </div>
-              </div>
-
-              <div className="pt-4 pb-2">
-                <div className="h-36 w-full flex items-end justify-between px-2 gap-2">
-                  {monthlyStats.semanas.map((s) => (
-                    <div key={s.label} className="flex-1 flex flex-col items-center h-full justify-end">
-                      <span className={`text-[10px] font-bold mb-1 ${s.isPeak ? 'text-[#9f3c16] dark:text-[#ff9973]' : 'text-[#57423b] dark:text-stone-400'}`}>
-                        {s.val > 0 ? `Bs. ${s.val.toFixed(0)}` : '0'}
-                      </span>
-                      <div
-                        className={`w-full max-w-[42px] rounded-t-lg transition-all duration-500 ${
-                          s.isPeak ? 'bg-[#9f3c16] dark:bg-[#ff8659]' : 'bg-[#ffddb8] dark:bg-[#733e2b]'
-                        }`}
-                        style={{ height: s.height }}
-                      />
-                      <span className="text-[10px] text-[#57423b] dark:text-stone-400 font-semibold mt-1">
-                        Días {s.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            {/* Top Productos del Mes */}
-            <section className="bg-white dark:bg-[#201815] rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 dark:border-stone-800 space-y-3 transition-colors">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#9f3c16] dark:bg-[#ff9973]"></span>
-                  <h3 className="text-sm font-bold text-[#1f1b19] dark:text-stone-100">Productos Más Vendidos</h3>
-                </div>
-                <div className="flex items-center bg-[#f5ece8] dark:bg-stone-800 p-0.5 rounded-full text-[11px]">
-                  <button
-                    id="btn-top-unidades"
-                    type="button"
-                    onClick={() => setTopModeMonth('unidades')}
-                    className={`px-2 py-0.5 rounded-full font-bold transition-all cursor-pointer ${
-                      topModeMonth === 'unidades'
-                        ? 'bg-[#9f3c16] text-white shadow-xs'
-                        : 'text-[#57423b] dark:text-stone-300 hover:text-[#1f1b19] dark:hover:text-stone-100'
-                    }`}
-                  >
-                    Unidades
-                  </button>
-                  <button
-                    id="btn-top-ingresos"
-                    type="button"
-                    onClick={() => setTopModeMonth('ingresos')}
-                    className={`px-2 py-0.5 rounded-full font-bold transition-all cursor-pointer ${
-                      topModeMonth === 'ingresos'
-                        ? 'bg-[#9f3c16] text-white shadow-xs'
-                        : 'text-[#57423b] dark:text-stone-300 hover:text-[#1f1b19] dark:hover:text-stone-100'
-                    }`}
-                  >
-                    Bs.
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-3" id="month-top-products-list">
-                {(topModeMonth === 'unidades' ? monthlyStats.topUnidades : monthlyStats.topIngresos).length === 0 ? (
-                  <p className="text-xs text-[#8a726a] dark:text-stone-400 text-center py-4">No hay ventas registradas en este mes.</p>
-                ) : (
-                  (topModeMonth === 'unidades' ? monthlyStats.topUnidades : monthlyStats.topIngresos).map((p) => (
-                    <div key={p.rank} className="space-y-1">
-                      <div className="flex justify-between items-center text-[#1f1b19] dark:text-stone-100">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span
-                            className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-bold ${
-                              p.rank === 1 ? 'bg-[#ffdbcf] dark:bg-[#5c2411] text-[#9f3c16] dark:text-[#ff9973]' : 'bg-[#f5ece8] dark:bg-stone-800 text-[#57423b] dark:text-stone-300'
-                            }`}
-                          >
-                            {p.rank}
-                          </span>
-                          <span className="text-xs font-bold truncate">{p.name}</span>
-                        </div>
-                        <span className="text-xs font-extrabold text-[#9f3c16] dark:text-[#ff9973] shrink-0">{p.qty}</span>
-                      </div>
-                      <div className="w-full bg-[#f5ece8] dark:bg-stone-800 rounded-full h-2.5 overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all duration-700 ${
-                            p.rank === 1 ? 'bg-[#9f3c16] dark:bg-[#ff8659]' : p.rank === 2 ? 'bg-[#bf542c]' : 'bg-[#fea619]'
-                          }`}
-                          style={{ width: p.barW }}
-                        />
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </section>
-
-            {/* Salidas y Gastos del Mes (Donut Chart Dinámico) */}
-            <section className="bg-white dark:bg-[#201815] rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 dark:border-stone-800 space-y-3 transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#2a6651] dark:bg-emerald-400"></span>
-                  <h3 className="text-sm font-bold text-[#1f1b19] dark:text-stone-100">Gastos y Salidas</h3>
-                </div>
-                <span className="text-xs font-bold text-[#57423b] dark:text-stone-300 bg-[#f5ece8] dark:bg-stone-800 px-2.5 py-0.5 rounded-full">
-                  Bs. {monthlyStats.totalGastos.toFixed(2)} total
-                </span>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-center gap-4 pt-1">
-                {/* SVG Donut */}
-                <div className="relative w-36 h-36 flex items-center justify-center shrink-0">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" fill="transparent" r="38" className="stroke-[#f5ece8] dark:stroke-[#332420]" strokeWidth="15" />
-                    {monthlyStats.donutCircles.map((c, i) => (
-                      <circle
-                        key={i}
-                        cx="50"
-                        cy="50"
-                        fill="transparent"
-                        r="38"
-                        stroke={c.stroke}
-                        strokeDasharray={c.dash}
-                        strokeDashoffset={c.offset}
-                        strokeWidth="15"
-                      />
-                    ))}
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center px-1">
-                    <span className="text-[10px] text-[#57423b] dark:text-stone-400 font-medium leading-none">Mayor gasto</span>
-                    <span id="mes-donut-major-percent" className="text-xl font-extrabold text-[#1f1b19] dark:text-stone-100 leading-tight">
-                      {monthlyStats.majorGastoPct}
-                    </span>
-                    <span id="mes-donut-major-name" className="text-[10px] text-[#9f3c16] dark:text-[#ff9973] font-bold truncate max-w-[80px]">
-                      {monthlyStats.majorGastoName}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Expense categories list */}
-                <div className="flex-1 w-full space-y-1.5" id="mes-gastos-list">
-                  {monthlyStats.gastosItems.length === 0 ? (
-                    <p className="text-xs text-[#8a726a] dark:text-stone-400 py-3 text-center">No hay compras ni gastos registrados en este mes.</p>
-                  ) : (
-                    monthlyStats.gastosItems.map((item) => (
-                      <div
-                        key={item.name}
-                        className="flex items-center justify-between text-[#1f1b19] dark:text-stone-200 bg-[#fbf2ee] dark:bg-[#2b1f1b] p-2 rounded-xl text-xs"
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                          <span className="font-semibold truncate">{item.name}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 shrink-0 font-bold">
-                          <span>{item.pct}</span>
-                          <span className="text-[#57423b] dark:text-stone-400 font-normal">({item.bs})</span>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </section>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                {activeTab === 'semana' ? 'Ventas de la semana' : 'Ventas del mes'}
+              </span>
+            </div>
+            <span className="text-[10px] font-black text-[#2D8A4E] bg-[#EBF5EC] dark:bg-[#1B2F23] px-2 py-0.5 rounded-full">
+              {monthlyStats.diffPctLabel}
+            </span>
           </div>
+
+          <div className="mt-2 flex items-baseline justify-between">
+            <div>
+              <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                Bs. {activeStats.totalVentas.toFixed(2)}
+              </span>
+              <p className="text-[11px] text-slate-500 mt-0.5 font-semibold">
+                {activeStats.salesCount} {activeStats.salesCount === 1 ? 'venta registrada' : 'ventas registradas'}
+              </p>
+            </div>
+
+            <div className="text-right">
+              <span className="text-xs text-slate-400 block font-bold">Ganancia neta</span>
+              <span
+                className={`text-base font-black ${
+                  activeStats.gananciaNeta >= 0 ? 'text-[#1E70BA] dark:text-[#60A5FA]' : 'text-rose-600'
+                }`}
+              >
+                Bs. {activeStats.gananciaNeta.toFixed(2)}
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* 2. EVOLUCIÓN DE VENTAS CHART (Real amounts plotted) */}
+        {activeTab !== 'productos' && (
+          <section className="bg-white dark:bg-[#1A1F26] rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                Evolución de ventas
+              </h3>
+              <span className="text-[10px] font-bold text-slate-400">
+                {activeTab === 'semana' ? 'Montos por día (Bs.)' : 'Montos por semana (Bs.)'}
+              </span>
+            </div>
+
+            {/* SVG Chart with Blue Gradient and Real Points */}
+            <div className="w-full h-36 relative">
+              <svg className="w-full h-full overflow-visible" viewBox="0 0 310 130">
+                <defs>
+                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#1E70BA" stopOpacity="0.35" />
+                    <stop offset="100%" stopColor="#1E70BA" stopOpacity="0.0" />
+                  </linearGradient>
+                </defs>
+
+                {/* Area */}
+                <path d={activeStats.svgArea} fill="url(#chartGradient)" />
+
+                {/* Line */}
+                <path
+                  d={activeStats.svgPath}
+                  fill="none"
+                  stroke="#1E70BA"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+
+                {/* Dots and Labels */}
+                {(activeTab === 'semana' ? weeklyStats.chartDays : monthlyStats.chartWeeks).map((pt: any, idx: number) => (
+                  <g key={idx}>
+                    <circle
+                      cx={pt.x}
+                      cy={pt.y}
+                      r="4.5"
+                      fill={pt.isPeak ? '#EE6B4D' : '#1E70BA'}
+                      stroke="#ffffff"
+                      strokeWidth="2"
+                    />
+                    {pt.val > 0 && (
+                      <text
+                        x={pt.x}
+                        y={pt.y - 8}
+                        textAnchor="middle"
+                        className="text-[9px] fill-[#1E70BA] font-extrabold"
+                      >
+                        {pt.val.toFixed(0)}
+                      </text>
+                    )}
+                    <text
+                      x={pt.x}
+                      y={126}
+                      textAnchor="middle"
+                      className="text-[10px] fill-slate-400 font-bold"
+                    >
+                      {activeTab === 'semana' ? pt.day : pt.label.replace('Sem. ', '')}
+                    </text>
+                  </g>
+                ))}
+              </svg>
+            </div>
+          </section>
         )}
 
-        {/* ================= VISTA ESTA SEMANA ================= */}
-        {activeTab === 'semana' && (
-          <div className="space-y-3.5" id="view-semana">
-            {/* KPI Cards: Ganancia Neta Semanal y Día Estrella */}
-            <section className="bg-gradient-to-br from-[#ffddb8]/40 dark:from-[#352119] via-[#fbf2ee] dark:via-[#221815] to-[#f5ece8] dark:to-[#1c1411] rounded-2xl p-3.5 shadow-xs border border-[#dec0b7]/40 dark:border-stone-800">
-              <div className="grid grid-cols-2 gap-2 bg-white/90 dark:bg-[#1a1311]/90 backdrop-blur-xs rounded-xl p-3 border border-[#dec0b7]/30 dark:border-stone-800">
-                <div className="flex flex-col min-w-0 border-r border-[#eae1dd] dark:border-stone-800 px-1">
-                  <span className="text-[11px] text-[#57423b] dark:text-stone-400 flex items-center gap-1 truncate font-medium">
-                    <span className="material-symbols-outlined text-[15px] text-[#9f3c16] dark:text-[#ff9973]">
-                      account_balance_wallet
-                    </span>
-                    Ganancia Neta
-                  </span>
-                  <div className="flex items-baseline gap-1 mt-1">
-                    <span className="text-2xl font-extrabold text-[#9f3c16] dark:text-[#ff9973] truncate">
-                      {weeklyStats.gananciaNeta.toLocaleString('es-BO', { maximumFractionDigits: 0 })}
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-[#2a6651] dark:text-emerald-400 font-bold leading-none mt-0.5">Bs. (Semana Actual)</span>
-                </div>
+        {/* 3. CATEGORÍAS (Real breakdown from transactions) */}
+        {activeTab !== 'productos' && (
+          <section className="bg-white dark:bg-[#1A1F26] rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                Distribución por categoría
+              </h3>
+              <span className="text-[10px] font-bold text-slate-400">
+                {activeStats.categoryBreakdown.length} categorías
+              </span>
+            </div>
 
-                <div className="flex flex-col min-w-0 px-2">
-                  <span className="text-[11px] text-[#57423b] dark:text-stone-400 flex items-center gap-1 truncate font-medium">
-                    <span className="material-symbols-outlined text-[15px] text-[#855300] dark:text-amber-400">
-                      workspace_premium
-                    </span>
-                    Día Estrella
-                  </span>
-                  <div className="flex items-baseline gap-1 mt-1 truncate">
-                    <span className="text-2xl font-extrabold text-[#855300] dark:text-amber-400 truncate">
-                      {weeklyStats.diaEstrella}
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-[#57423b] dark:text-stone-400 font-medium leading-none mt-0.5">
-                    {weeklyStats.diaEstrellaBs}
-                  </span>
-                </div>
-              </div>
-            </section>
-
-            {/* Top Productos Semanales */}
-            <section className="bg-white dark:bg-[#201815] rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 dark:border-stone-800 space-y-3 transition-colors">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#9f3c16] dark:bg-[#ff9973]"></span>
-                  <h3 className="text-sm font-bold text-[#1f1b19] dark:text-stone-100">Más Vendidos de la Semana</h3>
-                </div>
-                <div className="flex items-center bg-[#f5ece8] dark:bg-stone-800 p-0.5 rounded-full text-[11px]">
-                  <button
-                    type="button"
-                    onClick={() => setTopModeSemana('unidades')}
-                    className={`px-2 py-0.5 rounded-full font-bold transition-all cursor-pointer ${
-                      topModeSemana === 'unidades'
-                        ? 'bg-[#9f3c16] text-white shadow-xs'
-                        : 'text-[#57423b] dark:text-stone-300 hover:text-[#1f1b19] dark:hover:text-stone-100'
-                    }`}
-                  >
-                    Unidades
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setTopModeSemana('ingresos')}
-                    className={`px-2 py-0.5 rounded-full font-bold transition-all cursor-pointer ${
-                      topModeSemana === 'ingresos'
-                        ? 'bg-[#9f3c16] text-white shadow-xs'
-                        : 'text-[#57423b] dark:text-stone-300 hover:text-[#1f1b19] dark:hover:text-stone-100'
-                    }`}
-                  >
-                    Bs.
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                {(topModeSemana === 'ingresos' ? weeklyStats.topIngresos : weeklyStats.topUnidades).length === 0 ? (
-                  <p className="text-xs text-[#8a726a] dark:text-stone-400 text-center py-4">Aún no hay ventas registradas esta semana.</p>
-                ) : (
-                  (topModeSemana === 'ingresos' ? weeklyStats.topIngresos : weeklyStats.topUnidades).map((p) => (
-                    <div key={p.rank} className="space-y-1">
-                      <div className="flex justify-between items-center text-[#1f1b19] dark:text-stone-100">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span
-                            className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-bold ${
-                              p.rank === 1 ? 'bg-[#ffdbcf] dark:bg-[#5c2411] text-[#9f3c16] dark:text-[#ff9973]' : 'bg-[#f5ece8] dark:bg-stone-800 text-[#57423b] dark:text-stone-300'
-                            }`}
-                          >
-                            {p.rank}
-                          </span>
-                          <span className="text-xs font-bold truncate">{p.name}</span>
-                        </div>
-                        <span className="text-xs font-extrabold text-[#9f3c16] dark:text-[#ff9973] shrink-0">{p.qty}</span>
-                      </div>
-                      <div className="w-full bg-[#f5ece8] dark:bg-stone-800 rounded-full h-2.5 overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all duration-700 ${
-                            p.rank === 1 ? 'bg-[#9f3c16] dark:bg-[#ff8659]' : 'bg-[#bf542c]'
-                          }`}
-                          style={{ width: p.barW }}
-                        />
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </section>
-
-            {/* Ventas por Día (Lun - Dom) */}
-            <section className="bg-white dark:bg-[#201815] rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 dark:border-stone-800 space-y-2 transition-colors">
-              <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#fea619]"></span>
-                  <h3 className="text-sm font-bold text-[#1f1b19] dark:text-stone-100">Ventas por Día</h3>
-                </div>
-                <div className="text-right">
-                  <span className="text-[10px] text-[#57423b] dark:text-stone-400 block uppercase font-medium">Total Semana</span>
-                  <span className="text-sm font-extrabold text-[#9f3c16] dark:text-[#ff9973]">
-                    Bs. {weeklyStats.totalVentas.toLocaleString('es-BO', { maximumFractionDigits: 2 })}
-                  </span>
-                </div>
-              </div>
-
-              <div className="pt-4 pb-2">
-                <div className="h-40 w-full flex items-end justify-between px-1 gap-1.5">
-                  {weeklyStats.chartDays.map((d) => (
-                    <div key={d.day} className="flex-1 flex flex-col items-center h-full justify-end">
-                      <span className={`text-[9px] font-bold mb-1 ${d.peak ? 'text-[#9f3c16] dark:text-[#ff9973] font-extrabold' : 'text-[#57423b] dark:text-stone-400'}`}>
-                        {d.val > 0 ? d.val : '0'}
-                      </span>
-                      <div
-                        className={`w-full max-w-[28px] rounded-t-lg transition-all duration-300 ${
-                          d.peak ? 'bg-[#9f3c16] dark:bg-[#ff8659] shadow-xs' : 'bg-[#fea619] dark:bg-[#d97706]'
-                        }`}
-                        style={{ height: d.h }}
-                      />
-                      <span className={`text-[10px] font-semibold mt-1 ${d.peak ? 'text-[#9f3c16] dark:text-[#ff9973] font-bold' : 'text-[#57423b] dark:text-stone-400'}`}>
-                        {d.day}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            {/* Gastos y Salidas Semanal */}
-            <section className="bg-white dark:bg-[#201815] rounded-2xl p-4 shadow-xs border border-[#dec0b7]/50 dark:border-stone-800 space-y-3 transition-colors">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#2a6651] dark:bg-emerald-400"></span>
-                  <h3 className="text-sm font-bold text-[#1f1b19] dark:text-stone-100">Gastos y Salidas</h3>
-                </div>
-                <span className="text-xs font-bold text-[#57423b] dark:text-stone-300 bg-[#f5ece8] dark:bg-stone-800 px-2.5 py-0.5 rounded-full">
-                  Bs. {weeklyStats.totalGastos.toFixed(2)} total
-                </span>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-center gap-4 pt-1">
-                <div className="relative w-36 h-36 flex items-center justify-center shrink-0">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" fill="transparent" r="38" className="stroke-[#f5ece8] dark:stroke-[#332420]" strokeWidth="15" />
-                    {weeklyStats.donutCircles.map((c, i) => (
+            {activeStats.categoryBreakdown.length === 0 ? (
+              <p className="text-xs text-slate-400 text-center py-4">
+                No hay movimientos registrados en este período.
+              </p>
+            ) : (
+              <div className="flex items-center gap-5">
+                {/* Real SVG Donut graphic */}
+                <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
+                  <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="38" fill="transparent" stroke="#E5E7EB" strokeWidth="14" />
+                    {activeStats.donutCircles.map((c, i) => (
                       <circle
                         key={i}
                         cx="50"
                         cy="50"
-                        fill="transparent"
                         r="38"
+                        fill="transparent"
                         stroke={c.stroke}
                         strokeDasharray={c.dash}
                         strokeDashoffset={c.offset}
-                        strokeWidth="15"
+                        strokeWidth="14"
                       />
                     ))}
                   </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                    <span className="text-[10px] text-[#57423b] dark:text-stone-400">Mayor gasto</span>
-                    <span className="text-xl font-extrabold text-[#1f1b19] dark:text-stone-100">{weeklyStats.majorGastoPct}</span>
-                    <span className="text-[10px] text-[#9f3c16] dark:text-[#ff9973] font-bold truncate max-w-[80px]">{weeklyStats.majorGastoName}</span>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                    <span className="text-[9px] font-bold text-slate-400 leading-none">Total</span>
+                    <span className="text-xs font-black text-slate-900 dark:text-white leading-tight">
+                      Bs. {activeStats.totalVentas.toFixed(0)}
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex-1 w-full space-y-1.5">
-                  {weeklyStats.gastosItems.length === 0 ? (
-                    <p className="text-xs text-[#8a726a] dark:text-stone-400 text-center py-3">No hay compras ni gastos esta semana.</p>
-                  ) : (
-                    weeklyStats.gastosItems.map((item) => (
-                      <div key={item.name} className="flex items-center justify-between text-[#1f1b19] dark:text-stone-200 bg-[#fbf2ee] dark:bg-[#2b1f1b] p-2 rounded-xl text-xs">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                          <span className="font-semibold truncate">{item.name}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 shrink-0 font-bold">
-                          <span>{item.pct}</span>
-                          <span className="text-[#57423b] dark:text-stone-400 font-normal">({item.bs})</span>
-                        </div>
+                {/* Category Percentages and Amounts */}
+                <div className="flex-1 space-y-2">
+                  {activeStats.categoryBreakdown.map((cat, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span
+                          className="w-2.5 h-2.5 rounded-full shrink-0"
+                          style={{ backgroundColor: cat.color }}
+                        ></span>
+                        <span className="font-semibold text-slate-700 dark:text-slate-300 truncate">
+                          {cat.name}
+                        </span>
                       </div>
-                    ))
-                  )}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="font-black text-slate-900 dark:text-white">
+                          {cat.pct}%
+                        </span>
+                        <span className="text-[10px] text-slate-400">
+                          (Bs. {cat.bs.toFixed(0)})
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </section>
-          </div>
+            )}
+          </section>
+        )}
+
+        {/* 4. TOP PRODUCTOS LIST (Real-time ranked by units or revenue) */}
+        {(activeTab === 'productos' || activeTab === 'mes') && (
+          <section className="bg-white dark:bg-[#1A1F26] rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                Productos más vendidos
+              </h3>
+              <div className="flex items-center gap-1 p-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-bold">
+                <button
+                  type="button"
+                  onClick={() => setTopMode('ingresos')}
+                  className={`px-2 py-0.5 rounded-md transition-all cursor-pointer ${
+                    topMode === 'ingresos' ? 'bg-white text-[#1E70BA] shadow-xs' : 'text-slate-500'
+                  }`}
+                >
+                  Por Bs.
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTopMode('unidades')}
+                  className={`px-2 py-0.5 rounded-md transition-all cursor-pointer ${
+                    topMode === 'unidades' ? 'bg-white text-[#1E70BA] shadow-xs' : 'text-slate-500'
+                  }`}
+                >
+                  Por u.
+                </button>
+              </div>
+            </div>
+
+            {activeStats.topList.length === 0 ? (
+              <p className="text-xs text-slate-400 text-center py-4">
+                No hay ventas de productos registradas en este período.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {activeStats.topList.slice(0, 5).map((p, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800 last:border-none"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="w-5 h-5 rounded-full bg-[#EAF2F9] text-[#1E70BA] font-black text-xs flex items-center justify-center shrink-0">
+                        {idx + 1}
+                      </span>
+                      <span className="font-bold text-xs text-slate-800 dark:text-slate-200 truncate">
+                        {p.name}
+                      </span>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="font-black text-xs text-[#2D8A4E]">
+                        Bs. {p.revenue.toFixed(2)}
+                      </span>
+                      <span className="text-[10px] text-slate-400 block">
+                        {p.units} {p.units === 1 ? 'unidad' : 'unidades'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
         )}
       </main>
 

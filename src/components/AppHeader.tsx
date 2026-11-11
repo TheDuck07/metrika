@@ -25,44 +25,60 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
     : 'MT';
 
   return (
-    <header className="flex-none w-full z-40 bg-[#fff8f5]/90 dark:bg-[#1a1412]/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] dark:shadow-[0_1px_8px_rgba(0,0,0,0.3)] border-b border-[#eae1dd]/60 dark:border-stone-800 transition-colors">
-      <div className="h-18 px-4 flex items-center justify-between gap-2 max-w-md mx-auto">
-        {/* Left: Logo & Store Name (Click to switch business) */}
+    <header className="flex-none w-full z-40 bg-[#1E70BA] dark:bg-[#155A96] text-white shadow-[0_2px_12px_rgba(30,112,186,0.25)] transition-colors">
+      <div className="h-16 px-4 flex items-center justify-between gap-2 max-w-md mx-auto">
+        {/* Left: METRIKA Logo & Store Switcher */}
         <button
           type="button"
           onClick={() => setShowBusinessSwitcher(true)}
           title="Toca para cambiar de negocio o crear otro"
-          className="flex items-center gap-2.5 min-w-0 flex-1 text-left group p-1 -ml-1 rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer"
+          className="flex items-center gap-2.5 min-w-0 flex-1 text-left group p-1 -ml-1 rounded-2xl hover:bg-white/10 transition-all cursor-pointer"
         >
-          <div className="w-9 h-9 rounded-full bg-[#fceede] dark:bg-[#33221b] flex items-center justify-center text-[#bd532b] dark:text-[#ff9973] shrink-0 shadow-sm border border-[#dec0b7]/40 dark:border-stone-700 group-hover:scale-105 transition-transform">
-            <span className="material-symbols-outlined text-[20px]">storefront</span>
+          <div className="w-9 h-9 rounded-xl bg-white/15 backdrop-blur-xs flex items-center justify-center text-white shrink-0 shadow-xs border border-white/20 group-hover:scale-105 transition-transform overflow-hidden">
+            <img
+              src="/logo-m.jpg"
+              alt="M"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback to storefront icon if image not available
+                (e.currentTarget as HTMLElement).style.display = 'none';
+              }}
+            />
+            <span className="material-symbols-outlined text-[20px] absolute">storefront</span>
           </div>
           <div className="flex flex-col min-w-0 flex-1">
             <div className="flex items-center gap-1">
-              <span className="text-[11px] font-bold text-[#9f3c16] dark:text-[#ff9973] uppercase tracking-wider truncate">
+              <span className="text-[10px] font-black tracking-wider text-emerald-300 uppercase truncate">
                 {storeInfo.name}
               </span>
-              <span className="material-symbols-outlined text-xs text-[#9f3c16] dark:text-[#ff9973] group-hover:translate-y-0.5 transition-transform">
+              <span className="material-symbols-outlined text-xs text-emerald-300 group-hover:translate-y-0.5 transition-transform">
                 expand_more
               </span>
             </div>
-            <h1 className="text-[17px] font-bold text-[#1f1b19] dark:text-stone-100 truncate leading-tight">
-              {title}
-            </h1>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[17px] font-black tracking-wide leading-tight text-white drop-shadow-xs">
+                METRIKA
+              </span>
+              {title !== 'Inicio' && (
+                <span className="text-xs font-semibold text-white/80 border-l border-white/30 pl-1.5 truncate">
+                  {title}
+                </span>
+              )}
+            </div>
           </div>
         </button>
 
         {/* Right: Dark Mode Toggle, Tutorial, Notifications & Profile */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           {/* Dark Mode Switch Button */}
           <button
             type="button"
             aria-label={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
             title={isDarkMode ? 'Modo claro' : 'Modo oscuro'}
             onClick={toggleDarkMode}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-[#f5ece8] dark:bg-[#2c221e] text-[#57423b] dark:text-amber-300 hover:text-[#9f3c16] transition-all active:scale-95 cursor-pointer shadow-xs"
+            className="w-8.5 h-8.5 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all active:scale-95 cursor-pointer border border-white/15"
           >
-            <span className="material-symbols-outlined text-[19px]">
+            <span className="material-symbols-outlined text-[18px]">
               {isDarkMode ? 'light_mode' : 'dark_mode'}
             </span>
           </button>
@@ -73,9 +89,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
             aria-label="Ver tutorial interactivo"
             title="Ver tutorial de Metrika"
             onClick={() => setShowTutorial(true)}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-[#f5ece8] dark:bg-[#2c221e] text-[#57423b] dark:text-stone-300 hover:text-[#9f3c16] dark:hover:text-[#ff9973] transition-all active:scale-95 cursor-pointer shadow-xs"
+            className="w-8.5 h-8.5 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all active:scale-95 cursor-pointer border border-white/15"
           >
-            <span className="material-symbols-outlined text-[19px]">help_outline</span>
+            <span className="material-symbols-outlined text-[18px]">help_outline</span>
           </button>
 
           {/* Notifications Button */}
@@ -83,16 +99,15 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
             type="button"
             aria-label="Notificaciones"
             onClick={() => showToast('Sin notificaciones pendientes. ¡Todo al día!')}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-[#f5ece8] dark:bg-[#2c221e] text-[#57423b] dark:text-stone-300 hover:text-[#9f3c16] dark:hover:text-[#ff9973] transition-all active:scale-95 cursor-pointer shadow-xs"
+            className="relative w-8.5 h-8.5 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all active:scale-95 cursor-pointer border border-white/15"
           >
-            <span className="material-symbols-outlined text-[19px]">notifications</span>
+            <span className="material-symbols-outlined text-[18px]">notifications</span>
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#9EC84A] ring-1 ring-white"></span>
           </button>
 
           {/* Profile Badge */}
-          <div className="w-9 h-9 rounded-full p-0.5 flex items-center justify-center border border-[#dec0b7]/60 dark:border-stone-700">
-            <div className="w-7 h-7 rounded-full bg-[#bd532b] text-white flex items-center justify-center font-black text-[11px] shadow-sm">
-              {initials}
-            </div>
+          <div className="w-8.5 h-8.5 rounded-xl bg-[#9EC84A] text-slate-950 flex items-center justify-center font-black text-[11px] shadow-sm ml-0.5 border border-white/20">
+            {initials}
           </div>
         </div>
       </div>

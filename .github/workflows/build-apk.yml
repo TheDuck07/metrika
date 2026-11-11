@@ -56,22 +56,24 @@ jobs:
           retention-days: 30
 
       - name: Create GitHub Release with APK
-        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         continue-on-error: true
         with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: "Metrika v1.0.${{ github.run_number }} (APK Actualizado)"
+          tag_name: v1.5.0
+          name: "Metrika v1.5.0 - Nueva Interfaz & Control de Inventario con Cámara"
           make_latest: true
           draft: false
           prerelease: false
           body: |
-            ### 📱 Metrika v1.0.${{ github.run_number }} - Hola al control total
-            APK Android actualizado con todos los recursos locales incluidos:
+            ### 📱 Metrika v1.5.0 - Nueva Imagen de Marca y Control Total
+            APK Android actualizado con la nueva identidad de marca y todas las optimizaciones:
             
-            - **Íconos Locales 100% Offline**: No requiere internet para cargar fuentes ni gráficos.
-            - **Cámara & Audio Sin Tokens**: Reconocimiento de voz y fotos de productos local en el teléfono.
-            - **Gráficas y Reportes Adaptados**: Soporte completo de modo oscuro y diseño responsive en cualquier móvil.
+            - 🎨 **Nueva Identidad Visual**: Interfaz rediseñada con los colores oficiales de la marca Metrika (`#1E70BA`, `#9EC84A`, `#EE6B4D`).
+            - 📸 **Inventario con Cámara y Modo Manual**: Accesos directos de 1 toque para agregar productos fotografiándolos con IA o mediante formulario manual con dictado por voz.
+            - 📊 **Datos y Métricas 100% Reales en Bs.**: Gráficas de evolución semanal/mensual y balances sincronizados en tiempo real con las ventas del negocio.
+            - 👵 **Diseño Accesible**: Botones grandes de alto contraste pensados para uso rápido en mostrador.
+            - 📦 **APK Android Listo**: Compilado para instalación directa en cualquier teléfono Android.
           files: android/app/build/outputs/apk/debug/app-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

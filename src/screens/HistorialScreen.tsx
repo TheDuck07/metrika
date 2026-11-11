@@ -182,59 +182,59 @@ _Generado automáticamente desde Metrika._`;
   };
 
   return (
-    <div className="bg-[#fff8f5] dark:bg-[#171210] text-[#1f1b19] dark:text-stone-100 min-h-screen flex flex-col select-none relative pb-48 transition-colors">
+    <div className="bg-[#F6F8FA] dark:bg-[#13171D] text-[#252524] dark:text-stone-100 min-h-screen flex flex-col select-none relative pb-48 transition-colors">
       <AppHeader title="Historial" />
 
       {/* Selector de Rango de Fechas y Resumen Fijo */}
-      <section className="flex-none w-full bg-[#fff8f5] dark:bg-[#171210] z-30 px-4 pt-2 pb-3 space-y-2 border-b border-[#eae1dd]/60 dark:border-stone-800 shadow-[0_2px_8px_rgba(0,0,0,0.02)] max-w-md mx-auto transition-colors">
-        <div className="bg-white dark:bg-[#231b17] rounded-xl p-2.5 shadow-xs border border-[#dec0b7]/40 dark:border-stone-800 flex items-center gap-2">
+      <section className="flex-none w-full bg-[#F6F8FA] dark:bg-[#13171D] z-30 px-4 pt-2 pb-3 space-y-2 border-b border-slate-200/80 dark:border-slate-800 shadow-xs max-w-md mx-auto transition-colors">
+        <div className="bg-white dark:bg-[#1A1F26] rounded-2xl p-2.5 shadow-xs border border-slate-200 dark:border-slate-800 flex items-center gap-2">
           <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-            <span className="text-[11px] text-[#57423b] dark:text-stone-300 font-bold tracking-wider uppercase px-0.5">
+            <span className="text-[11px] text-slate-500 font-bold tracking-wider uppercase px-0.5">
               Desde
             </span>
             <button
               id="btn-date-start"
               type="button"
               onClick={() => setShowCalendarModal(true)}
-              className="w-full h-10 px-2.5 bg-[#fbf2ee] dark:bg-[#2c221e] hover:bg-[#f5ece8] dark:hover:bg-[#382b26] border border-[#dec0b7]/40 dark:border-stone-700 rounded-xl flex items-center justify-between gap-1.5 text-[#1f1b19] dark:text-stone-100 transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+              className="w-full h-10 px-2.5 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between gap-1.5 text-slate-900 dark:text-white transition-all active:scale-[0.98] cursor-pointer shadow-xs"
             >
               <div className="flex items-center gap-1.5 min-w-0">
-                <span className="material-symbols-outlined text-[#9f3c16] dark:text-[#ff9973] text-[18px] shrink-0">
+                <span className="material-symbols-outlined text-[#1E70BA] dark:text-[#60A5FA] text-[18px] shrink-0">
                   calendar_month
                 </span>
                 <span id="btn-date-start-text" className="font-bold text-[13px] truncate">
                   {startDate}
                 </span>
               </div>
-              <span className="material-symbols-outlined text-[#8a726a] dark:text-stone-400 text-[18px] shrink-0">
+              <span className="material-symbols-outlined text-slate-400 text-[18px] shrink-0">
                 expand_more
               </span>
             </button>
           </div>
 
-          <div className="flex items-center justify-center pt-4 text-[#8a726a] dark:text-stone-400 shrink-0">
+          <div className="flex items-center justify-center pt-4 text-slate-400 shrink-0">
             <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
           </div>
 
           <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-            <span className="text-[11px] text-[#57423b] dark:text-stone-300 font-bold tracking-wider uppercase px-0.5">
+            <span className="text-[11px] text-slate-500 font-bold tracking-wider uppercase px-0.5">
               Hasta
             </span>
             <button
               id="btn-date-end"
               type="button"
               onClick={() => setShowCalendarModal(true)}
-              className="w-full h-10 px-2.5 bg-[#fbf2ee] dark:bg-[#2c221e] hover:bg-[#f5ece8] dark:hover:bg-[#382b26] border border-[#dec0b7]/40 dark:border-stone-700 rounded-xl flex items-center justify-between gap-1.5 text-[#1f1b19] dark:text-stone-100 transition-all active:scale-[0.98] cursor-pointer shadow-xs"
+              className="w-full h-10 px-2.5 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between gap-1.5 text-slate-900 dark:text-white transition-all active:scale-[0.98] cursor-pointer shadow-xs"
             >
               <div className="flex items-center gap-1.5 min-w-0">
-                <span className="material-symbols-outlined text-[#9f3c16] dark:text-[#ff9973] text-[18px] shrink-0">
+                <span className="material-symbols-outlined text-[#1E70BA] dark:text-[#60A5FA] text-[18px] shrink-0">
                   calendar_month
                 </span>
                 <span id="btn-date-end-text" className="font-bold text-[13px] truncate">
                   {endDate}
                 </span>
               </div>
-              <span className="material-symbols-outlined text-[#8a726a] dark:text-stone-400 text-[18px] shrink-0">
+              <span className="material-symbols-outlined text-slate-400 text-[18px] shrink-0">
                 expand_more
               </span>
             </button>
@@ -243,37 +243,37 @@ _Generado automáticamente desde Metrika._`;
 
         {/* Tarjetas de Resumen (Ingresos y Egresos del período) */}
         <div className="grid grid-cols-2 gap-2">
-          {/* Tarjeta 1: Total Ingresos */}
-          <div className="bg-white rounded-xl p-3 shadow-xs border border-[#dec0b7]/40 flex flex-col justify-between">
+          {/* Tarjeta 1: Total Ingresos (Pastel Green) */}
+          <div className="bg-[#EBF5EC] dark:bg-[#1B2F23] rounded-2xl p-3 shadow-xs border border-emerald-200/60 dark:border-emerald-800/40 flex flex-col justify-between">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-bold text-[#57423b]">Ventas Totales</span>
-              <div className="w-6 h-6 rounded-full bg-[#b1f0d4] text-[#0f513c] flex items-center justify-center">
+              <span className="text-xs font-bold text-slate-600 dark:text-slate-300">Ventas Totales</span>
+              <div className="w-6 h-6 rounded-full bg-emerald-100 text-[#2D8A4E] flex items-center justify-center">
                 <span className="material-symbols-outlined text-[15px]">trending_up</span>
               </div>
             </div>
             <div>
-              <p id="summary-income" className="text-xl font-extrabold text-[#2a6651] tracking-tight">
+              <p id="summary-income" className="text-xl font-black text-[#2D8A4E] dark:text-emerald-300 tracking-tight">
                 + Bs. {totalIncome.toFixed(2).replace('.', ',')}
               </p>
-              <p id="summary-income-sales" className="text-[11px] text-[#57423b] truncate">
+              <p id="summary-income-sales" className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
                 {salesCount} {salesCount === 1 ? 'venta realizada' : 'ventas realizadas'}
               </p>
             </div>
           </div>
 
-          {/* Tarjeta 2: Total Egresos */}
-          <div className="bg-white rounded-xl p-3 shadow-xs border border-[#dec0b7]/40 flex flex-col justify-between">
+          {/* Tarjeta 2: Total Egresos (Pastel Coral) */}
+          <div className="bg-[#FDEFEA] dark:bg-[#341F1A] rounded-2xl p-3 shadow-xs border border-orange-200/60 dark:border-orange-800/40 flex flex-col justify-between">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-bold text-[#57423b]">Salidas Totales</span>
-              <div className="w-6 h-6 rounded-full bg-[#ffdad6] text-[#ba1a1a] flex items-center justify-center">
+              <span className="text-xs font-bold text-slate-600 dark:text-slate-300">Salidas Totales</span>
+              <div className="w-6 h-6 rounded-full bg-orange-100 text-[#EE6B4D] flex items-center justify-center">
                 <span className="material-symbols-outlined text-[15px]">trending_down</span>
               </div>
             </div>
             <div>
-              <p id="summary-expense" className="text-xl font-extrabold text-[#ba1a1a] tracking-tight">
+              <p id="summary-expense" className="text-xl font-black text-[#EE6B4D] dark:text-rose-400 tracking-tight">
                 - Bs. {totalExpense.toFixed(2).replace('.', ',')}
               </p>
-              <p id="summary-expense-detail" className="text-[11px] text-[#57423b] truncate">
+              <p id="summary-expense-detail" className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
                 {expenseDetail}
               </p>
             </div>

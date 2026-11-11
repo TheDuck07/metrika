@@ -829,7 +829,7 @@ Determina:
   }
 
   app.listen(port, '0.0.0.0', () => {
-    console.log(`Metrika corriendo en http://0.0.0.0:${port}`);
+    console.log(`Metrika corriendo en http://localhost:${port}`);
   });
 }
 
