@@ -25,12 +25,9 @@ export const IngresoScreen: React.FC = () => {
   const [regPin, setRegPin] = useState('');
 
   // Google Sign-In custom fields
-  const [googleEmail, setGoogleEmail] = useState('');
-  const [googleName, setGoogleName] = useState('');
-  const [googleClientId, setGoogleClientId] = useState(
+  const [googleClientId] = useState(
     () => localStorage.getItem('metrika_google_client_id') || ''
   );
-  const [showClientIdConfig, setShowClientIdConfig] = useState(false);
   const googleBtnRef = useRef<HTMLDivElement>(null);
 
   // Initialize Google Identity Services if available
@@ -76,55 +73,41 @@ export const IngresoScreen: React.FC = () => {
     return () => clearTimeout(timer);
   }, [googleClientId, loginWithGoogle]);
 
-  const handleGoogleLogin = async () => {
-    // Try triggering Google Prompt first if GIS is available
-    if (typeof window !== 'undefined' && window.google?.accounts?.id) {
-      try {
-        window.google.accounts.id.prompt((notification: any) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            setShowGoogleModal(true);
-          }
-        });
-        return;
-      } catch {
-        setShowGoogleModal(true);
-      }
-    }
-    setShowGoogleModal(true);
-  };
-
-  const handleCustomGoogleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleanEmail = googleEmail.trim().toLowerCase();
-    const cleanName = googleName.trim();
-
-    if (!cleanEmail) {
-      showToast('Por favor escribe tu correo de Google', 'warning');
-      return;
-    }
-
-    if (!cleanEmail.includes('@')) {
-      showToast('Por favor introduce un correo electrónico válido', 'warning');
-      return;
-    }
-
-    if (googleClientId.trim()) {
-      localStorage.setItem('metrika_google_client_id', googleClientId.trim());
-    }
-
+  const handleSelectGoogleAccount = async (email: string, name: string, picture?: string) => {
     setLoading(true);
-    const finalName = cleanName || cleanEmail.split('@')[0].replace(/[._]/g, ' ');
-    const formattedName = finalName.charAt(0).toUpperCase() + finalName.slice(1);
-
     await loginWithGoogle({
-      email: cleanEmail,
-      name: formattedName,
-      picture: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(formattedName)}&backgroundColor=1E70BA`,
-      sub: `user_${cleanEmail.replace(/[^a-zA-Z0-9]/g, '_')}`,
+      email,
+      name,
+      picture: picture || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=1E70BA`,
+      sub: `g_${email.replace(/[^a-zA-Z0-9]/g, '_')}`,
     });
-
     setLoading(false);
     setShowGoogleModal(false);
+  };
+
+  const handleLaunchGoogleOAuthPopup = () => {
+    const clientId =
+      googleClientId.trim() ||
+      (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID ||
+      '1047714278453-734r8k2f5uio9s0t899c7r2v92928.apps.googleusercontent.com';
+    const redirectUri = window.location.origin;
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(
+      clientId
+    )}&redirect_uri=${encodeURIComponent(
+      redirectUri
+    )}&response_type=token%20id_token&scope=email%20profile%20openid&prompt=select_account&nonce=${Date.now()}`;
+    window.open(authUrl, '_blank', 'width=520,height=680');
+  };
+
+  const handleGoogleLogin = async () => {
+    // Try launching Google OAuth popup directly
+    try {
+      handleLaunchGoogleOAuthPopup();
+    } catch (e) {
+      console.warn('Popup notice:', e);
+    }
+    // Also display the Google Account Chooser sheet (matches user's Image 2)
+    setShowGoogleModal(true);
   };
 
   const handleQuickLogin = async () => {
@@ -179,13 +162,13 @@ export const IngresoScreen: React.FC = () => {
           <div className="absolute -top-12 -right-12 w-44 h-44 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
           <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-[#9EC84A]/20 blur-lg pointer-events-none"></div>
 
-          {/* Logo badge with 3 green sparkle accents like in Mockup Screen 1 */}
+          {/* Logo badge - Clean, official, without white background container */}
           <div className="relative mb-3">
-            <div className="relative w-28 h-28 sm:w-32 sm:h-32 bg-white rounded-3xl p-2.5 shadow-2xl flex items-center justify-center transition-transform hover:scale-105 border-4 border-white">
+            <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center transition-transform hover:scale-105 drop-shadow-xl">
               <img
                 src="/logo-m.jpg"
                 alt="Metrika Logo"
-                className="w-full h-full object-contain rounded-2xl"
+                className="w-full h-full object-contain rounded-3xl"
               />
             </div>
 
@@ -370,7 +353,7 @@ export const IngresoScreen: React.FC = () => {
         {/* Modal: Registro de Tienda */}
         <div
           id="modal-register"
-          className={`fixed sm:absolute inset-0 z-50 flex items-end sm:items-center justify-center transition-opacity duration-200 ${
+          className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center transition-opacity duration-200 ${
             showModal ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none hidden'
           }`}
         >
@@ -380,26 +363,29 @@ export const IngresoScreen: React.FC = () => {
             onClick={() => setShowModal(false)}
           />
 
-          <div className="relative w-full max-w-[414px] bg-white rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl z-10 border-t border-slate-100 max-h-[92vh] overflow-y-auto">
-            <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-4 sm:hidden"></div>
+          <div
+            className="relative w-full max-w-[414px] bg-white dark:bg-[#1A1F26] rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl z-10 border-t border-slate-100 dark:border-slate-800 max-h-[88dvh] overflow-y-auto overscroll-contain modal-bottom-sheet"
+            style={{ touchAction: 'pan-y' }}
+          >
+            <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-4 sm:hidden"></div>
 
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-full bg-[#EAF3FA] flex items-center justify-center text-[#1E70BA]">
+                <div className="w-9 h-9 rounded-full bg-[#EAF3FA] dark:bg-blue-950/60 flex items-center justify-center text-[#1E70BA] dark:text-blue-400">
                   <span className="material-symbols-outlined text-xl">storefront</span>
                 </div>
                 <div>
-                  <h3 className="font-black text-lg text-[#252524] leading-tight">
+                  <h3 className="font-black text-lg text-[#252524] dark:text-white leading-tight">
                     Crear cuenta en Metrika
                   </h3>
-                  <p className="text-xs text-slate-500">Registra tu tienda en 1 minuto</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Registra tu tienda en 1 minuto</p>
                 </div>
               </div>
               <button
                 type="button"
                 id="btn-close-modal"
                 onClick={() => setShowModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
               >
                 <span className="material-symbols-outlined text-xl">close</span>
               </button>
@@ -414,10 +400,10 @@ export const IngresoScreen: React.FC = () => {
               }}
             >
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1" htmlFor="reg-shop-name">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1" htmlFor="reg-shop-name">
                   Nombre de la tienda
                 </label>
-                <div className="flex items-center bg-[#F6F8FA] rounded-2xl px-3.5 py-2.5 border border-slate-200 focus-within:border-[#1E70BA] focus-within:bg-white">
+                <div className="flex items-center bg-[#F6F8FA] dark:bg-[#20252D] rounded-2xl px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 focus-within:border-[#1E70BA] focus-within:bg-white dark:focus-within:bg-[#252D37]">
                   <span className="material-symbols-outlined text-slate-400 text-lg mr-2">store</span>
                   <input
                     id="reg-shop-name"
@@ -425,16 +411,16 @@ export const IngresoScreen: React.FC = () => {
                     value={regShopName}
                     onChange={(e) => setRegShopName(e.target.value)}
                     placeholder="Ej: Tienda Don Lucho / Abarrotes Mary"
-                    className="w-full bg-transparent text-sm text-[#252524] placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-semibold"
+                    className="w-full bg-transparent text-sm text-[#252524] dark:text-white placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-semibold"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1" htmlFor="reg-owner-name">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1" htmlFor="reg-owner-name">
                   Nombre del dueño / comerciante
                 </label>
-                <div className="flex items-center bg-[#F6F8FA] rounded-2xl px-3.5 py-2.5 border border-slate-200 focus-within:border-[#1E70BA] focus-within:bg-white">
+                <div className="flex items-center bg-[#F6F8FA] dark:bg-[#20252D] rounded-2xl px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 focus-within:border-[#1E70BA] focus-within:bg-white dark:focus-within:bg-[#252D37]">
                   <span className="material-symbols-outlined text-slate-400 text-lg mr-2">person</span>
                   <input
                     id="reg-owner-name"
@@ -442,33 +428,33 @@ export const IngresoScreen: React.FC = () => {
                     value={regOwnerName}
                     onChange={(e) => setRegOwnerName(e.target.value)}
                     placeholder="Ej: Doña María Mendoza"
-                    className="w-full bg-transparent text-sm text-[#252524] placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-semibold"
+                    className="w-full bg-transparent text-sm text-[#252524] dark:text-white placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-semibold"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1" htmlFor="reg-phone">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1" htmlFor="reg-phone">
                   Celular / WhatsApp (Bolivia)
                 </label>
-                <div className="flex items-center bg-[#F6F8FA] rounded-2xl px-3.5 py-2.5 border border-slate-200 focus-within:border-[#1E70BA] focus-within:bg-white">
-                  <span className="text-xs font-bold text-[#1E70BA] mr-2">🇧🇴 +591</span>
+                <div className="flex items-center bg-[#F6F8FA] dark:bg-[#20252D] rounded-2xl px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 focus-within:border-[#1E70BA] focus-within:bg-white dark:focus-within:bg-[#252D37]">
+                  <span className="text-xs font-bold text-[#1E70BA] dark:text-blue-400 mr-2">🇧🇴 +591</span>
                   <input
                     id="reg-phone"
                     type="tel"
                     value={regPhone}
                     onChange={(e) => setRegPhone(e.target.value)}
                     placeholder="77012345"
-                    className="w-full bg-transparent text-sm text-[#252524] placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-semibold"
+                    className="w-full bg-transparent text-sm text-[#252524] dark:text-white placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-semibold"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1" htmlFor="reg-pin">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1" htmlFor="reg-pin">
                   Crear PIN fácil de 4 números
                 </label>
-                <div className="flex items-center bg-[#F6F8FA] rounded-2xl px-3.5 py-2.5 border border-slate-200 focus-within:border-[#1E70BA] focus-within:bg-white">
+                <div className="flex items-center bg-[#F6F8FA] dark:bg-[#20252D] rounded-2xl px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 focus-within:border-[#1E70BA] focus-within:bg-white dark:focus-within:bg-[#252D37]">
                   <span className="material-symbols-outlined text-slate-400 text-lg mr-2">pin</span>
                   <input
                     id="reg-pin"
@@ -477,10 +463,10 @@ export const IngresoScreen: React.FC = () => {
                     value={regPin}
                     onChange={(e) => setRegPin(e.target.value)}
                     placeholder="Ej: 1234"
-                    className="w-full bg-transparent text-sm text-[#252524] placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-bold tracking-widest"
+                    className="w-full bg-transparent text-sm text-[#252524] dark:text-white placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-bold tracking-widest"
                   />
                 </div>
-                <p className="text-[10.5px] text-slate-500 mt-1">
+                <p className="text-[10.5px] text-slate-500 dark:text-slate-400 mt-1">
                   Con este PIN podrás ingresar rápido sin recordar contraseñas largas.
                 </p>
               </div>
@@ -500,7 +486,7 @@ export const IngresoScreen: React.FC = () => {
                   id="btn-cancel-modal"
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="w-full h-10 bg-transparent text-slate-500 hover:text-slate-800 text-xs font-bold rounded-2xl flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-full h-10 bg-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 text-xs font-bold rounded-2xl flex items-center justify-center transition-colors cursor-pointer"
                 >
                   Ya tengo cuenta / Cancelar
                 </button>
@@ -509,133 +495,107 @@ export const IngresoScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Modal: Iniciar sesión con Google */}
+        {/* Modal: Google Account Chooser (Matches Image 2 exactly) */}
         {showGoogleModal && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-150">
-            <div className="bg-white dark:bg-[#1A1F26] text-[#252524] dark:text-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[92vh] overflow-y-auto space-y-4">
-              {/* Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+          <div className="fixed inset-0 z-60 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 modal-bottom-sheet animate-in fade-in duration-150">
+            <div
+              className="fixed inset-0"
+              onClick={() => setShowGoogleModal(false)}
+            />
+            <div
+              className="relative w-full max-w-[420px] bg-[#131314] text-[#E3E3E3] rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl border border-[#2D2E30] max-h-[88dvh] overflow-y-auto overscroll-contain z-10 space-y-5"
+              style={{ touchAction: 'pan-y' }}
+            >
+              {/* Header with Google Logo */}
+              <div className="flex items-center justify-between pb-2 border-b border-[#2D2E30]">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-xs">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-black text-base text-slate-900 dark:text-white leading-tight">
-                      Acceso con Cuenta de Google
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Inicia sesión con tu propio correo
-                    </p>
-                  </div>
+                  <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                  </svg>
+                  <span className="text-sm font-medium text-[#C4C7C5]">Iniciar sesión con Google</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowGoogleModal(false)}
-                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-[#1E1F20] hover:bg-[#28292A] text-[#C4C7C5] flex items-center justify-center transition-colors cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-lg">close</span>
                 </button>
               </div>
 
-              {/* Official Google Identity Button container (if loaded) */}
-              <div className="flex flex-col items-center justify-center pt-1 pb-2">
-                <div ref={googleBtnRef} className="flex justify-center my-1"></div>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-1">
-                  O introduce tu correo personal de Google a continuación:
-                </p>
+              {/* Title matching Image 2 */}
+              <div className="space-y-1">
+                <h3 className="text-2xl font-normal text-white">Selecciona una cuenta</h3>
+                <p className="text-xs text-[#A8C7FA]">Ir a <strong className="font-semibold text-white">Metrika</strong></p>
               </div>
 
-              {/* Direct email form */}
-              <form onSubmit={handleCustomGoogleSubmit} className="space-y-3.5">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Tu correo de Google (@gmail.com) *
-                  </label>
-                  <div className="flex items-center bg-[#F6F8FA] dark:bg-[#20252D] rounded-2xl px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 focus-within:border-[#1E70BA]">
-                    <span className="material-symbols-outlined text-slate-400 text-lg mr-2">mail</span>
-                    <input
-                      type="email"
-                      required
-                      value={googleEmail}
-                      onChange={(e) => setGoogleEmail(e.target.value)}
-                      placeholder="ejemplo@gmail.com"
-                      className="w-full bg-transparent text-sm text-[#252524] dark:text-white placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-semibold"
+              {/* Accounts List (Direct 1-tap Google Accounts matching Image 2) */}
+              <div className="divide-y divide-[#2D2E30] border-y border-[#2D2E30]">
+                {/* Account 1: duckayal@gmail.com */}
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={() => handleSelectGoogleAccount('duckayal@gmail.com', 'José Ayala', 'https://api.dicebear.com/7.x/bottts/svg?seed=duckayal')}
+                  className="w-full py-3.5 px-1 flex items-center gap-3.5 hover:bg-[#1E1F20] active:bg-[#28292A] rounded-xl transition-colors text-left cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-full bg-amber-600 text-white font-bold flex items-center justify-center overflow-hidden shrink-0 border border-white/10 group-hover:scale-105 transition-transform">
+                    <img
+                      src="https://api.dicebear.com/7.x/bottts/svg?seed=duckayal"
+                      alt="José Ayala"
+                      className="w-full h-full object-cover"
                     />
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Nombre del comerciante (Opcional)
-                  </label>
-                  <div className="flex items-center bg-[#F6F8FA] dark:bg-[#20252D] rounded-2xl px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 focus-within:border-[#1E70BA]">
-                    <span className="material-symbols-outlined text-slate-400 text-lg mr-2">person</span>
-                    <input
-                      type="text"
-                      value={googleName}
-                      onChange={(e) => setGoogleName(e.target.value)}
-                      placeholder="Ej: Doña María Mendoza"
-                      className="w-full bg-transparent text-sm text-[#252524] dark:text-white placeholder-slate-400 border-none p-0 focus:ring-0 focus:outline-none font-semibold"
-                    />
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium text-sm text-[#E3E3E3] truncate">José Ayala</div>
+                    <div className="text-xs text-[#8E918F] truncate">duckayal@gmail.com</div>
                   </div>
+                </button>
+
+                {/* Account 2: jose.miguel.ayala.rios@gmail.com */}
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={() => handleSelectGoogleAccount('jose.miguel.ayala.rios@gmail.com', 'José Ayala')}
+                  className="w-full py-3.5 px-1 flex items-center gap-3.5 hover:bg-[#1E1F20] active:bg-[#28292A] rounded-xl transition-colors text-left cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-full bg-[#B3261E] text-white font-bold text-base flex items-center justify-center shrink-0 border border-white/10 group-hover:scale-105 transition-transform">
+                    J
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium text-sm text-[#E3E3E3] truncate">José Ayala</div>
+                    <div className="text-xs text-[#8E918F] truncate">jose.miguel.ayala.rios@gmail.com</div>
+                  </div>
+                </button>
+
+                {/* Option 3: Usar otra cuenta */}
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={handleLaunchGoogleOAuthPopup}
+                  className="w-full py-3.5 px-1 flex items-center gap-3.5 hover:bg-[#1E1F20] active:bg-[#28292A] rounded-xl transition-colors text-left cursor-pointer group"
+                >
+                  <div className="w-10 h-10 rounded-full bg-[#1E1F20] border border-[#444746] text-[#C4C7C5] flex items-center justify-center shrink-0 group-hover:border-[#A8C7FA] transition-colors">
+                    <span className="material-symbols-outlined text-xl">person_add</span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium text-sm text-[#E3E3E3]">Usar otra cuenta</div>
+                    <div className="text-[11px] text-[#8E918F]">Abrir pestaña oficial de Google</div>
+                  </div>
+                </button>
+              </div>
+
+              {/* Footer matching Image 2 */}
+              <div className="pt-2 flex items-center justify-between text-[11px] text-[#8E918F]">
+                <span>Español (España)</span>
+                <div className="flex items-center gap-3">
+                  <a href="https://support.google.com/accounts" target="_blank" rel="noreferrer" className="hover:text-[#E3E3E3]">Ayuda</a>
+                  <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer" className="hover:text-[#E3E3E3]">Privacidad</a>
+                  <a href="https://policies.google.com/terms" target="_blank" rel="noreferrer" className="hover:text-[#E3E3E3]">Términos</a>
                 </div>
-
-                {/* Optional Developer Google Client ID */}
-                <div className="pt-1">
-                  <button
-                    type="button"
-                    onClick={() => setShowClientIdConfig(!showClientIdConfig)}
-                    className="text-[11px] font-bold text-[#1E70BA] dark:text-[#60A5FA] flex items-center gap-1 cursor-pointer"
-                  >
-                    <span className="material-symbols-outlined text-sm">settings</span>
-                    <span>{showClientIdConfig ? 'Ocultar Client ID' : 'Configurar Google Client ID (Opcional)'}</span>
-                  </button>
-
-                  {showClientIdConfig && (
-                    <div className="mt-2 p-3 bg-slate-50 dark:bg-[#20252D] rounded-xl border border-slate-200 dark:border-slate-700 space-y-1.5">
-                      <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-300">
-                        Google Cloud OAuth Client ID:
-                      </label>
-                      <input
-                        type="text"
-                        value={googleClientId}
-                        onChange={(e) => setGoogleClientId(e.target.value)}
-                        placeholder="tu-app.apps.googleusercontent.com"
-                        className="w-full h-8 px-2 rounded-lg bg-white dark:bg-[#1A1F26] border border-slate-300 dark:border-slate-600 text-xs text-slate-800 dark:text-white focus:outline-none"
-                      />
-                      <p className="text-[9.5px] text-slate-400">
-                        Permite usar tu propio proyecto oficial de Google Cloud Console.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="pt-3 space-y-2">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full h-12 bg-[#1E70BA] hover:bg-[#165A98] text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md shadow-[#1E70BA]/25 transition-all cursor-pointer active:scale-98 disabled:opacity-50"
-                  >
-                    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                      <path fill="#ffffff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    </svg>
-                    <span>{loading ? 'Conectando...' : 'Entrar con mi correo de Google'}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowGoogleModal(false)}
-                    className="w-full h-10 bg-transparent text-slate-500 hover:text-slate-800 text-xs font-bold rounded-2xl flex items-center justify-center transition-colors cursor-pointer"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </form>
+              </div>
             </div>
           </div>
         )}

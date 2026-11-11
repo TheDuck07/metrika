@@ -666,7 +666,10 @@ export const ReportesScreen: React.FC = () => {
       {/* ================= MODAL: EXPORTAR A EXCEL ================= */}
       {showExportModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-[#1A1F26] text-[#252524] dark:text-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[92vh] overflow-y-auto flex flex-col">
+          <div
+            className="bg-white dark:bg-[#1A1F26] text-[#252524] dark:text-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[88dvh] overflow-y-auto overscroll-contain modal-bottom-sheet flex flex-col"
+            style={{ touchAction: 'pan-y' }}
+          >
             {/* Modal Header */}
             <div className="p-4 bg-[#2D8A4E] text-white rounded-t-3xl sm:rounded-t-3xl flex items-center justify-between shrink-0 shadow-md">
               <div className="flex items-center gap-2.5">

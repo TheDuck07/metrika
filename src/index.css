@@ -98,3 +98,27 @@ body {
   background: #374151;
   border-radius: 9999px;
 }
+
+/* Smooth mobile sheet & popup physics */
+.modal-bottom-sheet {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  will-change: transform, opacity;
+}
+
+/* Horizontal card carousels momentum scrolling */
+.carousel-smooth {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+}
+
+/* Fluid hardware-accelerated transitions */
+.fluid-card {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.fluid-card:active {
+  transform: scale(0.98);
+}

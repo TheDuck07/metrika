@@ -42,8 +42,11 @@ export const CreateBusinessModal: React.FC<CreateBusinessModalProps> = ({ isOpen
   };
 
   return (
-    <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#1e1714] w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-stone-200 dark:border-stone-800 flex flex-col max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
+      <div
+        className="bg-white dark:bg-[#1e1714] w-full max-w-sm rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl border border-stone-200 dark:border-stone-800 flex flex-col max-h-[88dvh] overflow-y-auto overscroll-contain modal-bottom-sheet"
+        style={{ touchAction: 'pan-y' }}
+      >
         <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-2xl bg-[#ffdbcf] text-[#822801] flex items-center justify-center shadow-xs">

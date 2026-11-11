@@ -31,6 +31,11 @@
       "token": "tok_c01a270e-3cf4-48a5-917e-01ec45efccfd",
       "userId": "user-demo",
       "createdAt": "2026-11-09T00:51:48.918Z"
+    },
+    {
+      "token": "tok_95975a18-a13c-4881-a6c2-57b99ddf27f2",
+      "userId": "user-demo",
+      "createdAt": "2026-11-11T16:37:32.393Z"
     }
   ],
   "storesData": {

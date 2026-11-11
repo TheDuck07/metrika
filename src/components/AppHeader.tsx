@@ -9,10 +9,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
   const {
     user,
     storeInfo,
-    showToast,
-    isDarkMode,
-    toggleDarkMode,
-    setShowTutorial,
     setShowBusinessSwitcher,
     setShowAccountModal,
   } = useStore();
@@ -35,17 +31,13 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
           title="Toca para cambiar de negocio o crear otro"
           className="flex items-center gap-2.5 min-w-0 flex-1 text-left group p-1 -ml-1 rounded-2xl hover:bg-white/10 transition-all cursor-pointer"
         >
-          <div className="w-9 h-9 rounded-xl bg-white/15 backdrop-blur-xs flex items-center justify-center text-white shrink-0 shadow-xs border border-white/20 group-hover:scale-105 transition-transform overflow-hidden">
+          {/* Official Metrika Logo - Clean, without white background or icon clash */}
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform overflow-hidden">
             <img
               src="/logo-m.jpg"
-              alt="M"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                // Fallback to storefront icon if image not available
-                (e.currentTarget as HTMLElement).style.display = 'none';
-              }}
+              alt="Metrika Logo"
+              className="w-full h-full object-contain rounded-xl"
             />
-            <span className="material-symbols-outlined text-[20px] absolute">storefront</span>
           </div>
           <div className="flex flex-col min-w-0 flex-1">
             <div className="flex items-center gap-1">
@@ -69,61 +61,25 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
           </div>
         </button>
 
-        {/* Right: Dark Mode Toggle, Tutorial, Notifications & Profile */}
-        <div className="flex items-center gap-1 shrink-0">
-          {/* Dark Mode Switch Button */}
-          <button
-            type="button"
-            aria-label={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-            title={isDarkMode ? 'Modo claro' : 'Modo oscuro'}
-            onClick={toggleDarkMode}
-            className="w-8.5 h-8.5 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all active:scale-95 cursor-pointer border border-white/15"
-          >
-            <span className="material-symbols-outlined text-[18px]">
-              {isDarkMode ? 'light_mode' : 'dark_mode'}
-            </span>
-          </button>
-
-          {/* Tutorial Help Button */}
-          <button
-            type="button"
-            aria-label="Ver tutorial interactivo"
-            title="Ver tutorial de Metrika"
-            onClick={() => setShowTutorial(true)}
-            className="w-8.5 h-8.5 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all active:scale-95 cursor-pointer border border-white/15"
-          >
-            <span className="material-symbols-outlined text-[18px]">help_outline</span>
-          </button>
-
-          {/* Notifications Button */}
-          <button
-            type="button"
-            aria-label="Notificaciones"
-            onClick={() => showToast('Sin notificaciones pendientes. ¡Todo al día!')}
-            className="relative w-8.5 h-8.5 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all active:scale-95 cursor-pointer border border-white/15"
-          >
-            <span className="material-symbols-outlined text-[18px]">notifications</span>
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#9EC84A] ring-1 ring-white"></span>
-          </button>
-
-          {/* Interactive Profile Photo Avatar Button */}
+        {/* Right: Functional Profile Photo Avatar Button */}
+        <div className="flex items-center shrink-0">
           <button
             type="button"
             onClick={() => setShowAccountModal(true)}
             aria-label="Abrir mi cuenta, perfil y configuración"
             title={`Perfil de ${user?.name || storeInfo.owner || 'Comerciante'} - Toca para ver cuenta y tema`}
-            className="relative w-9 h-9 rounded-xl bg-[#9EC84A] text-slate-950 flex items-center justify-center font-black text-xs shadow-sm ml-0.5 border-2 border-white/30 hover:border-white active:scale-95 transition-all cursor-pointer overflow-hidden group"
+            className="relative w-10 h-10 rounded-2xl bg-[#9EC84A] text-slate-950 flex items-center justify-center font-black text-xs shadow-md border-2 border-white/40 hover:border-white active:scale-95 transition-all cursor-pointer overflow-hidden group"
           >
             {userAvatar ? (
               <img
                 src={userAvatar}
                 alt={user?.name || 'Perfil'}
-                className="w-full h-full object-cover rounded-lg group-hover:scale-105 transition-transform"
+                className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform"
               />
             ) : (
-              <span>{initials}</span>
+              <span className="text-sm font-black tracking-wider text-slate-950">{initials}</span>
             )}
-            <span className="absolute bottom-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-1 ring-white"></span>
+            <span className="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white"></span>
           </button>
         </div>
       </div>

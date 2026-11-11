@@ -443,7 +443,10 @@ export const ScanReceiptModal: React.FC<ScanReceiptModalProps> = ({
       />
 
       {/* Main Modal Card */}
-      <div className="bg-white w-full max-w-lg rounded-3xl p-5 sm:p-6 shadow-2xl border border-stone-200 max-h-[92vh] overflow-y-auto flex flex-col">
+      <div
+        className="bg-white dark:bg-[#1A1F26] text-[#252524] dark:text-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl border border-stone-200 dark:border-slate-800 max-h-[88dvh] overflow-y-auto overscroll-contain modal-bottom-sheet flex flex-col"
+        style={{ touchAction: 'pan-y' }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between pb-3.5 border-b border-stone-200 mb-4 shrink-0">
           <div className="flex items-center gap-2.5">

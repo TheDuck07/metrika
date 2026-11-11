@@ -450,7 +450,10 @@ export const ProductScanModal: React.FC<ProductScanModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-y-auto">
-      <div className="bg-[#fff8f5] w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl border border-stone-200 overflow-hidden flex flex-col max-h-[94vh]">
+      <div
+        className="bg-[#fff8f5] dark:bg-[#1A1F26] text-[#252524] dark:text-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl border border-stone-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[88dvh] overscroll-contain modal-bottom-sheet"
+        style={{ touchAction: 'pan-y' }}
+      >
         {/* Modal Header */}
         <div className="p-4 bg-gradient-to-r from-[#1c1917] via-[#2c1e19] to-[#1c1917] text-white flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
