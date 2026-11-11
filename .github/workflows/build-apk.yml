@@ -61,19 +61,22 @@ jobs:
         continue-on-error: true
         with:
           tag_name: v1.5.0
-          name: "Metrika v1.5.0 - Nueva Interfaz & Control de Inventario con Cámara"
+          name: "Metrika v1.5.0 - Logo Oficial, Pantalla de Ingreso y Cuentas"
           make_latest: true
           draft: false
           prerelease: false
           body: |
-            ### 📱 Metrika v1.5.0 - Nueva Imagen de Marca y Control Total
-            APK Android actualizado con la nueva identidad de marca y todas las optimizaciones:
-            
-            - 🎨 **Nueva Identidad Visual**: Interfaz rediseñada con los colores oficiales de la marca Metrika (`#1E70BA`, `#9EC84A`, `#EE6B4D`).
-            - 📸 **Inventario con Cámara y Modo Manual**: Accesos directos de 1 toque para agregar productos fotografiándolos con IA o mediante formulario manual con dictado por voz.
-            - 📊 **Datos y Métricas 100% Reales en Bs.**: Gráficas de evolución semanal/mensual y balances sincronizados en tiempo real con las ventas del negocio.
-            - 👵 **Diseño Accesible**: Botones grandes de alto contraste pensados para uso rápido en mostrador.
-            - 📦 **APK Android Listo**: Compilado para instalación directa en cualquier teléfono Android.
+            ### 📱 Metrika v1.5.0 - Nueva Identidad de Marca y Cuentas
+
+            APK Android generado automáticamente con el logo oficial de Metrika y todas las mejoras solicitadas:
+
+            - 🏷️ **Logo Oficial en la APK Android**: Iconos launcher adaptativos y redondos (`ic_launcher`, `ic_launcher_round`, `ic_launcher_foreground`) con el isotipo oficial de Metrika en todas las densidades (mdpi, hdpi, xhdpi, xxhdpi, xxxhdpi).
+            - 🔐 **Pantalla de Inicio de Sesión Oficial**: Rediseño exacto del Mockup Pantalla 1 con cabecera azul `#1E70BA`, isotipo "M", destellos, onda de transición verde lima `#9EC84A`, botones redondeados "Iniciar sesión", "Crear cuenta", Google y Modo Demo.
+            - 👤 **Sistema de Cuentas y Perfil**: Cierre de sesión, personalización de nombre de tienda y comerciante, foto de perfil desde cámara o galería y selector de tema Claro / Oscuro.
+            - 🔑 **Inicio con Google Real**: Compatibilidad con Google Identity Services (GIS), inicio con tu propio correo `@gmail.com` y funcionamiento continuo en modo offline.
+            - 📊 **Exportador Excel Funcional**: Descarga directa de reportes de ventas y balance a formatos CSV con BOM UTF-8 y hoja de cálculo `.xls`, además de copiado al portapapeles en 1 toque.
+            - 📸 **Inventario con Cámara IA y Modo Manual**: Agregado de productos por fotografía de etiquetas con IA, dictado por voz o ingreso manual.
+            - 👵 **Accesibilidad para Adultos Mayores**: Botones de gran tamaño, contraste visual optimizado y tipografía clara.
           files: android/app/build/outputs/apk/debug/app-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

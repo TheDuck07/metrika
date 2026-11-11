@@ -18,6 +18,12 @@ export const IngresoScreen: React.FC = () => {
   const [identity, setIdentity] = useState('77012345');
   const [password, setPassword] = useState('1234');
 
+  // Registration fields
+  const [regShopName, setRegShopName] = useState('');
+  const [regOwnerName, setRegOwnerName] = useState('');
+  const [regPhone, setRegPhone] = useState('');
+  const [regPin, setRegPin] = useState('');
+
   // Google Sign-In custom fields
   const [googleEmail, setGoogleEmail] = useState('');
   const [googleName, setGoogleName] = useState('');
@@ -168,30 +174,38 @@ export const IngresoScreen: React.FC = () => {
         data-purpose="mobile-viewport"
       >
         {/* Top Blue Hero with Logo M (Matches Mockup Screen 1) */}
-        <section className="relative w-full bg-[#1E70BA] pt-12 pb-14 px-6 rounded-b-[40px] shadow-lg flex flex-col items-center text-center overflow-hidden">
-          {/* Subtle decorative circles */}
+        <section className="relative w-full bg-[#1E70BA] pt-10 pb-4 px-6 flex flex-col items-center text-center overflow-hidden">
+          {/* Subtle decorative glow */}
           <div className="absolute -top-12 -right-12 w-44 h-44 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
           <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-[#9EC84A]/20 blur-lg pointer-events-none"></div>
 
-          {/* White Card holding the METRIKA Cut-Out M Logo */}
-          <div className="relative w-28 h-28 sm:w-32 sm:h-32 bg-white rounded-3xl p-3 shadow-xl flex items-center justify-center mb-4 transition-transform hover:scale-105 border-4 border-white">
-            <img
-              src="/logo-m.jpg"
-              alt="Metrika M Logo"
-              className="w-full h-full object-contain"
-              onError={(e) => {
-                // Fallback icon
-                (e.currentTarget as HTMLElement).style.display = 'none';
-              }}
-            />
+          {/* Logo badge with 3 green sparkle accents like in Mockup Screen 1 */}
+          <div className="relative mb-3">
+            <div className="relative w-28 h-28 sm:w-32 sm:h-32 bg-white rounded-3xl p-2.5 shadow-2xl flex items-center justify-center transition-transform hover:scale-105 border-4 border-white">
+              <img
+                src="/logo-m.jpg"
+                alt="Metrika Logo"
+                className="w-full h-full object-contain rounded-2xl"
+              />
+            </div>
+
+            {/* 3 Green sparkle rays at top-right of logo (exact match to Mockup Screen 1) */}
+            <div className="absolute -top-2.5 -right-3 text-[#9EC84A] flex items-center pointer-events-none">
+              <svg className="w-7 h-7 filter drop-shadow-sm" viewBox="0 0 24 24" fill="none" stroke="#9EC84A" strokeWidth="3" strokeLinecap="round">
+                <line x1="8" y1="4" x2="6" y2="2" />
+                <line x1="14" y1="6" x2="18" y2="3" />
+                <line x1="16" y1="12" x2="20" y2="12" />
+              </svg>
+            </div>
           </div>
 
-          <h1 className="text-3xl font-black text-white tracking-wide drop-shadow-sm">
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-wider drop-shadow-sm">
             METRIKA
           </h1>
 
-          {/* Dotted decorative green line like in mockup */}
-          <div className="flex items-center gap-1.5 my-2.5">
+          {/* Dotted green divider like in mockup */}
+          <div className="flex items-center gap-1.5 my-2">
+            <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
             <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
             <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
             <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
@@ -199,10 +213,28 @@ export const IngresoScreen: React.FC = () => {
             <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
           </div>
 
-          <p className="text-white/95 text-xs sm:text-sm font-semibold max-w-[260px] leading-snug">
+          <p className="text-white/95 text-xs sm:text-sm font-semibold max-w-[240px] leading-snug">
             Control de stock y ventas para tu negocio
           </p>
         </section>
+
+        {/* Green transition wave like in Mockup Screen 1 */}
+        <div className="w-full leading-none overflow-hidden -mt-0.5 bg-[#1E70BA]">
+          <svg viewBox="0 0 400 45" preserveAspectRatio="none" className="w-full h-9 block">
+            <path
+              d="M0,0 C120,40 260,42 400,10 L400,45 L0,45 Z"
+              fill="#9EC84A"
+            />
+          </svg>
+        </div>
+        <div className="w-full leading-none overflow-hidden -mt-0.5 bg-[#9EC84A]">
+          <svg viewBox="0 0 400 35" preserveAspectRatio="none" className="w-full h-7 block">
+            <path
+              d="M0,0 C140,30 280,32 400,8 L400,35 L0,35 Z"
+              className="fill-white dark:fill-[#1A1F26]"
+            />
+          </svg>
+        </div>
 
         {/* Form and actions */}
         <main className="w-full flex-1 flex flex-col justify-between px-6 pt-5 pb-6">
@@ -311,7 +343,7 @@ export const IngresoScreen: React.FC = () => {
               type="button"
               disabled={loading}
               onClick={handleStandardLogin}
-              className="w-full h-12 bg-[#1E70BA] hover:bg-[#165A98] active:scale-[0.98] text-white text-base font-bold rounded-2xl flex items-center justify-center shadow-lg shadow-[#1E70BA]/25 transition-all cursor-pointer disabled:opacity-50"
+              className="w-full h-12 sm:h-13 bg-[#1E70BA] hover:bg-[#165A98] active:scale-[0.98] text-white text-base font-bold rounded-full flex items-center justify-center shadow-lg shadow-[#1E70BA]/25 transition-all cursor-pointer disabled:opacity-50"
             >
               {loading ? 'Iniciando...' : 'Iniciar sesión'}
             </button>
@@ -320,7 +352,7 @@ export const IngresoScreen: React.FC = () => {
               id="btn-open-register"
               type="button"
               onClick={() => setShowModal(true)}
-              className="w-full h-12 bg-white border-2 border-slate-200 hover:border-[#1E70BA] hover:bg-slate-50 active:scale-[0.98] text-slate-700 text-sm font-bold rounded-2xl flex items-center justify-center transition-all cursor-pointer"
+              className="w-full h-12 sm:h-13 bg-white border-2 border-[#1E70BA] hover:bg-[#EAF3FA] active:scale-[0.98] text-[#1E70BA] text-sm sm:text-base font-bold rounded-full flex items-center justify-center transition-all cursor-pointer"
             >
               Crear cuenta
             </button>

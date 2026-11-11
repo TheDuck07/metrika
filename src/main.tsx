@@ -5,7 +5,7 @@ import './index.css';
 createRoot(document.getElementById('root')!).render(<App />);
 
 // Register Service Worker for 100% offline support
-if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch((err) => {
       console.log('SW registration error:', err);
