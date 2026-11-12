@@ -261,169 +261,135 @@ export const InicioScreen: React.FC = () => {
           </button>
         </section>
 
-        {/* 1. THE 4 KPI CARDS (Real-time dynamic data with actual store figures) */}
-        <section className="grid grid-cols-2 gap-3">
-          {/* Card 1: Ventas (Pastel Green) */}
-          <div className="bg-[#EBF5EC] dark:bg-[#1B2F23] rounded-2xl p-3.5 border border-emerald-200/60 dark:border-emerald-800/40 shadow-xs flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="material-symbols-outlined text-[22px] text-[#2D8A4E] dark:text-emerald-400">
-                shopping_cart
-              </span>
-              <span className="text-[10px] font-black text-[#2D8A4E] dark:text-emerald-400 bg-white/70 dark:bg-black/30 px-1.5 py-0.5 rounded-full">
-                {ventasTrend}
+        {/* 1. HERO CASH CARD: DINERO EN CAJA HOY (Restaurado con distribución exacta y estilo de marca) */}
+        <section className="bg-gradient-to-br from-[#9F3C16] via-[#A84218] to-[#8C3413] text-white rounded-3xl p-5 shadow-lg border border-orange-700/30 relative overflow-hidden">
+          {/* Top row inside card: Status + Base button */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
+              <span className="text-[11px] font-black uppercase tracking-wider text-white/95">
+                DINERO EN CAJA HOY
               </span>
             </div>
-            <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
-              Ventas de hoy
-            </span>
-            <span className="text-xl sm:text-2xl font-black text-[#252524] dark:text-white mt-0.5">
-              Bs. {todayVentas.toFixed(2)}
-            </span>
-          </div>
-
-          {/* Card 2: Gastos (Pastel Coral/Orange) */}
-          <div className="bg-[#FDEFEA] dark:bg-[#341F1A] rounded-2xl p-3.5 border border-orange-200/60 dark:border-orange-800/40 shadow-xs flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="material-symbols-outlined text-[22px] text-[#EE6B4D] dark:text-[#ff8a6f]">
-                account_balance_wallet
-              </span>
-              <span className="text-[10px] font-black text-[#EE6B4D] dark:text-[#ff8a6f] bg-white/70 dark:bg-black/30 px-1.5 py-0.5 rounded-full">
-                {gastosTrend}
-              </span>
-            </div>
-            <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
-              Gastos y compras
-            </span>
-            <span className="text-xl sm:text-2xl font-black text-[#252524] dark:text-white mt-0.5">
-              Bs. {totalSalidasHoy.toFixed(2)}
-            </span>
-          </div>
-
-          {/* Card 3: Ingresos / Ganancia Neta (Pastel Blue) */}
-          <div className="bg-[#EAF2F9] dark:bg-[#162738] rounded-2xl p-3.5 border border-blue-200/60 dark:border-blue-800/40 shadow-xs flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="material-symbols-outlined text-[22px] text-[#1E70BA] dark:text-[#60A5FA]">
-                trending_up
-              </span>
-              <span className="text-[10px] font-black text-[#1E70BA] dark:text-[#60A5FA] bg-white/70 dark:bg-black/30 px-1.5 py-0.5 rounded-full">
-                {ingresosTrend}
-              </span>
-            </div>
-            <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
-              Ganancia neta hoy
-            </span>
-            <span
-              className={`text-xl sm:text-2xl font-black mt-0.5 ${
-                balanceHoy >= 0 ? 'text-[#1E70BA] dark:text-white' : 'text-rose-600 dark:text-rose-400'
-              }`}
+            <button
+              type="button"
+              onClick={() => {
+                setCashInput(String(initialCashRegister));
+                setShowCashModal(true);
+              }}
+              title="Toca para ajustar el fondo de caja inicial"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-black/25 hover:bg-black/35 text-[11px] font-bold text-white/95 backdrop-blur-sm transition-all cursor-pointer active:scale-95 border border-white/10"
             >
-              Bs. {balanceHoy.toFixed(2)}
-            </span>
+              <span>Base: Bs. {initialCashRegister.toFixed(0)}</span>
+              <span className="material-symbols-outlined text-xs">tune</span>
+            </button>
           </div>
 
-          {/* Card 4: Stock (Pastel Yellow/Lime) */}
-          <div className="bg-[#FBF6E9] dark:bg-[#2C3119] rounded-2xl p-3.5 border border-lime-200/60 dark:border-lime-800/40 shadow-xs flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="material-symbols-outlined text-[22px] text-[#86A334] dark:text-[#A7CC44]">
-                inventory_2
+          {/* Big Amount */}
+          <div className="mt-3 mb-1">
+            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
+              Bs. {efectivoEnCaja >= 0 ? efectivoEnCaja.toFixed(2) : `(${Math.abs(efectivoEnCaja).toFixed(2)})`}
+            </h1>
+            <p className="text-xs text-white/85 font-medium mt-0.5">
+              Efectivo disponible para dar cambio y pagar
+            </p>
+          </div>
+
+          {/* Divider */}
+          <div className="my-3.5 border-t border-white/20"></div>
+
+          {/* 3 Summary Columns inside Card: + VENTAS, - COMPRAS, - GASTOS */}
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="p-2 rounded-2xl bg-black/15 backdrop-blur-xs flex flex-col justify-center border border-white/5">
+              <span className="text-[10px] font-black uppercase text-emerald-300 tracking-wider">
+                + VENTAS
               </span>
-              <span className="text-[10px] font-black text-[#86A334] dark:text-[#A7CC44] bg-white/70 dark:bg-black/30 px-1.5 py-0.5 rounded-full">
-                {lowStockCount > 0 ? `${lowStockCount} bajos` : 'Al día'}
+              <span className="text-sm sm:text-base font-black text-white mt-0.5">
+                Bs. {todayVentas.toFixed(0)}
               </span>
             </div>
-            <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
-              Inventario total
-            </span>
-            <span className="text-xl sm:text-2xl font-black text-[#252524] dark:text-white mt-0.5">
-              {products.length} <span className="text-xs font-normal text-slate-500">productos</span>
-            </span>
+
+            <div className="p-2 rounded-2xl bg-black/15 backdrop-blur-xs flex flex-col justify-center border border-white/5">
+              <span className="text-[10px] font-black uppercase text-amber-300 tracking-wider">
+                - COMPRAS
+              </span>
+              <span className="text-sm sm:text-base font-black text-white mt-0.5">
+                Bs. {todayCompras.toFixed(0)}
+              </span>
+            </div>
+
+            <div className="p-2 rounded-2xl bg-black/15 backdrop-blur-xs flex flex-col justify-center border border-white/5">
+              <span className="text-[10px] font-black uppercase text-rose-300 tracking-wider">
+                - GASTOS
+              </span>
+              <span className="text-sm sm:text-base font-black text-white mt-0.5">
+                Bs. {todayGastosDirectos.toFixed(0)}
+              </span>
+            </div>
           </div>
         </section>
 
-        {/* EFECTIVO EN CAJA BAR */}
-        <section className="bg-white dark:bg-[#1A1F26] rounded-2xl p-3.5 border border-slate-200/80 dark:border-slate-800 shadow-xs flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-[#EAF2F9] dark:bg-[#1E293B] text-[#1E70BA] dark:text-[#60A5FA] flex items-center justify-center">
-              <span className="material-symbols-outlined text-xl">payments</span>
-            </div>
-            <div>
-              <span className="text-[10px] font-black uppercase text-slate-400 block tracking-wider">
-                Efectivo Disponible en Caja
-              </span>
-              <span className="text-lg font-black text-slate-900 dark:text-white leading-none">
-                Bs. {efectivoEnCaja >= 0 ? efectivoEnCaja.toFixed(2) : `(${Math.abs(efectivoEnCaja).toFixed(2)})`}
-              </span>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              setCashInput(String(initialCashRegister));
-              setShowCashModal(true);
-            }}
-            className="text-[11px] font-bold text-[#1E70BA] dark:text-[#60A5FA] bg-[#EAF2F9] dark:bg-[#1E293B] hover:bg-[#DEECF8] px-3 py-1.5 rounded-xl transition-all cursor-pointer"
-          >
-            Ajustar
-          </button>
-        </section>
-
-        {/* 2. ACCESOS RÁPIDOS (Botones grandes y accesibles para adultos mayores de 60+) */}
+        {/* 2. ¿CÓMO DESEAS REGISTRAR? (Distribución de funciones principales) */}
         <section className="space-y-2.5">
           <div className="flex items-center justify-between px-1">
-            <h3 className="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-wider">
-              Accesos rápidos
+            <h3 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+              ¿CÓMO DESEAS REGISTRAR?
             </h3>
-            <span className="text-[11px] font-bold text-[#EE6B4D]">
-              1 toque para iniciar
+            <span className="text-[11px] font-bold text-[#EE6B4D] dark:text-orange-400">
+              1 Toque para iniciar
             </span>
           </div>
 
-          {/* 3 HERO ACCION BUTTONS */}
+          {/* 3 HERO ACTION CARDS */}
           <div className="grid grid-cols-3 gap-2.5">
-            {/* OPCIÓN 1: CÁMARA CON IA (Mostrador) */}
+            {/* OPCIÓN 1: CON CÁMARA */}
             <button
               type="button"
               onClick={() => {
                 setProductScanMode('venta');
                 setShowProductScanModal(true);
               }}
-              className="bg-white dark:bg-[#1A1F26] hover:bg-slate-50 active:scale-95 text-[#252524] dark:text-white p-3 rounded-2xl flex flex-col items-center justify-center text-center shadow-md border-2 border-[#1E70BA]/30 hover:border-[#1E70BA] transition-all cursor-pointer min-h-[140px] group"
+              className="bg-[#241A16] dark:bg-[#1A1412] hover:bg-[#2F211C] active:scale-95 text-white p-3 rounded-3xl flex flex-col items-center justify-between text-center shadow-lg border border-orange-900/40 transition-all cursor-pointer min-h-[160px] group"
             >
-              <div className="w-13 h-13 rounded-2xl bg-[#EAF2F9] dark:bg-[#1E293B] text-[#1E70BA] dark:text-[#60A5FA] flex items-center justify-center mb-2 shadow-xs group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-[30px]">photo_camera</span>
+              <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform mt-1">
+                <span className="material-symbols-outlined text-[28px]">photo_camera</span>
               </div>
-              <span className="text-xs sm:text-sm font-black leading-tight text-slate-900 dark:text-white">
-                Cámara IA
-              </span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                Foto mostrador
-              </span>
-              <span className="mt-1.5 text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full bg-[#1E70BA]/10 text-[#1E70BA] dark:text-[#60A5FA]">
-                1 Toque
+              <div className="my-1">
+                <span className="text-xs sm:text-sm font-black text-white leading-tight block">
+                  Con Cámara
+                </span>
+                <span className="text-[10px] text-stone-400 block mt-0.5">
+                  Foto mostrador
+                </span>
+              </div>
+              <span className="text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-600/40">
+                IA RÁPIDA
               </span>
             </button>
 
-            {/* OPCIÓN 2: POR VOZ (Dictado Inteligente) */}
+            {/* OPCIÓN 2: POR VOZ */}
             <button
               type="button"
               onClick={() => setShowVoiceModal(true)}
-              className="bg-white dark:bg-[#1A1F26] hover:bg-slate-50 active:scale-95 text-[#252524] dark:text-white p-3 rounded-2xl flex flex-col items-center justify-center text-center shadow-md border-2 border-[#9EC84A]/40 hover:border-[#9EC84A] transition-all cursor-pointer min-h-[140px] group"
+              className="bg-[#132219] dark:bg-[#0E1E15] hover:bg-[#192D21] active:scale-95 text-white p-3 rounded-3xl flex flex-col items-center justify-between text-center shadow-lg border border-emerald-900/40 transition-all cursor-pointer min-h-[160px] group"
             >
-              <div className="w-13 h-13 rounded-2xl bg-[#EBF5EC] dark:bg-[#1B2F23] text-[#2D8A4E] dark:text-[#9EC84A] flex items-center justify-center mb-2 shadow-xs group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-[30px]">mic</span>
+              <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform mt-1">
+                <span className="material-symbols-outlined text-[28px]">mic</span>
               </div>
-              <span className="text-xs sm:text-sm font-black leading-tight text-slate-900 dark:text-white">
-                Por Voz
-              </span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                Di lo que vendes
-              </span>
-              <span className="mt-1.5 text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
-                Dictado
+              <div className="my-1">
+                <span className="text-xs sm:text-sm font-black text-white leading-tight block">
+                  Por Voz
+                </span>
+                <span className="text-[10px] text-stone-400 block mt-0.5">
+                  Di lo que vendes
+                </span>
+              </div>
+              <span className="text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 border border-emerald-600/40">
+                AUTOMÁTICO
               </span>
             </button>
 
-            {/* OPCIÓN 3: VENTA RÁPIDA (Brand Coral CTA Button) */}
+            {/* OPCIÓN 3: VENTA 2 PASOS */}
             <button
               type="button"
               onClick={() => {
@@ -433,56 +399,86 @@ export const InicioScreen: React.FC = () => {
                 setCustomSaleAmount('');
                 setShowSaleModal(true);
               }}
-              className="bg-[#EE6B4D] hover:bg-[#D65538] active:scale-95 text-white p-3 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg shadow-[#EE6B4D]/30 transition-all cursor-pointer min-h-[140px] group"
+              className="bg-[#9F3C16] hover:bg-[#8D3412] active:scale-95 text-white p-3 rounded-3xl flex flex-col items-center justify-between text-center shadow-lg border border-orange-700/50 transition-all cursor-pointer min-h-[160px] group"
             >
-              <div className="w-13 h-13 rounded-2xl bg-white/20 text-white flex items-center justify-center mb-2 shadow-xs group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-[30px]">point_of_sale</span>
+              <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-orange-400/30 to-red-500/30 border border-white/20 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform mt-1">
+                <span className="material-symbols-outlined text-[28px]">point_of_sale</span>
               </div>
-              <span className="text-xs sm:text-sm font-black leading-tight text-white">
-                Registrar Venta
-              </span>
-              <span className="text-[10px] text-white/90 mt-0.5">
-                Toca y cobra
-              </span>
-              <span className="mt-1.5 text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full bg-white/25 text-white">
-                Manual
+              <div className="my-1">
+                <span className="text-xs sm:text-sm font-black text-white leading-tight block">
+                  Venta 2 Pasos
+                </span>
+                <span className="text-[10px] text-white/80 block mt-0.5">
+                  Toca y cobra
+                </span>
+              </div>
+              <span className="text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full bg-black/25 text-white/90 border border-white/20">
+                MANUAL
               </span>
             </button>
           </div>
 
-          {/* Quick Mockup Tiles: Inventario, Compras, Reportes */}
-          <div className="grid grid-cols-3 gap-2.5 pt-1">
+          {/* TWO QUICK ACTION BUTTONS: + Anotar Compra / - Anotar Gasto (Luz) */}
+          <div className="grid grid-cols-2 gap-2.5 pt-1">
             <button
               type="button"
-              onClick={() => setCurrentScreen('inventario')}
-              className="p-3 bg-white dark:bg-[#1A1F26] hover:bg-slate-50 rounded-2xl border border-slate-200/80 dark:border-slate-800 flex flex-col items-center text-center shadow-xs cursor-pointer active:scale-95 transition-all"
+              onClick={() => setShowPurchaseModal(true)}
+              className="h-13 px-3 bg-white dark:bg-[#1A1F26] hover:bg-slate-50 dark:hover:bg-slate-800 text-[#252524] dark:text-white rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all group"
             >
-              <div className="w-9 h-9 rounded-xl bg-[#EBF5EC] text-[#2D8A4E] flex items-center justify-center mb-1">
-                <span className="material-symbols-outlined text-xl">inventory_2</span>
-              </div>
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Inventario</span>
+              <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-xl group-hover:scale-110 transition-transform">
+                local_shipping
+              </span>
+              <span className="text-xs font-black truncate">
+                + Anotar Compra
+              </span>
             </button>
 
             <button
               type="button"
-              onClick={() => setShowPurchaseModal(true)}
-              className="p-3 bg-white dark:bg-[#1A1F26] hover:bg-slate-50 rounded-2xl border border-slate-200/80 dark:border-slate-800 flex flex-col items-center text-center shadow-xs cursor-pointer active:scale-95 transition-all"
+              onClick={() => setShowExpenseModal(true)}
+              className="h-13 px-3 bg-white dark:bg-[#1A1F26] hover:bg-slate-50 dark:hover:bg-slate-800 text-[#252524] dark:text-white rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all group"
             >
-              <div className="w-9 h-9 rounded-xl bg-[#FDEFEA] text-[#EE6B4D] flex items-center justify-center mb-1">
-                <span className="material-symbols-outlined text-xl">local_shipping</span>
+              <span className="material-symbols-outlined text-rose-500 dark:text-rose-400 text-xl group-hover:scale-110 transition-transform">
+                receipt_long
+              </span>
+              <span className="text-xs font-black truncate">
+                - Anotar Gasto (Luz)
+              </span>
+            </button>
+          </div>
+
+          {/* Shortcuts to Inventario and Reportes */}
+          <div className="grid grid-cols-2 gap-2.5 pt-0.5">
+            <button
+              type="button"
+              onClick={() => setCurrentScreen('inventario')}
+              className="p-2.5 bg-slate-100/80 dark:bg-[#1E2530] hover:bg-slate-200/70 dark:hover:bg-[#252F3D] rounded-2xl border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between px-3.5 transition-all active:scale-95 cursor-pointer text-left"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="material-symbols-outlined text-[#2D8A4E] dark:text-emerald-400 text-lg">
+                  inventory_2
+                </span>
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                  Inventario ({products.length})
+                </span>
               </div>
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Compras</span>
+              <span className="material-symbols-outlined text-slate-400 text-sm">chevron_right</span>
             </button>
 
             <button
               type="button"
               onClick={() => setCurrentScreen('reportes')}
-              className="p-3 bg-white dark:bg-[#1A1F26] hover:bg-slate-50 rounded-2xl border border-slate-200/80 dark:border-slate-800 flex flex-col items-center text-center shadow-xs cursor-pointer active:scale-95 transition-all"
+              className="p-2.5 bg-slate-100/80 dark:bg-[#1E2530] hover:bg-slate-200/70 dark:hover:bg-[#252F3D] rounded-2xl border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between px-3.5 transition-all active:scale-95 cursor-pointer text-left"
             >
-              <div className="w-9 h-9 rounded-xl bg-[#EAF2F9] text-[#1E70BA] flex items-center justify-center mb-1">
-                <span className="material-symbols-outlined text-xl">bar_chart</span>
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="material-symbols-outlined text-[#1E70BA] dark:text-blue-400 text-lg">
+                  bar_chart
+                </span>
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                  Ver Reportes
+                </span>
               </div>
-              <span className="text-xs font-bold text-slate-800 dark:text-slate-200">Reportes</span>
+              <span className="material-symbols-outlined text-slate-400 text-sm">chevron_right</span>
             </button>
           </div>
         </section>
