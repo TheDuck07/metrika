@@ -340,18 +340,18 @@ export const InicioScreen: React.FC = () => {
             </span>
           </div>
 
-          {/* 3 HERO ACTION CARDS - Destacadas con color unificado oficial de acción (#EE754C) en toda la tarjeta */}
+          {/* 3 HERO ACTION CARDS - Cada tarjeta con su color de marca completo para identificarla al instante */}
           <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
-            {/* OPCIÓN 1: CON CÁMARA */}
+            {/* OPCIÓN 1: CON CÁMARA (100% Naranja / Coral de acción) */}
             <button
               type="button"
               onClick={() => {
                 setProductScanMode('venta');
                 setShowProductScanModal(true);
               }}
-              className="bg-gradient-to-br from-[#EE754C] via-[#EE754C] to-[#DF6237] hover:brightness-105 active:scale-95 text-white p-2.5 sm:p-3 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-between text-center shadow-md shadow-orange-600/25 border border-orange-400/40 transition-all cursor-pointer min-h-[142px] sm:min-h-[152px] overflow-hidden group"
+              className="bg-gradient-to-br from-[#EE754C] via-[#EE754C] to-[#DC592E] hover:brightness-105 active:scale-95 text-white p-2.5 sm:p-3 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-between text-center shadow-md shadow-orange-600/25 border border-orange-300/40 transition-all cursor-pointer min-h-[142px] sm:min-h-[152px] overflow-hidden group"
             >
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/20 text-white flex items-center justify-center backdrop-blur-xs shadow-xs group-hover:scale-105 transition-transform mt-0.5 shrink-0 border border-white/20">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/20 text-white flex items-center justify-center backdrop-blur-xs shadow-xs group-hover:scale-105 transition-transform mt-0.5 shrink-0 border border-white/25">
                 <span className="material-symbols-outlined text-[22px] sm:text-[24px]">photo_camera</span>
               </div>
               <div className="my-1 w-full px-0.5">
@@ -367,13 +367,13 @@ export const InicioScreen: React.FC = () => {
               </span>
             </button>
 
-            {/* OPCIÓN 2: POR VOZ */}
+            {/* OPCIÓN 2: POR VOZ (100% Verde Limón oficial de marca) */}
             <button
               type="button"
               onClick={() => setShowVoiceModal(true)}
-              className="bg-gradient-to-br from-[#EE754C] via-[#EE754C] to-[#DF6237] hover:brightness-105 active:scale-95 text-white p-2.5 sm:p-3 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-between text-center shadow-md shadow-orange-600/25 border border-orange-400/40 transition-all cursor-pointer min-h-[142px] sm:min-h-[152px] overflow-hidden group"
+              className="bg-gradient-to-br from-[#8EA838] via-[#859E30] to-[#728A25] hover:brightness-105 active:scale-95 text-white p-2.5 sm:p-3 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-between text-center shadow-md shadow-lime-900/25 border border-lime-300/40 transition-all cursor-pointer min-h-[142px] sm:min-h-[152px] overflow-hidden group"
             >
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/20 text-white flex items-center justify-center backdrop-blur-xs shadow-xs group-hover:scale-105 transition-transform mt-0.5 shrink-0 border border-white/20">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/20 text-white flex items-center justify-center backdrop-blur-xs shadow-xs group-hover:scale-105 transition-transform mt-0.5 shrink-0 border border-white/25">
                 <span className="material-symbols-outlined text-[22px] sm:text-[24px]">mic</span>
               </div>
               <div className="my-1 w-full px-0.5">
@@ -389,7 +389,7 @@ export const InicioScreen: React.FC = () => {
               </span>
             </button>
 
-            {/* OPCIÓN 3: VENTA 2 PASOS */}
+            {/* OPCIÓN 3: VENTA 2 PASOS (100% Azul Metrika oficial de marca) */}
             <button
               type="button"
               onClick={() => {
@@ -399,9 +399,9 @@ export const InicioScreen: React.FC = () => {
                 setCustomSaleAmount('');
                 setShowSaleModal(true);
               }}
-              className="bg-gradient-to-br from-[#EE754C] via-[#EE754C] to-[#DF6237] hover:brightness-105 active:scale-95 text-white p-2.5 sm:p-3 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-between text-center shadow-md shadow-orange-600/25 border border-orange-400/40 transition-all cursor-pointer min-h-[142px] sm:min-h-[152px] overflow-hidden group"
+              className="bg-gradient-to-br from-[#2B7BBE] via-[#2470AE] to-[#1C5B8F] hover:brightness-105 active:scale-95 text-white p-2.5 sm:p-3 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-between text-center shadow-md shadow-blue-600/25 border border-blue-300/40 transition-all cursor-pointer min-h-[142px] sm:min-h-[152px] overflow-hidden group"
             >
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/20 text-white flex items-center justify-center backdrop-blur-xs shadow-xs group-hover:scale-105 transition-transform mt-0.5 shrink-0 border border-white/20">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/20 text-white flex items-center justify-center backdrop-blur-xs shadow-xs group-hover:scale-105 transition-transform mt-0.5 shrink-0 border border-white/25">
                 <span className="material-symbols-outlined text-[22px] sm:text-[24px]">point_of_sale</span>
               </div>
               <div className="my-1 w-full px-0.5">
