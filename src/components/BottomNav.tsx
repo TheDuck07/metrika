@@ -13,7 +13,7 @@ export const BottomNav: React.FC = () => {
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#1A1F26]/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] select-none transition-colors pb-[env(safe-area-inset-bottom,0px)]"
-      data-active-classes="text-[#1E70BA] dark:text-[#60A5FA] font-bold"
+      data-active-classes="text-[#2B7BBE] dark:text-[#60A5FA] font-bold"
     >
       <div className="flex items-center justify-around h-16 sm:h-20 px-2 max-w-md mx-auto">
         {/* 1. Inicio */}
@@ -24,8 +24,8 @@ export const BottomNav: React.FC = () => {
           onClick={(e) => handleNav('inicio', e)}
           className={`flex flex-col items-center justify-center min-w-[56px] min-h-[48px] py-1 transition-all gap-0.5 ${
             currentScreen === 'inicio'
-              ? 'text-[#1E70BA] dark:text-[#60A5FA] font-black'
-              : 'text-[#64748B] dark:text-stone-400 hover:text-[#1E70BA]'
+              ? 'text-[#2B7BBE] dark:text-[#60A5FA] font-black'
+              : 'text-[#64748B] dark:text-stone-400 hover:text-[#2B7BBE]'
           }`}
         >
           <span className="material-symbols-outlined text-[24px]">home</span>
@@ -40,8 +40,8 @@ export const BottomNav: React.FC = () => {
           onClick={(e) => handleNav('inventario', e)}
           className={`flex flex-col items-center justify-center min-w-[56px] min-h-[48px] py-1 transition-all gap-0.5 ${
             currentScreen === 'inventario'
-              ? 'text-[#1E70BA] dark:text-[#60A5FA] font-black'
-              : 'text-[#64748B] dark:text-stone-400 hover:text-[#1E70BA]'
+              ? 'text-[#2B7BBE] dark:text-[#60A5FA] font-black'
+              : 'text-[#64748B] dark:text-stone-400 hover:text-[#2B7BBE]'
           }`}
         >
           <span className="material-symbols-outlined text-[24px]">inventory_2</span>
@@ -58,7 +58,7 @@ export const BottomNav: React.FC = () => {
           title="Registrar venta rápida"
         >
           <div
-            className={`w-14 h-14 rounded-full flex items-center justify-center shadow-[0_6px_18px_rgba(30,112,186,0.35)] transition-all bg-[#1E70BA] text-white ring-4 ring-[#EAF3FA] dark:ring-[#1E293B] group-hover:scale-105 group-hover:bg-[#165A98]`}
+            className={`w-14 h-14 rounded-full flex items-center justify-center shadow-[0_6px_18px_rgba(43,123,190,0.35)] transition-all bg-[#2B7BBE] text-white ring-4 ring-[#EAF3FA] dark:ring-[#1E293B] group-hover:scale-105 group-hover:bg-[#1D649D]`}
           >
             <span className="material-symbols-outlined text-[32px] font-bold">add</span>
           </div>
@@ -72,8 +72,8 @@ export const BottomNav: React.FC = () => {
           onClick={(e) => handleNav('historial', e)}
           className={`flex flex-col items-center justify-center min-w-[56px] min-h-[48px] py-1 transition-all gap-0.5 ${
             currentScreen === 'historial'
-              ? 'text-[#1E70BA] dark:text-[#60A5FA] font-black'
-              : 'text-[#64748B] dark:text-stone-400 hover:text-[#1E70BA]'
+              ? 'text-[#2B7BBE] dark:text-[#60A5FA] font-black'
+              : 'text-[#64748B] dark:text-stone-400 hover:text-[#2B7BBE]'
           }`}
         >
           <span className="material-symbols-outlined text-[24px]">shopping_cart</span>
@@ -88,8 +88,8 @@ export const BottomNav: React.FC = () => {
           onClick={(e) => handleNav('reportes', e)}
           className={`flex flex-col items-center justify-center min-w-[56px] min-h-[48px] py-1 transition-all gap-0.5 ${
             currentScreen === 'reportes'
-              ? 'text-[#1E70BA] dark:text-[#60A5FA] font-black'
-              : 'text-[#64748B] dark:text-stone-400 hover:text-[#1E70BA]'
+              ? 'text-[#2B7BBE] dark:text-[#60A5FA] font-black'
+              : 'text-[#64748B] dark:text-stone-400 hover:text-[#2B7BBE]'
           }`}
         >
           <span className="material-symbols-outlined text-[24px]">bar_chart</span>

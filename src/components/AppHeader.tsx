@@ -22,7 +22,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
     .join('');
 
   return (
-    <header className="flex-none w-full z-40 bg-[#1E70BA] dark:bg-[#155A96] text-white shadow-[0_2px_12px_rgba(30,112,186,0.25)] transition-colors">
+    <header className="flex-none w-full z-40 bg-[#2B7BBE] dark:bg-[#1D649D] text-white shadow-[0_2px_12px_rgba(43,123,190,0.25)] transition-colors">
       <div className="h-16 px-4 flex items-center justify-between gap-2 max-w-md mx-auto">
         {/* Left: METRIKA Logo & Store Switcher */}
         <button
@@ -41,10 +41,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
           </div>
           <div className="flex flex-col min-w-0 flex-1">
             <div className="flex items-center gap-1">
-              <span className="text-[10px] font-black tracking-wider text-emerald-300 uppercase truncate">
+              <span className="text-[10px] font-black tracking-wider text-[#B0CC5D] uppercase truncate">
                 {storeInfo.name}
               </span>
-              <span className="material-symbols-outlined text-xs text-emerald-300 group-hover:translate-y-0.5 transition-transform">
+              <span className="material-symbols-outlined text-xs text-[#B0CC5D] group-hover:translate-y-0.5 transition-transform">
                 expand_more
               </span>
             </div>
@@ -68,7 +68,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
             onClick={() => setShowAccountModal(true)}
             aria-label="Abrir mi cuenta, perfil y configuración"
             title={`Perfil de ${user?.name || storeInfo.owner || 'Comerciante'} - Toca para ver cuenta y tema`}
-            className="relative w-10 h-10 rounded-2xl bg-[#9EC84A] text-slate-950 flex items-center justify-center font-black text-xs shadow-md border-2 border-white/40 hover:border-white active:scale-95 transition-all cursor-pointer overflow-hidden group"
+            className="relative w-10 h-10 rounded-2xl bg-[#B0CC5D] text-slate-950 flex items-center justify-center font-black text-xs shadow-md border-2 border-white/40 hover:border-white active:scale-95 transition-all cursor-pointer overflow-hidden group"
           >
             {userAvatar ? (
               <img
@@ -79,7 +79,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ title }) => {
             ) : (
               <span className="text-sm font-black tracking-wider text-slate-950">{initials}</span>
             )}
-            <span className="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white"></span>
+            <span className="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 rounded-full bg-[#B0CC5D] ring-2 ring-white"></span>
           </button>
         </div>
       </div>

@@ -174,10 +174,10 @@ export const IngresoScreen: React.FC = () => {
         data-purpose="mobile-viewport"
       >
         {/* Top Blue Hero with Logo M (Matches Mockup Screen 1) */}
-        <section className="relative w-full bg-[#1E70BA] pt-10 pb-4 px-6 flex flex-col items-center text-center overflow-hidden">
+        <section className="relative w-full bg-[#2B7BBE] pt-10 pb-4 px-6 flex flex-col items-center text-center overflow-hidden">
           {/* Subtle decorative glow */}
           <div className="absolute -top-12 -right-12 w-44 h-44 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
-          <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-[#9EC84A]/20 blur-lg pointer-events-none"></div>
+          <div className="absolute -bottom-10 -left-10 w-36 h-36 rounded-full bg-[#B0CC5D]/20 blur-lg pointer-events-none"></div>
 
           {/* Logo badge - Clean, official, without white background container */}
           <div className="relative mb-3">
@@ -190,8 +190,8 @@ export const IngresoScreen: React.FC = () => {
             </div>
 
             {/* 3 Green sparkle rays at top-right of logo (exact match to Mockup Screen 1) */}
-            <div className="absolute -top-2.5 -right-3 text-[#9EC84A] flex items-center pointer-events-none">
-              <svg className="w-7 h-7 filter drop-shadow-sm" viewBox="0 0 24 24" fill="none" stroke="#9EC84A" strokeWidth="3" strokeLinecap="round">
+            <div className="absolute -top-2.5 -right-3 text-[#B0CC5D] flex items-center pointer-events-none">
+              <svg className="w-7 h-7 filter drop-shadow-sm" viewBox="0 0 24 24" fill="none" stroke="#B0CC5D" strokeWidth="3" strokeLinecap="round">
                 <line x1="8" y1="4" x2="6" y2="2" />
                 <line x1="14" y1="6" x2="18" y2="3" />
                 <line x1="16" y1="12" x2="20" y2="12" />
@@ -205,12 +205,12 @@ export const IngresoScreen: React.FC = () => {
 
           {/* Dotted green divider like in mockup */}
           <div className="flex items-center gap-1.5 my-2">
-            <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
-            <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
-            <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
-            <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
-            <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
-            <span className="w-2.5 h-1 rounded-full bg-[#9EC84A]"></span>
+            <span className="w-2.5 h-1 rounded-full bg-[#B0CC5D]"></span>
+            <span className="w-2.5 h-1 rounded-full bg-[#B0CC5D]"></span>
+            <span className="w-2.5 h-1 rounded-full bg-[#B0CC5D]"></span>
+            <span className="w-2.5 h-1 rounded-full bg-[#B0CC5D]"></span>
+            <span className="w-2.5 h-1 rounded-full bg-[#B0CC5D]"></span>
+            <span className="w-2.5 h-1 rounded-full bg-[#B0CC5D]"></span>
           </div>
 
           <p className="text-white/95 text-xs sm:text-sm font-semibold max-w-[240px] leading-snug">
@@ -219,15 +219,15 @@ export const IngresoScreen: React.FC = () => {
         </section>
 
         {/* Green transition wave like in Mockup Screen 1 */}
-        <div className="w-full leading-none overflow-hidden -mt-0.5 bg-[#1E70BA]">
+        <div className="w-full leading-none overflow-hidden -mt-0.5 bg-[#2B7BBE]">
           <svg viewBox="0 0 400 45" preserveAspectRatio="none" className="w-full h-9 block">
             <path
               d="M0,0 C120,40 260,42 400,10 L400,45 L0,45 Z"
-              fill="#9EC84A"
+              fill="#B0CC5D"
             />
           </svg>
         </div>
-        <div className="w-full leading-none overflow-hidden -mt-0.5 bg-[#9EC84A]">
+        <div className="w-full leading-none overflow-hidden -mt-0.5 bg-[#B0CC5D]">
           <svg viewBox="0 0 400 35" preserveAspectRatio="none" className="w-full h-7 block">
             <path
               d="M0,0 C140,30 280,32 400,8 L400,35 L0,35 Z"
@@ -260,7 +260,7 @@ export const IngresoScreen: React.FC = () => {
                   </span>
                 </div>
               </div>
-              <span className="bg-[#1E70BA]/10 text-[#1E70BA] text-[10px] font-black px-2 py-0.5 rounded-full">
+              <span className="bg-[#2B7BBE]/10 text-[#2B7BBE] text-[10px] font-black px-2 py-0.5 rounded-full">
                 Rápido
               </span>
             </button>
@@ -271,20 +271,20 @@ export const IngresoScreen: React.FC = () => {
               type="button"
               disabled={loading}
               onClick={handleQuickLogin}
-              className="w-full bg-[#EAF3FA] hover:bg-[#DEECF8] active:scale-[0.98] transition-all text-[#1E70BA] rounded-2xl p-3 border border-[#1E70BA]/20 flex items-center justify-between text-left cursor-pointer disabled:opacity-50"
+              className="w-full bg-[#EAF3FA] hover:bg-[#DEECF8] active:scale-[0.98] transition-all text-[#2B7BBE] rounded-2xl p-3 border border-[#2B7BBE]/20 flex items-center justify-between text-left cursor-pointer disabled:opacity-50"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#1E70BA] text-white flex items-center justify-center shadow-xs">
+                <div className="w-9 h-9 rounded-xl bg-[#2B7BBE] text-white flex items-center justify-center shadow-xs">
                   <span className="material-symbols-outlined text-xl">bolt</span>
                 </div>
                 <div>
-                  <span className="text-[11px] font-black uppercase text-[#1E70BA] tracking-wider block">
+                  <span className="text-[11px] font-black uppercase text-[#2B7BBE] tracking-wider block">
                     Modo Demostración
                   </span>
                   <p className="text-xs font-bold text-slate-800">Abrir tienda de prueba Don Lucho</p>
                 </div>
               </div>
-              <span className="material-symbols-outlined text-lg text-[#1E70BA]">arrow_forward</span>
+              <span className="material-symbols-outlined text-lg text-[#2B7BBE]">arrow_forward</span>
             </button>
 
             {/* Divider */}
@@ -296,7 +296,7 @@ export const IngresoScreen: React.FC = () => {
 
             {/* Credentials Inputs */}
             <div className="space-y-2">
-              <div className="flex items-center bg-[#F6F8FA] dark:bg-[#20252D] border-2 border-slate-200 dark:border-slate-700 rounded-2xl h-12 px-3.5 focus-within:border-[#1E70BA] focus-within:bg-white dark:focus-within:bg-[#252D37] transition-all">
+              <div className="flex items-center bg-[#F6F8FA] dark:bg-[#20252D] border-2 border-slate-200 dark:border-slate-700 rounded-2xl h-12 px-3.5 focus-within:border-[#2B7BBE] focus-within:bg-white dark:focus-within:bg-[#252D37] transition-all">
                 <span className="material-symbols-outlined text-slate-400 text-lg mr-2">phone_android</span>
                 <input
                   id="user-identity"
@@ -309,7 +309,7 @@ export const IngresoScreen: React.FC = () => {
                 />
               </div>
 
-              <div className="flex items-center bg-[#F6F8FA] dark:bg-[#20252D] border-2 border-slate-200 dark:border-slate-700 rounded-2xl h-12 px-3.5 focus-within:border-[#1E70BA] focus-within:bg-white dark:focus-within:bg-[#252D37] transition-all">
+              <div className="flex items-center bg-[#F6F8FA] dark:bg-[#20252D] border-2 border-slate-200 dark:border-slate-700 rounded-2xl h-12 px-3.5 focus-within:border-[#2B7BBE] focus-within:bg-white dark:focus-within:bg-[#252D37] transition-all">
                 <span className="material-symbols-outlined text-slate-400 text-lg mr-2">lock</span>
                 <input
                   id="password-input"
@@ -343,7 +343,7 @@ export const IngresoScreen: React.FC = () => {
               type="button"
               disabled={loading}
               onClick={handleStandardLogin}
-              className="w-full h-12 sm:h-13 bg-[#1E70BA] hover:bg-[#165A98] active:scale-[0.98] text-white text-base font-bold rounded-full flex items-center justify-center shadow-lg shadow-[#1E70BA]/25 transition-all cursor-pointer disabled:opacity-50"
+              className="w-full h-12 sm:h-13 bg-[#2B7BBE] hover:bg-[#1D649D] active:scale-[0.98] text-white text-base font-bold rounded-full flex items-center justify-center shadow-lg shadow-[#2B7BBE]/25 transition-all cursor-pointer disabled:opacity-50"
             >
               {loading ? 'Iniciando...' : 'Iniciar sesión'}
             </button>
@@ -352,7 +352,7 @@ export const IngresoScreen: React.FC = () => {
               id="btn-open-register"
               type="button"
               onClick={() => setShowModal(true)}
-              className="w-full h-12 sm:h-13 bg-white border-2 border-[#1E70BA] hover:bg-[#EAF3FA] active:scale-[0.98] text-[#1E70BA] text-sm sm:text-base font-bold rounded-full flex items-center justify-center transition-all cursor-pointer"
+              className="w-full h-12 sm:h-13 bg-white border-2 border-[#2B7BBE] hover:bg-[#EAF3FA] active:scale-[0.98] text-[#2B7BBE] text-sm sm:text-base font-bold rounded-full flex items-center justify-center transition-all cursor-pointer"
             >
               Crear cuenta
             </button>

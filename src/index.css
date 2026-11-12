@@ -3,15 +3,15 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-brand-blue: #1E70BA;
-  --color-brand-blue-dark: #165A98;
+  --color-brand-blue: #2B7BBE;
+  --color-brand-blue-dark: #1D649D;
   --color-brand-blue-light: #EAF3FA;
-  --color-brand-green: #9EC84A;
-  --color-brand-green-dark: #7FA532;
-  --color-brand-green-light: #EAF7EE;
-  --color-brand-coral: #EE6B4D;
-  --color-brand-coral-dark: #D65538;
-  --color-brand-coral-light: #FDF2EE;
+  --color-brand-green: #B0CC5D;
+  --color-brand-green-dark: #92AC44;
+  --color-brand-green-light: #F4F8E8;
+  --color-brand-coral: #EE754C;
+  --color-brand-coral-dark: #D65E36;
+  --color-brand-coral-light: #FDF3EF;
   --color-brand-dark: #252524;
   --color-brand-surface: #F6F8FA;
 }

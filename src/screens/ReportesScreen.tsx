@@ -343,7 +343,7 @@ export const ReportesScreen: React.FC = () => {
             onClick={() => setActiveTab('mes')}
             className={`px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer ${
               activeTab === 'mes'
-                ? 'bg-[#9EC84A] text-slate-950 shadow-xs ring-2 ring-[#9EC84A]/30'
+                ? 'bg-[#B0CC5D] text-slate-950 shadow-xs ring-2 ring-[#B0CC5D]/30'
                 : 'bg-white dark:bg-[#1A1F26] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800'
             }`}
           >
@@ -355,7 +355,7 @@ export const ReportesScreen: React.FC = () => {
             onClick={() => setActiveTab('semana')}
             className={`px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer ${
               activeTab === 'semana'
-                ? 'bg-[#9EC84A] text-slate-950 shadow-xs ring-2 ring-[#9EC84A]/30'
+                ? 'bg-[#B0CC5D] text-slate-950 shadow-xs ring-2 ring-[#B0CC5D]/30'
                 : 'bg-white dark:bg-[#1A1F26] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800'
             }`}
           >
@@ -367,7 +367,7 @@ export const ReportesScreen: React.FC = () => {
             onClick={() => setActiveTab('productos')}
             className={`px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer ${
               activeTab === 'productos'
-                ? 'bg-[#9EC84A] text-slate-950 shadow-xs ring-2 ring-[#9EC84A]/30'
+                ? 'bg-[#B0CC5D] text-slate-950 shadow-xs ring-2 ring-[#B0CC5D]/30'
                 : 'bg-white dark:bg-[#1A1F26] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800'
             }`}
           >

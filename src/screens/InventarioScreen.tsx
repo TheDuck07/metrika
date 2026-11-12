@@ -256,16 +256,16 @@ export const InventarioScreen: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowScannerModal(true)}
-              className="h-16 px-3 rounded-xl bg-[#EAF2F9] hover:bg-[#dcebf8] dark:bg-[#162738] dark:hover:bg-[#1c3248] border-2 border-[#1E70BA]/30 hover:border-[#1E70BA] active:scale-[0.98] transition-all flex items-center gap-2.5 text-left cursor-pointer shadow-2xs group"
+              className="h-16 px-3 rounded-xl bg-[#EAF3FA] hover:bg-[#dcebf8] dark:bg-[#162738] dark:hover:bg-[#1c3248] border-2 border-[#2B7BBE]/30 hover:border-[#2B7BBE] active:scale-[0.98] transition-all flex items-center gap-2.5 text-left cursor-pointer shadow-2xs group"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#1E70BA] text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-[#2B7BBE] text-white flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
                 <span className="material-symbols-outlined text-[22px]">photo_camera</span>
               </div>
               <div className="min-w-0">
                 <div className="text-xs font-black text-slate-900 dark:text-white leading-tight">
                   Con Cámara
                 </div>
-                <div className="text-[10px] font-bold text-[#1E70BA] dark:text-[#60A5FA] truncate mt-0.5">
+                <div className="text-[10px] font-bold text-[#2B7BBE] dark:text-[#60A5FA] truncate mt-0.5">
                   Foto / Escáner IA
                 </div>
               </div>
@@ -275,16 +275,16 @@ export const InventarioScreen: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowCreateModal(true)}
-              className="h-16 px-3 rounded-xl bg-[#F4F9EA] hover:bg-[#eaf4da] dark:bg-[#1F2C18] dark:hover:bg-[#28381e] border-2 border-[#9EC84A]/40 hover:border-[#9EC84A] active:scale-[0.98] transition-all flex items-center gap-2.5 text-left cursor-pointer shadow-2xs group"
+              className="h-16 px-3 rounded-xl bg-[#F4F8E8] hover:bg-[#eaf4da] dark:bg-[#1F2C18] dark:hover:bg-[#28381e] border-2 border-[#B0CC5D]/40 hover:border-[#B0CC5D] active:scale-[0.98] transition-all flex items-center gap-2.5 text-left cursor-pointer shadow-2xs group"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#9EC84A] text-slate-950 flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-[#B0CC5D] text-slate-950 flex items-center justify-center shadow-xs shrink-0 group-hover:scale-105 transition-transform">
                 <span className="material-symbols-outlined text-[22px] font-black">edit_note</span>
               </div>
               <div className="min-w-0">
                 <div className="text-xs font-black text-slate-900 dark:text-white leading-tight">
                   Modo Manual
                 </div>
-                <div className="text-[10px] font-bold text-[#4B7319] dark:text-[#A7CC44] truncate mt-0.5">
+                <div className="text-[10px] font-bold text-[#5B781E] dark:text-[#B0CC5D] truncate mt-0.5">
                   Escribir datos
                 </div>
               </div>
@@ -303,7 +303,7 @@ export const InventarioScreen: React.FC = () => {
               placeholder="Buscar producto o categoría..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-11 pl-10 pr-9 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#1A1F26] text-sm font-semibold text-[#252524] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#1E70BA] shadow-xs"
+              className="w-full h-11 pl-10 pr-9 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#1A1F26] text-sm font-semibold text-[#252524] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#2B7BBE] shadow-xs"
             />
             {searchQuery && (
               <button
@@ -320,7 +320,7 @@ export const InventarioScreen: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowScannerModal(true)}
-            className="w-11 h-11 rounded-2xl bg-[#EAF2F9] dark:bg-[#1E293B] text-[#1E70BA] dark:text-[#60A5FA] border border-blue-200/60 dark:border-slate-700 flex items-center justify-center shadow-xs cursor-pointer active:scale-95 transition-all shrink-0"
+            className="w-11 h-11 rounded-2xl bg-[#EAF3FA] dark:bg-[#1E293B] text-[#2B7BBE] dark:text-[#60A5FA] border border-blue-200/60 dark:border-slate-700 flex items-center justify-center shadow-xs cursor-pointer active:scale-95 transition-all shrink-0"
             title="Escanear con IA"
           >
             <span className="material-symbols-outlined text-[20px]">photo_camera</span>
@@ -334,7 +334,7 @@ export const InventarioScreen: React.FC = () => {
             onClick={() => setStockFilter('Todos')}
             className={`px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer ${
               stockFilter === 'Todos'
-                ? 'bg-[#9EC84A] text-slate-950 shadow-xs ring-2 ring-[#9EC84A]/30'
+                ? 'bg-[#B0CC5D] text-slate-950 shadow-xs ring-2 ring-[#B0CC5D]/30'
                 : 'bg-white dark:bg-[#1A1F26] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800'
             }`}
           >
@@ -346,7 +346,7 @@ export const InventarioScreen: React.FC = () => {
             onClick={() => setStockFilter('Con stock')}
             className={`px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer ${
               stockFilter === 'Con stock'
-                ? 'bg-[#9EC84A] text-slate-950 shadow-xs ring-2 ring-[#9EC84A]/30'
+                ? 'bg-[#B0CC5D] text-slate-950 shadow-xs ring-2 ring-[#B0CC5D]/30'
                 : 'bg-white dark:bg-[#1A1F26] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800'
             }`}
           >
@@ -358,7 +358,7 @@ export const InventarioScreen: React.FC = () => {
             onClick={() => setStockFilter('Stock bajo')}
             className={`px-4 py-2 rounded-full text-xs font-black transition-all cursor-pointer flex items-center gap-1 ${
               stockFilter === 'Stock bajo'
-                ? 'bg-[#EE6B4D] text-white shadow-xs'
+                ? 'bg-[#EE754C] text-white shadow-xs'
                 : 'bg-white dark:bg-[#1A1F26] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800'
             }`}
           >
