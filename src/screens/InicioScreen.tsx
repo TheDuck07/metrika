@@ -340,7 +340,7 @@ export const InicioScreen: React.FC = () => {
             </span>
           </div>
 
-          {/* 3 HERO ACTION CARDS - Responsive, ultra-estables en móvil sin desbordes */}
+          {/* 3 HERO ACTION CARDS - Destacadas con color unificado oficial de acción (#EE754C) en toda la tarjeta */}
           <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
             {/* OPCIÓN 1: CON CÁMARA */}
             <button
@@ -349,20 +349,20 @@ export const InicioScreen: React.FC = () => {
                 setProductScanMode('venta');
                 setShowProductScanModal(true);
               }}
-              className="bg-white dark:bg-[#1A1F26] hover:bg-slate-50 dark:hover:bg-[#202731] active:scale-95 text-[#252524] dark:text-white p-2 sm:p-3 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-between text-center shadow-xs hover:shadow-md border border-slate-200/90 dark:border-slate-800 transition-all cursor-pointer min-h-[140px] sm:min-h-[150px] overflow-hidden group"
+              className="bg-gradient-to-br from-[#EE754C] via-[#EE754C] to-[#DF6237] hover:brightness-105 active:scale-95 text-white p-2.5 sm:p-3 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-between text-center shadow-md shadow-orange-600/25 border border-orange-400/40 transition-all cursor-pointer min-h-[142px] sm:min-h-[152px] overflow-hidden group"
             >
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-[#EE754C] to-[#DB633A] text-white flex items-center justify-center shadow-sm shadow-orange-500/25 group-hover:scale-105 transition-transform mt-0.5 shrink-0">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/20 text-white flex items-center justify-center backdrop-blur-xs shadow-xs group-hover:scale-105 transition-transform mt-0.5 shrink-0 border border-white/20">
                 <span className="material-symbols-outlined text-[22px] sm:text-[24px]">photo_camera</span>
               </div>
               <div className="my-1 w-full px-0.5">
-                <span className="text-[11.5px] sm:text-xs font-black text-[#252524] dark:text-white leading-tight block truncate">
+                <span className="text-[12px] sm:text-xs font-black text-white leading-tight block truncate drop-shadow-xs">
                   Con Cámara
                 </span>
-                <span className="text-[9.5px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-medium block mt-0.5 truncate">
+                <span className="text-[10px] text-white/90 font-semibold block mt-0.5 truncate">
                   Foto mostrador
                 </span>
               </div>
-              <span className="text-[8px] sm:text-[8.5px] font-black uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-950/40 text-[#EE754C] dark:text-orange-300 border border-orange-200 dark:border-orange-900/60 leading-tight">
+              <span className="text-[8px] sm:text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full bg-white/20 text-white border border-white/35 backdrop-blur-xs leading-tight">
                 IA RÁPIDA
               </span>
             </button>
@@ -371,20 +371,20 @@ export const InicioScreen: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowVoiceModal(true)}
-              className="bg-white dark:bg-[#1A1F26] hover:bg-slate-50 dark:hover:bg-[#202731] active:scale-95 text-[#252524] dark:text-white p-2 sm:p-3 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-between text-center shadow-xs hover:shadow-md border border-slate-200/90 dark:border-slate-800 transition-all cursor-pointer min-h-[140px] sm:min-h-[150px] overflow-hidden group"
+              className="bg-gradient-to-br from-[#EE754C] via-[#EE754C] to-[#DF6237] hover:brightness-105 active:scale-95 text-white p-2.5 sm:p-3 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-between text-center shadow-md shadow-orange-600/25 border border-orange-400/40 transition-all cursor-pointer min-h-[142px] sm:min-h-[152px] overflow-hidden group"
             >
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-[#B0CC5D] to-[#92AF3D] text-white flex items-center justify-center shadow-sm shadow-lime-600/25 group-hover:scale-105 transition-transform mt-0.5 shrink-0">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/20 text-white flex items-center justify-center backdrop-blur-xs shadow-xs group-hover:scale-105 transition-transform mt-0.5 shrink-0 border border-white/20">
                 <span className="material-symbols-outlined text-[22px] sm:text-[24px]">mic</span>
               </div>
               <div className="my-1 w-full px-0.5">
-                <span className="text-[11.5px] sm:text-xs font-black text-[#252524] dark:text-white leading-tight block truncate">
+                <span className="text-[12px] sm:text-xs font-black text-white leading-tight block truncate drop-shadow-xs">
                   Por Voz
                 </span>
-                <span className="text-[9.5px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-medium block mt-0.5 truncate">
+                <span className="text-[10px] text-white/90 font-semibold block mt-0.5 truncate">
                   Di lo que vendes
                 </span>
               </div>
-              <span className="text-[8px] sm:text-[8.5px] font-black uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-lime-50 dark:bg-lime-950/40 text-[#5B781E] dark:text-[#B0CC5D] border border-lime-200 dark:border-lime-900/60 leading-tight">
+              <span className="text-[8px] sm:text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full bg-white/20 text-white border border-white/35 backdrop-blur-xs leading-tight">
                 AUTOMÁTICO
               </span>
             </button>
@@ -399,20 +399,20 @@ export const InicioScreen: React.FC = () => {
                 setCustomSaleAmount('');
                 setShowSaleModal(true);
               }}
-              className="bg-white dark:bg-[#1A1F26] hover:bg-slate-50 dark:hover:bg-[#202731] active:scale-95 text-[#252524] dark:text-white p-2 sm:p-3 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-between text-center shadow-xs hover:shadow-md border border-slate-200/90 dark:border-slate-800 transition-all cursor-pointer min-h-[140px] sm:min-h-[150px] overflow-hidden group"
+              className="bg-gradient-to-br from-[#EE754C] via-[#EE754C] to-[#DF6237] hover:brightness-105 active:scale-95 text-white p-2.5 sm:p-3 rounded-2xl sm:rounded-3xl flex flex-col items-center justify-between text-center shadow-md shadow-orange-600/25 border border-orange-400/40 transition-all cursor-pointer min-h-[142px] sm:min-h-[152px] overflow-hidden group"
             >
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-[#2B7BBE] to-[#1E609A] text-white flex items-center justify-center shadow-sm shadow-blue-500/25 group-hover:scale-105 transition-transform mt-0.5 shrink-0">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/20 text-white flex items-center justify-center backdrop-blur-xs shadow-xs group-hover:scale-105 transition-transform mt-0.5 shrink-0 border border-white/20">
                 <span className="material-symbols-outlined text-[22px] sm:text-[24px]">point_of_sale</span>
               </div>
               <div className="my-1 w-full px-0.5">
-                <span className="text-[11.5px] sm:text-xs font-black text-[#252524] dark:text-white leading-tight block truncate">
+                <span className="text-[12px] sm:text-xs font-black text-white leading-tight block truncate drop-shadow-xs">
                   Venta 2 Pasos
                 </span>
-                <span className="text-[9.5px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-medium block mt-0.5 truncate">
+                <span className="text-[10px] text-white/90 font-semibold block mt-0.5 truncate">
                   Toca y cobra
                 </span>
               </div>
-              <span className="text-[8px] sm:text-[8.5px] font-black uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-[#2B7BBE] dark:text-blue-300 border border-blue-200 dark:border-blue-900/60 leading-tight">
+              <span className="text-[8px] sm:text-[8.5px] font-black uppercase px-2 py-0.5 rounded-full bg-white/20 text-white border border-white/35 backdrop-blur-xs leading-tight">
                 MANUAL
               </span>
             </button>
